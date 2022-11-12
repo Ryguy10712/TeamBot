@@ -29,3 +29,21 @@ Slash commands can be made by making an instance of the DiscordCommand class (lo
 Listeners can be made through instances of the Discord Listener class (located at ./src/discord/DiscordListener). Look at ReadyListener (located at ./src/discord/Listeners/ReadyListener.ts) for example.
 
 
+
+HOW TO RUN/TEST
+-Have node.js installed
+To install the dependencies (located in package.json)
+    npm install
+
+You can test this bot through ts-node (typescript runtinme) or tsc (typescript compiler), but before making pull requests BE SURE that the bot runs properly with the typescript compiler.
+To test via ts-node you can either run this in the terminal:
+    ts-node ./src/Bot.ts
+Or run the Development Debug configuration provided in ./vscode/launch.json
+
+To test/run compiled typescript (tsc) you need to build first by either runinng this in the terminal
+    tsc ./src/Bot.ts
+Or running "tsc build" by pressing Ctrl+Shift+B on your keybaord. Once the program is compiled, you can run it by either running
+    node ./dist/Bot.js
+Or by running Production Launch provided in ./vscode/launch.json
+
+
