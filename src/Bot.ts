@@ -12,7 +12,7 @@ dotenv.config()
 export class TeamBot {
     public readonly client: Client
     public readonly commands: Map<String, DiscordCommand>
-    public rest: REST
+    public readonly rest: REST
 
     constructor(){
         this.rest = new REST({ version: '10' }).setToken(process.env.TOKEN!)
