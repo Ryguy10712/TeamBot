@@ -11,7 +11,7 @@ class ReadyListener extends DiscordListener_1.DiscordListener {
         teamBot.client.on("ready", async () => {
             console.log("Team Bot is ready");
             try {
-                const auth = { "Authorization": "Bot MTA0MDExNTg5MjI0NTIzNzg2MA.G0LUd3.qeLX1ZG6UTZooFiQaUZVsVvAZMEGNT-SiEL6JU" };
+                const auth = { "Authorization": `Bot ${process.env.TOKEN}` };
                 let inDevBody = [];
                 let body = [];
                 await teamBot.commands.forEach(command => {
@@ -27,7 +27,7 @@ class ReadyListener extends DiscordListener_1.DiscordListener {
                     await teamBot.rest.put(discord_js_1.Routes.applicationGuildCommands(process.env.APPLICATION_ID, process.env.TESTING_GUILD_ID), { headers: auth, body: inDevBody });
                 }
                 if (body.length) {
-                    await teamBot.rest.put(discord_js_1.Routes.applicationCommands("1040115892245237860"), { body: body });
+                    await teamBot.rest.put(discord_js_1.Routes.applicationCommands(process.env.APPLICATION_ID), { body: body });
                 }
             }
             catch (error) {
