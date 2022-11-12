@@ -11,6 +11,6 @@ export abstract class DiscordCommand {
   constructor(){
     this.properties = new SlashCommandBuilder()
   }
-
+  //code for the funtion goes here
   abstract executeInteraction(client: Client, interaction: CommandInteraction): any
 }
