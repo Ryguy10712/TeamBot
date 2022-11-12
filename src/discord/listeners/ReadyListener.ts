@@ -10,7 +10,7 @@ export class ReadyListener extends DiscordListener {
             console.log("Team Bot is ready")
 
             try{
-                const auth = {"Authorization": "Bot MTA0MDExNTg5MjI0NTIzNzg2MA.G0LUd3.qeLX1ZG6UTZooFiQaUZVsVvAZMEGNT-SiEL6JU"}
+                const auth = {"Authorization": `Bot ${process.env.TOKEN}`}
                 let inDevBody: Array<any> = []
                 let body: any = []
                 await teamBot.commands.forEach(command => {
@@ -30,7 +30,7 @@ export class ReadyListener extends DiscordListener {
                 } 
                 if(body.length){
                     await teamBot.rest.put(
-                        Routes.applicationCommands("1040115892245237860"),
+                        Routes.applicationCommands(process.env.APPLICATION_ID!),
                         {body: body}
                     )
                 }
