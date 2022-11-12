@@ -5,7 +5,7 @@ import dotenv from "dotenv"
 dotenv.config()
 
 export class ReadyListener extends DiscordListener {
-    registerListener(teamBot: TeamBot): void {
+    startListener(teamBot: TeamBot): void {
         teamBot.client.on("ready", async () => {
             console.log("Team Bot is ready")
 

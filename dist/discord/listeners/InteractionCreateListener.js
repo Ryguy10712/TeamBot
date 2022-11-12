@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InteractionCreateListener = void 0;
 const DiscordListener_1 = require("../DiscordListener");
 class InteractionCreateListener extends DiscordListener_1.DiscordListener {
-    registerListener(teamBot) {
+    startListener(teamBot) {
         teamBot.client.on("interactionCreate", (interaction) => {
             try {
                 if (interaction.isCommand()) {

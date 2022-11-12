@@ -12,7 +12,7 @@
         "<node_internals>/**",
         "./dist"
       ],
-      "program": "./src/Bot.ts",
+      "program": "${cwd}/src/Bot.ts",
 
       "runtimeExecutable": "ts-node"
     },
@@ -20,8 +20,8 @@
       "type": "node",
       "request": "launch",
       "name": "Production Launch",
-      "program": "./dist/Bot.js",
-      "runtimeExecutable": "node"
+      "program": "${cwd}/dist/Bot.js",
+      "runtimeExecutable": "node",
     }
   ]
 }

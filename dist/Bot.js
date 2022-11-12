@@ -28,7 +28,7 @@ class TeamBot {
         await this.client.login(process.env.TOKEN);
     }
     registerListener(discordListener) {
-        discordListener.registerListener(this);
+        discordListener.startListener(this);
     }
     async registerCommand(discordCommand) {
         this.commands.set(discordCommand.properties.name, discordCommand);

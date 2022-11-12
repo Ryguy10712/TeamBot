@@ -7,7 +7,7 @@ const discord_js_1 = require("discord.js");
 const dotenv_1 = tslib_1.__importDefault(require("dotenv"));
 dotenv_1.default.config();
 class ReadyListener extends DiscordListener_1.DiscordListener {
-    registerListener(teamBot) {
+    startListener(teamBot) {
         teamBot.client.on("ready", async () => {
             console.log("Team Bot is ready");
             try {

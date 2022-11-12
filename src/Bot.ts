@@ -33,7 +33,7 @@ export class TeamBot {
     }
 
     registerListener(discordListener: DiscordListener): void {
-        discordListener.registerListener(this)
+        discordListener.startListener(this)
     }
     async registerCommand(discordCommand: DiscordCommand) {
         this.commands.set(discordCommand.properties.name, discordCommand)
