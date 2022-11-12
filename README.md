@@ -15,7 +15,7 @@ Once this request is accepted by a captain, individual team members on both team
 POSSIBLE FEATURES
 
 -Scheduling takes account for occupied servers
-The bot will show what servers are taken by looking at scheduled times by other teams. Do not rely on this as teh #confirmed-tiemes channel in the PCL discord where servers are officially occupied.
+The bot will show what servers are taken by looking at scheduled times by other teams. Do not rely on this as the #confirmed-times channel in the PCL discord where servers are officially occupied.
 
 
 HOW TO CONTRIBUTE
