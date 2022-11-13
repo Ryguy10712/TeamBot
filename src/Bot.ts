@@ -7,6 +7,7 @@ import { InteractionCreateListener } from "./discord/listeners/InteractionCreate
 import {PingCommand} from "./discord/commands/PingCommand"
 import { PongCommand } from "./discord/commands/PongCommand"
 import fs from "fs"
+import RegisterCommand from "./discord/commands/RegisterCommand"
 dotenv.config()
 
 
@@ -23,10 +24,11 @@ export class TeamBot {
         });
         this.commands = new Map<string, DiscordCommand>();
         
-        
         this.registerListener(new ReadyListener);
         this.registerListener(new InteractionCreateListener)
 
+        
+        this.initCommand(new RegisterCommand());
       
         
     }
