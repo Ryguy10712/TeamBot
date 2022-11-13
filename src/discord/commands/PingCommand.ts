@@ -18,3 +18,4 @@ export class PingCommand extends DiscordCommand {
        interaction.reply("Pong!")
    }
 }
+

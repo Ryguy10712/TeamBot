@@ -1,4 +1,4 @@
-import {ApplicationCommandOptionType, Client, REST, Routes, SlashCommandBuilder} from "discord.js"
+import {chatInputApplicationCommandMention, Client, REST, Routes, SystemChannelFlagsBitField} from "discord.js"
 import dotenv from "dotenv"
 import { DiscordCommand } from "./discord/DiscordCommand"
 import {DiscordListener} from "./discord/DiscordListener"
@@ -6,6 +6,7 @@ import { ReadyListener } from "./discord/listeners/ReadyListener"
 import { InteractionCreateListener } from "./discord/listeners/InteractionCreateListener"
 import {PingCommand} from "./discord/commands/PingCommand"
 import { PongCommand } from "./discord/commands/PongCommand"
+import fs from "fs"
 dotenv.config()
 
 
@@ -21,11 +22,13 @@ export class TeamBot {
             intents: ["Guilds", "GuildMembers", "MessageContent", "GuildMessages", "DirectMessages", "GuildMessageReactions", "DirectMessageReactions"],
         });
         this.commands = new Map<string, DiscordCommand>();
-        this.registerCommand(new PingCommand())
-        this.registerCommand(new PongCommand())
+        
         
         this.registerListener(new ReadyListener);
         this.registerListener(new InteractionCreateListener)
+
+      
+        
     }
 
     async start(): Promise<void> {
@@ -35,10 +38,13 @@ export class TeamBot {
     registerListener(discordListener: DiscordListener): void {
         discordListener.startListener(this)
     }
-    async registerCommand(discordCommand: DiscordCommand) {
+
+    initCommand(discordCommand: DiscordCommand){
         this.commands.set(discordCommand.properties.name, discordCommand)
     }
+
 }
+
 
 (async () => {
     try{
