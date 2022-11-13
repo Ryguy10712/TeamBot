@@ -1,13 +1,13 @@
 import PCLPlayer from "./PCLPlayer"
-enum Ranks {
+export enum Ranks {
     GOLD,
     SILVER,
     BRONZE
 }
 
-export default interface PCLTeam {
+export interface PCLTeam {
     players: PCLPlayer[];
-    rank: Ranks
+    rank: Ranks | undefined
     guildID: string,
     isWeeklySchedulingPollsEnabled: boolean
 }
