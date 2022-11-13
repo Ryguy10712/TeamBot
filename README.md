@@ -2,6 +2,7 @@
 A discord bot that helps with effective scheduling between teams
 
 Github formatting is annoying, please read this here:  https://github.com/Ryguy10712/TeamBot/blob/main/README.md?plain=1
+BE SURE TO CHECK OUT THE DEVELOPMENT BRANCH
 
 
 PLANNED FEATURES
