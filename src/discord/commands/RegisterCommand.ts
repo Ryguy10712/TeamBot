@@ -10,7 +10,7 @@ export default class RegisterCommand extends DiscordCommand {
         this.properties
             .setName("register")
             .setDescription("registers player and/or team")
-            .addStringOption(new SlashCommandStringOption().setName("oculusid").setDescription("your oculus username in exact casing"));
+            .addStringOption(new SlashCommandStringOption().setName("oculusid").setDescription("your oculus username in exact casing").setRequired(true));
     }
 
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>) {
@@ -41,7 +41,14 @@ export default class RegisterCommand extends DiscordCommand {
                 }
             } else {
                 //at this point, the user has not registered their discord
-                registeredPlayers.push({ discordID: interaction.user.id, oculusId: optionResponse, isCaptain: undefined, isCoCap: undefined, team: undefined });
+                registeredPlayers.push({
+                    discordID: interaction.user.id,
+                    oculusId: optionResponse,
+                    isCaptain: undefined,
+                    isCoCap: undefined,
+                    team: undefined,
+                    isBotAdmin: undefined,
+                });
                 fs.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
                 await interaction.reply("Sucessfully registered");
             }
