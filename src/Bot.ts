@@ -9,6 +9,7 @@ import { PongCommand } from "./discord/commands/PongCommand";
 import fs from "fs";
 import RegisterCommand from "./discord/commands/RegisterCommand";
 import RegisterTeamCommand from "./discord/commands/RegisterTeamCommand";
+import PCLPlayer from "./interfaces/PCLPlayer";
 dotenv.config();
 
 export class TeamBot {
@@ -42,6 +43,20 @@ export class TeamBot {
 
     initCommand(discordCommand: DiscordCommand) {
         this.commands.set(discordCommand.properties.name, discordCommand);
+    }
+
+    findPCLPlayerByDiscord(discordId: string): PCLPlayer | undefined {
+        const registeredPlayers: PCLPlayer[] = JSON.parse(fs.readFileSync("./db/registeredPlayers.json", "utf-8"));
+        return registeredPlayers.find((PCLPlayer) => {
+            return PCLPlayer.discordID === discordId;
+        });
+    }
+
+    findPCLPlayerByOculus(oculusId: string): PCLPlayer | undefined {
+        const registeredPlayers: PCLPlayer[] = JSON.parse(fs.readFileSync("./db/registeredPlayers.json", "utf-8"));
+        return registeredPlayers.find((PCLPlayer) => {
+            return PCLPlayer.oculusId === oculusId;
+        });
     }
 }
 
