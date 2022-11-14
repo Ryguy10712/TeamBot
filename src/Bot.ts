@@ -8,6 +8,7 @@ import { PingCommand } from "./discord/commands/PingCommand";
 import { PongCommand } from "./discord/commands/PongCommand";
 import fs from "fs";
 import RegisterCommand from "./discord/commands/RegisterCommand";
+import RegisterTeamCommand from "./discord/commands/RegisterTeamCommand";
 dotenv.config();
 
 export class TeamBot {
@@ -26,7 +27,9 @@ export class TeamBot {
         this.registerListener(new ReadyListener());
         this.registerListener(new InteractionCreateListener());
 
+        //initializing all commands
         this.initCommand(new RegisterCommand());
+        this.initCommand(new RegisterTeamCommand());
     }
 
     async start(): Promise<void> {
