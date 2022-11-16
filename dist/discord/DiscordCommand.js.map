@@ -1,1 +1,1 @@
-{"version":3,"file":"DiscordCommand.js","sourceRoot":"","sources":["../../src/discord/DiscordCommand.ts"],"names":[],"mappings":";;;AAAA,2CAIoB;AAEpB,MAAsB,cAAc;IAC3B,UAAU,CAAqB;IAOtC;QACE,IAAI,CAAC,UAAU,GAAG,IAAI,gCAAmB,EAAE,CAAA;IAC7C,CAAC;CAGF;AAbD,wCAaC"}
+{"version":3,"file":"DiscordCommand.js","sourceRoot":"","sources":["../../src/discord/DiscordCommand.ts"],"names":[],"mappings":";;;AAAA,2CAMoB;AAGpB,MAAsB,cAAc;IAC3B,UAAU,GAAuB,EAAE,CAAC;IACpC,UAAU,GAAwB,IAAI,gCAAmB,EAAE,CAAC;CAUpE;AAZD,wCAYC"}

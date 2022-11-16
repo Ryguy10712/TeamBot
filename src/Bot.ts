@@ -32,7 +32,7 @@ export class TeamBot {
         this.initCommand(new RegisterCommand());
         this.initCommand(new RegisterTeamCommand());
     }
-
+    
     async start(): Promise<void> {
         await this.client.login(process.env.TOKEN);
     }
