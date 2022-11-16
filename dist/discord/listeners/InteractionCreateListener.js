@@ -7,7 +7,7 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
         teamBot.client.on("interactionCreate", (interaction) => {
             try {
                 if (interaction.isCommand()) {
-                    teamBot.commands.get(interaction.commandName)?.executeInteraction(teamBot.client, interaction);
+                    teamBot.commands.get(interaction.commandName)?.executeInteraction(teamBot.client, interaction, teamBot);
                 }
             }
             catch (e) {
