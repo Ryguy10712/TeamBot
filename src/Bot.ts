@@ -31,6 +31,8 @@ export class TeamBot {
         //initializing all commands
         this.initCommand(new RegisterCommand());
         this.initCommand(new RegisterTeamCommand());
+        this.initCommand(new PingCommand());
+        this.initCommand(new PongCommand());
     }
     
     async start(): Promise<void> {

@@ -6,6 +6,8 @@ const discord_js_1 = require("discord.js");
 const dotenv_1 = tslib_1.__importDefault(require("dotenv"));
 const ReadyListener_1 = require("./discord/listeners/ReadyListener");
 const InteractionCreateListener_1 = require("./discord/listeners/InteractionCreateListener");
+const PingCommand_1 = require("./discord/commands/PingCommand");
+const PongCommand_1 = require("./discord/commands/PongCommand");
 const fs_1 = tslib_1.__importDefault(require("fs"));
 const RegisterCommand_1 = tslib_1.__importDefault(require("./discord/commands/RegisterCommand"));
 const RegisterTeamCommand_1 = tslib_1.__importDefault(require("./discord/commands/RegisterTeamCommand"));
@@ -24,6 +26,8 @@ class TeamBot {
         this.registerListener(new InteractionCreateListener_1.InteractionCreateListener());
         this.initCommand(new RegisterCommand_1.default());
         this.initCommand(new RegisterTeamCommand_1.default());
+        this.initCommand(new PingCommand_1.PingCommand());
+        this.initCommand(new PongCommand_1.PongCommand());
     }
     async start() {
         await this.client.login(process.env.TOKEN);
