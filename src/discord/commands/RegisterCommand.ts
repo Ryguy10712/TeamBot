@@ -1,4 +1,4 @@
-import { Client, CommandInteraction, CacheType, SlashCommandStringOption } from "discord.js";
+import { Client, CommandInteraction, CacheType, SlashCommandStringOption, ActionRowBuilder } from "discord.js";
 import { DiscordCommand } from "../DiscordCommand";
 import fs from "fs";
 import PCLPlayer from "../../interfaces/PCLPlayer";
@@ -10,7 +10,7 @@ export default class RegisterCommand extends DiscordCommand {
         this.properties
             .setName("register")
             .setDescription("registers player and/or team")
-            .addStringOption(new SlashCommandStringOption().setName("oculusid").setDescription("your oculus username in exact casing").setRequired(true));
+            .addStringOption(new SlashCommandStringOption().setName("oculusid").setDescription("your oculus username in exact casing").setRequired(true)); 
     }
 
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>) {
