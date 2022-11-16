@@ -124,14 +124,14 @@ export default class RegisterTeamCommand extends DiscordCommand {
             ? true
             : false;
         coCaptainOnTeamFlag = registeredTeams.some((PCLTeam) => {
-            return PCLTeam.captain === cocap || PCLTeam.coCap === cocap;
+            return PCLTeam.captain === team.coCap || PCLTeam.coCap === team.coCap;
         })
             ? true
             : false;
         //then push the team to registeredTeams
         registeredTeams.push(team);
         fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
-        RegisterTeamEmbeds.TeamCreateSuccess.addFields({
+        RegisterTeamEmbeds.TeamCreateSuccess.setFields({
             name: "Success:",
             value: `Team **${teamName}** has been created with the following: \n **Co-Captain:** <@${team.coCap?.discordID}> \n **Rank:** ${
                 interaction.options.get("rank")?.value
@@ -141,16 +141,16 @@ export default class RegisterTeamCommand extends DiscordCommand {
         if (captainOnTeamFlag)
             await interaction.followUp({
                 embeds: [
-                    RegisterTeamEmbeds.MultipleTeamsWarning.addFields({
+                    RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
                         name: "Warning",
                         value: "You are already captain of a team. This isn't breaking anything, just be sure to delete your old team when it's time.",
                     }),
                 ],
             });
-        if (coCaptainOnTeamFlag) if (team.coCap === undefined) return;
+        if (coCaptainOnTeamFlag && team.coCap != undefined)
         await interaction.followUp({
             embeds: [
-                RegisterTeamEmbeds.MultipleTeamsWarning.addFields({
+                RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
                     name: "Warning",
                     value: "Your Co-Captain is already on a team. This won't break anything, just be sure to have them leave the team when the time comes.",
                 }),
