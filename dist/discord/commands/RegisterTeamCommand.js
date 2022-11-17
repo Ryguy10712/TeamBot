@@ -36,7 +36,7 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
         if (!player)
             return interaction.reply({ embeds: [RegisterTeamEmbeds.NotRegisteredError] });
         if (registeredTeams.some((PCLTeam) => {
-            return PCLTeam.name == teamName;
+            return PCLTeam.name.toLowerCase() == teamName.toLowerCase();
         }))
             return interaction.reply({ embeds: [RegisterTeamEmbeds.TeamNameMatchError] });
         if (discordResponse) {
@@ -45,20 +45,22 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
         else if (stringResponse) {
             cocap = teamBot.findPCLPlayerByOculus(stringResponse);
         }
-        if (cocap === undefined && discordResponse && stringResponse)
+        if (cocap === undefined && discordResponse || stringResponse)
             return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
         let team = {
-            captain: player,
-            coCap: cocap,
-            players: [player],
+            captain: player.discordID,
+            coCap: undefined,
+            players: [player.discordID],
             rank: undefined,
             guildID: undefined,
             isWeeklySchedulingPollsEnabled: undefined,
             confidential: confidentiality,
             name: teamName,
         };
-        if (cocap)
-            team.players.push(cocap);
+        if (cocap) {
+            team.players.push(cocap.discordID);
+            team.coCap = cocap.discordID;
+        }
         switch (interaction.options.get("rank")?.value) {
             case "Gold":
                 team.rank = PCLTeam_1.Ranks.GOLD;
@@ -70,7 +72,7 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
                 team.rank = PCLTeam_1.Ranks.BRONZE;
         }
         captainOnTeamFlag = registeredTeams.some((PCLTeam) => {
-            return PCLTeam.captain === player || PCLTeam.coCap === player;
+            return PCLTeam.captain === player.discordID || PCLTeam.coCap === player.discordID;
         })
             ? true
             : false;
@@ -83,11 +85,11 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
         fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
         RegisterTeamEmbeds.TeamCreateSuccess.setFields({
             name: "Success:",
-            value: `Team **${teamName}** has been created with the following: \n **Co-Captain:** <@${team.coCap?.discordID}> \n **Rank:** ${interaction.options.get("rank")?.value}`,
+            value: `Team **${teamName}** has been created with the following: \n **Co-Captain:** <@${team.coCap}> \n **Rank:** ${interaction.options.get("rank")?.value}`,
         });
         await interaction.reply({ embeds: [RegisterTeamEmbeds.TeamCreateSuccess] });
         if (captainOnTeamFlag)
-            await interaction.followUp({
+            await interaction.channel?.send({
                 embeds: [
                     RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
                         name: "Warning",
@@ -96,7 +98,7 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
                 ],
             });
         if (coCaptainOnTeamFlag && team.coCap != undefined)
-            await interaction.followUp({
+            await interaction.channel?.send({
                 embeds: [
                     RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
                         name: "Warning",

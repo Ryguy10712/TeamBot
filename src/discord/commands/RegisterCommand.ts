@@ -42,7 +42,7 @@ export default class RegisterCommand extends DiscordCommand {
                     //registered user re-registered with the same oculusid
                     await interaction.reply({embeds: [Embeds.IdMatchError.setFields({name: "Failed:", value: "You are already registered with that username!"})]});
                 }
-            } else if(registeredPlayers.some((player => {return player.oculusId === optionResponse}))) return (interaction.reply({embeds: [Embeds.UserNameExistsError]})) 
+            } else if(registeredPlayers.some((player => {return player.oculusId.toLowerCase() === optionResponse.toLowerCase()}))) return (interaction.reply({embeds: [Embeds.UserNameExistsError]})) 
             else {
                 //at this point, the user has not registered their discord
                 registeredPlayers.push({
