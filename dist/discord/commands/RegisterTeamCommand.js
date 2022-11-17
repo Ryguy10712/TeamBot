@@ -45,8 +45,12 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
         else if (stringResponse) {
             cocap = teamBot.findPCLPlayerByOculus(stringResponse);
         }
-        if (cocap === undefined && discordResponse || stringResponse)
-            return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
+        if (cocap === undefined) {
+            if (discordResponse)
+                return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
+            if (stringResponse)
+                return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
+        }
         let team = {
             captain: player.discordID,
             coCap: undefined,

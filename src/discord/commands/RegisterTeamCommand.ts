@@ -74,8 +74,10 @@ export default class RegisterTeamCommand extends DiscordCommand {
             cocap = teamBot.findPCLPlayerByOculus(stringResponse)!;
         }
         //terminate if cocap isnt found, and user has provided one
-        if (cocap! === undefined && discordResponse || stringResponse) return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
-
+        if (cocap! === undefined) {
+            if (discordResponse) return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
+            if (stringResponse) return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
+        }
         let team: PCLTeam = {
             captain: player.discordID,
             coCap: undefined,
@@ -88,7 +90,7 @@ export default class RegisterTeamCommand extends DiscordCommand {
         };
         if (cocap!) {
             team.players.push(cocap.discordID);
-            team.coCap = cocap.discordID
+            team.coCap = cocap.discordID;
         }
         //determine team rank
         switch (interaction.options.get("rank")?.value) {
@@ -151,13 +153,13 @@ export default class RegisterTeamCommand extends DiscordCommand {
                 ],
             });
         if (coCaptainOnTeamFlag && team.coCap != undefined)
-        await interaction.channel?.send({
-            embeds: [
-                RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
-                    name: "Warning",
-                    value: "Your Co-Captain is already on a team. This won't break anything, just be sure to have them leave the team when the time comes.",
-                }),
-            ],
-        });
+            await interaction.channel?.send({
+                embeds: [
+                    RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
+                        name: "Warning",
+                        value: "Your Co-Captain is already on a team. This won't break anything, just be sure to have them leave the team when the time comes.",
+                    }),
+                ],
+            });
     }
 }
