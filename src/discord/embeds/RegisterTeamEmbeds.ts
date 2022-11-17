@@ -1,5 +1,5 @@
 import { TeamBot } from "../../Bot";
-import { Embed, EmbedBuilder } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 
 //INFO EMBEDS
 export const GuildConfirmationEmbed = new EmbedBuilder()
