@@ -23,7 +23,6 @@ class ReadyListener extends DiscordListener_1.DiscordListener {
                     }
                 });
                 if (inDevBody.length) {
-                    console.log(inDevBody);
                     await teamBot.rest.put(discord_js_1.Routes.applicationGuildCommands(process.env.APPLICATION_ID, process.env.TESTING_GUILD_ID), { headers: auth, body: inDevBody });
                 }
                 if (body.length) {

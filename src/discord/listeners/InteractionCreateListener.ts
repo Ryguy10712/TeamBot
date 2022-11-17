@@ -6,7 +6,7 @@ export class InteractionCreateListener extends DiscordListener {
         teamBot.client.on("interactionCreate", (interaction) =>{
             try {
                 if(interaction.isCommand()) {
-                    teamBot.commands.get(interaction.commandName)?.executeInteraction(teamBot.client, interaction)
+                    teamBot.commands.get(interaction.commandName)?.executeInteraction(teamBot.client, interaction, teamBot)
                 }
             } catch (e) {
                 console.error(e)

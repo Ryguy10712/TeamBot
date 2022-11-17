@@ -22,7 +22,6 @@ export class ReadyListener extends DiscordListener {
                 })
 
                 if(inDevBody.length){
-                    console.log(inDevBody)
                     await teamBot.rest.put(
                         Routes.applicationGuildCommands(process.env.APPLICATION_ID!, process.env.TESTING_GUILD_ID!),
                         {headers: auth, body: inDevBody}
