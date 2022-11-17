@@ -7,11 +7,11 @@ export enum Ranks {
 
 export interface PCLTeam {
     name: string
-    players: PCLPlayer[];
+    players: string[];
     rank: Ranks | undefined
     guildID: string | undefined,
     confidential: boolean
     isWeeklySchedulingPollsEnabled: boolean | undefined,
-    captain: PCLPlayer,
-    coCap: PCLPlayer | undefined
+    captain: string
+    coCap: string | undefined
 }
