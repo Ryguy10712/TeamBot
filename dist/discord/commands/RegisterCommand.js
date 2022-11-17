@@ -25,19 +25,25 @@ class RegisterCommand extends DiscordCommand_1.DiscordCommand {
             const PCLPLayer = registeredPlayers.find((PCLPlayer) => {
                 return PCLPlayer.discordID === interaction.user.id;
             });
+            if (registeredPlayers.some((PCLPLayer) => {
+                return PCLPLayer.oculusId.toLowerCase() === optionResponse.toLowerCase();
+            }))
+                return interaction.reply({ embeds: [Embeds.UserNameExistsError] });
             if (PCLPLayer) {
                 const index = registeredPlayers.indexOf(PCLPLayer);
                 if (PCLPLayer.oculusId != optionResponse) {
                     registeredPlayers[index].oculusId = optionResponse;
                     fs_1.default.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
-                    await interaction.reply({ embeds: [Embeds.UpdateSuccess.setFields({ name: "Success:", value: `Your username has been updated to ${optionResponse}` })] });
+                    await interaction.reply({
+                        embeds: [Embeds.UpdateSuccess.setFields({ name: "Success:", value: `Your username has been updated to **${optionResponse}**` })],
+                    });
                 }
                 else {
-                    await interaction.reply({ embeds: [Embeds.IdMatchError.setFields({ name: "Failed:", value: "You are already registered with that username!" })] });
+                    await interaction.reply({
+                        embeds: [Embeds.IdMatchError.setFields({ name: "Failed:", value: "You are already registered with that username!" })],
+                    });
                 }
             }
-            else if (registeredPlayers.some((player => { return player.oculusId.toLowerCase() === optionResponse.toLowerCase(); })))
-                return (interaction.reply({ embeds: [Embeds.UserNameExistsError] }));
             else {
                 registeredPlayers.push({
                     discordID: interaction.user.id,
@@ -48,7 +54,9 @@ class RegisterCommand extends DiscordCommand_1.DiscordCommand {
                     isBotAdmin: undefined,
                 });
                 fs_1.default.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
-                await interaction.reply({ embeds: [Embeds.RegisterSuccess.setFields({ name: "Success", value: "Successfully registered as " + optionResponse })] });
+                await interaction.reply({
+                    embeds: [Embeds.RegisterSuccess.setFields({ name: "Success", value: "Successfully registered as **" + optionResponse + "**" })],
+                });
             }
         }
     }

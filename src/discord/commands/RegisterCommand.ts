@@ -2,7 +2,7 @@ import { Client, CommandInteraction, CacheType, SlashCommandStringOption } from 
 import { DiscordCommand } from "../DiscordCommand";
 import fs from "fs";
 import PCLPlayer from "../../interfaces/PCLPlayer";
-import * as Embeds from "../embeds/RegisterEmbeds"
+import * as Embeds from "../embeds/RegisterEmbeds";
 import { isoculusidClean } from "../../utils/StringSanatizers";
 
 export default class RegisterCommand extends DiscordCommand {
@@ -12,15 +12,14 @@ export default class RegisterCommand extends DiscordCommand {
         this.properties
             .setName("register")
             .setDescription("registers player and/or team")
-            .addStringOption(new SlashCommandStringOption().setName("oculusid").setDescription("your oculus username in exact casing").setRequired(true)); 
+            .addStringOption(new SlashCommandStringOption().setName("oculusid").setDescription("your oculus username in exact casing").setRequired(true));
     }
 
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>) {
         const optionResponse = interaction.options.get("oculusid")?.value as string;
 
-
         if (!isoculusidClean(optionResponse)) {
-            return interaction.reply({embeds: [Embeds.InvalidIdError]});
+            return interaction.reply({ embeds: [Embeds.InvalidIdError] });
         }
 
         if (interaction.options.get("oculusid")?.value) {
@@ -28,6 +27,14 @@ export default class RegisterCommand extends DiscordCommand {
             const PCLPLayer = registeredPlayers.find((PCLPlayer) => {
                 return PCLPlayer.discordID === interaction.user.id;
             });
+
+            //terminate if username already exits
+            if (
+                registeredPlayers.some((PCLPLayer) => {
+                    return PCLPLayer.oculusId.toLowerCase() === optionResponse.toLowerCase();
+                })
+            )
+                return interaction.reply({ embeds: [Embeds.UserNameExistsError] });
 
             if (PCLPLayer) {
                 //at this point, the user has registered their discord
@@ -37,13 +44,16 @@ export default class RegisterCommand extends DiscordCommand {
                     //user is already registered, but has changed oculus username
                     registeredPlayers[index].oculusId = optionResponse;
                     fs.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
-                    await interaction.reply({embeds: [Embeds.UpdateSuccess.setFields({name: "Success:", value: `Your username has been updated to ${optionResponse}`})]});
+                    await interaction.reply({
+                        embeds: [Embeds.UpdateSuccess.setFields({ name: "Success:", value: `Your username has been updated to **${optionResponse}**` })],
+                    });
                 } else {
                     //registered user re-registered with the same oculusid
-                    await interaction.reply({embeds: [Embeds.IdMatchError.setFields({name: "Failed:", value: "You are already registered with that username!"})]});
+                    await interaction.reply({
+                        embeds: [Embeds.IdMatchError.setFields({ name: "Failed:", value: "You are already registered with that username!" })],
+                    });
                 }
-            } else if(registeredPlayers.some((player => {return player.oculusId.toLowerCase() === optionResponse.toLowerCase()}))) return (interaction.reply({embeds: [Embeds.UserNameExistsError]})) 
-            else {
+            } else {
                 //at this point, the user has not registered their discord
                 registeredPlayers.push({
                     discordID: interaction.user.id,
@@ -54,7 +64,9 @@ export default class RegisterCommand extends DiscordCommand {
                     isBotAdmin: undefined,
                 });
                 fs.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
-                await interaction.reply({embeds: [Embeds.RegisterSuccess.setFields({name: "Success", value: "Successfully registered as " + optionResponse})]});
+                await interaction.reply({
+                    embeds: [Embeds.RegisterSuccess.setFields({ name: "Success", value: "Successfully registered as **" + optionResponse + "**" })],
+                });
             }
         }
     }
