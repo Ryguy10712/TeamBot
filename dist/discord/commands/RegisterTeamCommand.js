@@ -7,7 +7,7 @@ const fs_1 = tslib_1.__importDefault(require("fs"));
 const DiscordCommand_1 = require("../DiscordCommand");
 const RegisterTeamEmbeds = tslib_1.__importStar(require("../embeds/RegisterTeamEmbeds"));
 class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
-    inDev = true;
+    inDev = false;
     constructor() {
         super();
         this.properties

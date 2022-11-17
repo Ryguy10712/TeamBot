@@ -21,7 +21,7 @@ import { TeamBot } from "../../Bot";
 import * as RegisterTeamEmbeds from "../embeds/RegisterTeamEmbeds";
 
 export default class RegisterTeamCommand extends DiscordCommand {
-    public inDev: boolean = true;
+    public inDev: boolean = false;
 
     constructor() {
         super();
