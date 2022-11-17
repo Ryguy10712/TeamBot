@@ -13,7 +13,7 @@ exports.InvalidIdError = new discord_js_1.EmbedBuilder()
     .setTitle("That's not your name...")
     .setFields({
     name: "Failed:",
-    value: "Oculus usernames can only contain numbers, letters, periods, and underscores",
+    value: "Oculus usernames must be 3-15 characters, and can only contain letters, numbers, periods, and underscores",
 })
     .setColor("Red");
 exports.IdMatchError = new discord_js_1.EmbedBuilder()
