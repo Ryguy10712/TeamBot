@@ -1,7 +1,9 @@
-import { Client, CommandInteraction, CacheType, SlashCommandStringOption, ActionRowBuilder } from "discord.js";
+import { Client, CommandInteraction, CacheType, SlashCommandStringOption } from "discord.js";
 import { DiscordCommand } from "../DiscordCommand";
 import fs from "fs";
 import PCLPlayer from "../../interfaces/PCLPlayer";
+import * as Embeds from "../embeds/RegisterEmbeds"
+import { isoculusidClean } from "../../utils/StringSanatizers";
 
 export default class RegisterCommand extends DiscordCommand {
     public inDev: boolean = true;
@@ -16,8 +18,9 @@ export default class RegisterCommand extends DiscordCommand {
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>) {
         const optionResponse = interaction.options.get("oculusid")?.value as string;
 
-        if (optionResponse.includes(" ")) {
-            return interaction.reply("Invalid Username: Oculus usernames cannot have spaces.");
+
+        if (!isoculusidClean(optionResponse)) {
+            return interaction.reply({embeds: [Embeds.InvalidIdError]});
         }
 
         if (interaction.options.get("oculusid")?.value) {
@@ -34,12 +37,13 @@ export default class RegisterCommand extends DiscordCommand {
                     //user is already registered, but has changed oculus username
                     registeredPlayers[index].oculusId = optionResponse;
                     fs.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
-                    await interaction.reply("Your oculus username has been updated successfully");
+                    await interaction.reply({embeds: [Embeds.UpdateSuccess.setFields({name: "Success:", value: `Your username has been updated to ${optionResponse}`})]});
                 } else {
                     //registered user re-registered with the same oculusid
-                    await interaction.reply("No need to re-register, you are already registered as " + optionResponse);
+                    await interaction.reply({embeds: [Embeds.IdMatchError.setFields({name: "Failed:", value: "You are already registered with that username!"})]});
                 }
-            } else {
+            } else if(registeredPlayers.some((player => {return player.oculusId === optionResponse}))) return (interaction.reply({embeds: [Embeds.UserNameExistsError]})) 
+            else {
                 //at this point, the user has not registered their discord
                 registeredPlayers.push({
                     discordID: interaction.user.id,
@@ -50,7 +54,7 @@ export default class RegisterCommand extends DiscordCommand {
                     isBotAdmin: undefined,
                 });
                 fs.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
-                await interaction.reply("Sucessfully registered");
+                await interaction.reply({embeds: [Embeds.RegisterSuccess.setFields({name: "Success", value: "Successfully registered as " + optionResponse})]});
             }
         }
     }
