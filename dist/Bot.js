@@ -11,6 +11,7 @@ const PongCommand_1 = require("./discord/commands/PongCommand");
 const fs_1 = tslib_1.__importDefault(require("fs"));
 const RegisterCommand_1 = tslib_1.__importDefault(require("./discord/commands/RegisterCommand"));
 const RegisterTeamCommand_1 = tslib_1.__importDefault(require("./discord/commands/RegisterTeamCommand"));
+const TeamConfigCommand_1 = tslib_1.__importDefault(require("./discord/commands/TeamConfigCommand"));
 dotenv_1.default.config();
 class TeamBot {
     client;
@@ -26,6 +27,7 @@ class TeamBot {
         this.registerListener(new InteractionCreateListener_1.InteractionCreateListener());
         this.initCommand(new RegisterCommand_1.default());
         this.initCommand(new RegisterTeamCommand_1.default());
+        this.initCommand(new TeamConfigCommand_1.default());
         this.initCommand(new PingCommand_1.PingCommand());
         this.initCommand(new PongCommand_1.PongCommand());
     }
@@ -48,6 +50,12 @@ class TeamBot {
         const registeredPlayers = JSON.parse(fs_1.default.readFileSync("./db/registeredPlayers.json", "utf-8"));
         return registeredPlayers.find((PCLPlayer) => {
             return PCLPlayer.oculusId === oculusId;
+        });
+    }
+    findTeamByCoCap(discordId) {
+        const registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
+        return registeredTeams.find((PCLTeam) => {
+            return PCLTeam.captain === discordId;
         });
     }
 }

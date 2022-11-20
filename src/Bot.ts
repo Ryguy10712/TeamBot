@@ -10,6 +10,8 @@ import fs from "fs";
 import RegisterCommand from "./discord/commands/RegisterCommand";
 import RegisterTeamCommand from "./discord/commands/RegisterTeamCommand";
 import PCLPlayer from "./interfaces/PCLPlayer";
+import TeamConfigCommand from "./discord/commands/TeamConfigCommand";
+import { PCLTeam } from "./interfaces/PCLTeam";
 dotenv.config();
 
 export class TeamBot {
@@ -31,10 +33,11 @@ export class TeamBot {
         //initializing all commands
         this.initCommand(new RegisterCommand());
         this.initCommand(new RegisterTeamCommand());
+        this.initCommand(new TeamConfigCommand());
         this.initCommand(new PingCommand());
         this.initCommand(new PongCommand());
     }
-    
+
     async start(): Promise<void> {
         await this.client.login(process.env.TOKEN);
     }
@@ -58,6 +61,13 @@ export class TeamBot {
         const registeredPlayers: PCLPlayer[] = JSON.parse(fs.readFileSync("./db/registeredPlayers.json", "utf-8"));
         return registeredPlayers.find((PCLPlayer) => {
             return PCLPlayer.oculusId === oculusId;
+        });
+    }
+
+    findTeamByCoCap(discordId: string): PCLTeam | undefined {
+        const registeredTeams: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
+        return registeredTeams.find((PCLTeam) => {
+            return PCLTeam.captain === discordId;
         });
     }
 }
