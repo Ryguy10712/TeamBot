@@ -16,9 +16,26 @@ export let TeamCreateSuccess = new EmbedBuilder()
     .setDescription("If any of this information is incorrect, change it immediateley with /team_config or you risk losing permission to run this command")
     .setColor("Green");
 
-export const MultipleTeamsWarning = new EmbedBuilder()
+export const AlreadyCaptainError = new EmbedBuilder()
     .setTitle("Heads Up!")
-    .setColor("Orange")
+    .setColor("Red")
+    .setFields(
+        {
+            name: "Failed:",
+            value: "You cannot be the captain or co-captain of multiple teams at once"
+        }
+    )
+
+export const CoCapOccuipiedError = new EmbedBuilder()
+    .setTitle("Heads Up!")
+    .setColor("Red")
+    .setFields(
+        {
+            name: "Failed:",
+            value: "Your co-captain is already a captain or co-captain of another team"
+        }
+    )
+    
 
 //ERROR EMBEDS
 export const NotRegisteredError = new EmbedBuilder()

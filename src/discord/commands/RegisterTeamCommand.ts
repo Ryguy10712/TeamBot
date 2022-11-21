@@ -19,6 +19,7 @@ import fs from "fs";
 import { DiscordCommand } from "../DiscordCommand";
 import { TeamBot } from "../../Bot";
 import * as RegisterTeamEmbeds from "../embeds/RegisterTeamEmbeds";
+import { register } from "ts-node";
 
 export default class RegisterTeamCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -122,17 +123,20 @@ export default class RegisterTeamCommand extends DiscordCommand {
         if (collected.customId === "0no") return interaction.followUp({ embeds: [RegisterTeamEmbeds.NotTeamGuildError] });
         team.guildID = interaction.guild?.id;
         */
-        //flag if the player is a captain
-        captainOnTeamFlag = registeredTeams.some((PCLTeam) => {
-            return PCLTeam.captain === player.discordID || PCLTeam.coCap === player.discordID;
-        })
-            ? true
-            : false;
-        coCaptainOnTeamFlag = registeredTeams.some((PCLTeam) => {
-            return PCLTeam.captain === team.coCap || PCLTeam.coCap === team.coCap;
-        })
-            ? true
-            : false;
+        //return if the player is a captain
+        if (
+            registeredTeams.some((PCLTeam) => {
+                return PCLTeam.captain == player.discordID || PCLTeam.coCap == player.discordID;
+            })
+        )
+            return interaction.reply({ embeds: [RegisterTeamEmbeds.AlreadyCaptainError] });
+
+        if (
+            registeredTeams.some((PCLTeam) => {
+                return PCLTeam.captain == team.coCap || PCLTeam.coCap == team.coCap;
+            })
+        )
+            return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapOccuipiedError] });
         //then push the team to registeredTeams
         registeredTeams.push(team);
         fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
@@ -143,23 +147,5 @@ export default class RegisterTeamCommand extends DiscordCommand {
             }`,
         });
         await interaction.reply({ embeds: [RegisterTeamEmbeds.TeamCreateSuccess] });
-        if (captainOnTeamFlag)
-            await interaction.channel?.send({
-                embeds: [
-                    RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
-                        name: "Warning",
-                        value: "You are already captain of a team. This isn't breaking anything, just be sure to delete your old team when it's time.",
-                    }),
-                ],
-            });
-        if (coCaptainOnTeamFlag && team.coCap != undefined)
-            await interaction.channel?.send({
-                embeds: [
-                    RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
-                        name: "Warning",
-                        value: "Your Co-Captain is already on a team. This won't break anything, just be sure to have them leave the team when the time comes.",
-                    }),
-                ],
-            });
     }
 }

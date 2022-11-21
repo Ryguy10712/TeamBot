@@ -75,16 +75,14 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
             case "Bronze":
                 team.rank = PCLTeam_1.Ranks.BRONZE;
         }
-        captainOnTeamFlag = registeredTeams.some((PCLTeam) => {
-            return PCLTeam.captain === player.discordID || PCLTeam.coCap === player.discordID;
-        })
-            ? true
-            : false;
-        coCaptainOnTeamFlag = registeredTeams.some((PCLTeam) => {
-            return PCLTeam.captain === team.coCap || PCLTeam.coCap === team.coCap;
-        })
-            ? true
-            : false;
+        if (registeredTeams.some((PCLTeam) => {
+            return PCLTeam.captain == player.discordID || PCLTeam.coCap == player.discordID;
+        }))
+            return interaction.reply({ embeds: [RegisterTeamEmbeds.AlreadyCaptainError] });
+        if (registeredTeams.some((PCLTeam) => {
+            return PCLTeam.captain == team.coCap || PCLTeam.coCap == team.coCap;
+        }))
+            return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapOccuipiedError] });
         registeredTeams.push(team);
         fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
         RegisterTeamEmbeds.TeamCreateSuccess.setFields({
@@ -92,24 +90,6 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
             value: `Team **${teamName}** has been created with the following: \n **Co-Captain:** <@${team.coCap}> \n **Rank:** ${interaction.options.get("rank")?.value}`,
         });
         await interaction.reply({ embeds: [RegisterTeamEmbeds.TeamCreateSuccess] });
-        if (captainOnTeamFlag)
-            await interaction.channel?.send({
-                embeds: [
-                    RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
-                        name: "Warning",
-                        value: "You are already captain of a team. This isn't breaking anything, just be sure to delete your old team when it's time.",
-                    }),
-                ],
-            });
-        if (coCaptainOnTeamFlag && team.coCap != undefined)
-            await interaction.channel?.send({
-                embeds: [
-                    RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
-                        name: "Warning",
-                        value: "Your Co-Captain is already on a team. This won't break anything, just be sure to have them leave the team when the time comes.",
-                    }),
-                ],
-            });
     }
 }
 exports.default = RegisterTeamCommand;

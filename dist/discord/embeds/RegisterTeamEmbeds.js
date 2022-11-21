@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TeamNameMatchError = exports.CoCapNotRegisteredError = exports.NotTeamGuildError = exports.NotRegisteredError = exports.MultipleTeamsWarning = exports.TeamCreateSuccess = exports.GuildConfirmationEmbed = void 0;
+exports.TeamNameMatchError = exports.CoCapNotRegisteredError = exports.NotTeamGuildError = exports.NotRegisteredError = exports.CoCapOccuipiedError = exports.AlreadyCaptainError = exports.TeamCreateSuccess = exports.GuildConfirmationEmbed = void 0;
 const discord_js_1 = require("discord.js");
 exports.GuildConfirmationEmbed = new discord_js_1.EmbedBuilder()
     .setTitle("Is this your team's main server?")
@@ -12,9 +12,20 @@ exports.TeamCreateSuccess = new discord_js_1.EmbedBuilder()
     .setDescription("Your team will be verified shortly")
     .setDescription("If any of this information is incorrect, change it immediateley with /team_config or you risk losing permission to run this command")
     .setColor("Green");
-exports.MultipleTeamsWarning = new discord_js_1.EmbedBuilder()
+exports.AlreadyCaptainError = new discord_js_1.EmbedBuilder()
     .setTitle("Heads Up!")
-    .setColor("Orange");
+    .setColor("Red")
+    .setFields({
+    name: "Failed:",
+    value: "You cannot be the captain or co-captain of multiple teams at once"
+});
+exports.CoCapOccuipiedError = new discord_js_1.EmbedBuilder()
+    .setTitle("Heads Up!")
+    .setColor("Red")
+    .setFields({
+    name: "Failed:",
+    value: "Your co-captain is already a captain or co-captain of another team"
+});
 exports.NotRegisteredError = new discord_js_1.EmbedBuilder()
     .setTitle("You are not registered!")
     .setDescription("You cannot run this command until you are registered.")
