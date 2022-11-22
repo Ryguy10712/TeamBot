@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TeamNameMatchError = exports.CoCapNotRegisteredError = exports.NotTeamGuildError = exports.NotRegisteredError = exports.CoCapOccuipiedError = exports.AlreadyCaptainError = exports.TeamCreateSuccess = exports.GuildConfirmationEmbed = void 0;
+exports.CaptainCoCapMatchError = exports.TeamNameMatchError = exports.CoCapNotRegisteredError = exports.NotTeamGuildError = exports.NotRegisteredError = exports.CoCapOccuipiedError = exports.AlreadyCaptainError = exports.TeamCreateSuccess = exports.GuildConfirmationEmbed = void 0;
 const discord_js_1 = require("discord.js");
 exports.GuildConfirmationEmbed = new discord_js_1.EmbedBuilder()
     .setTitle("Is this your team's main server?")
@@ -48,6 +48,13 @@ exports.TeamNameMatchError = new discord_js_1.EmbedBuilder()
     .addFields({
     name: "Failed:",
     value: "A team with that name already exists. If you believe someone is trying to impersonate your team, contact Ryguy to have it resolved"
+})
+    .setColor("Red");
+exports.CaptainCoCapMatchError = new discord_js_1.EmbedBuilder()
+    .setTitle("That makes no sense")
+    .addFields({
+    name: "Failed",
+    value: "You cannot be the captain, and the cocaptain of the same team"
 })
     .setColor("Red");
 //# sourceMappingURL=RegisterTeamEmbeds.js.map

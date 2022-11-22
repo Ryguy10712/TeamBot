@@ -30,8 +30,6 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
         const confidentiality = interaction.options.get("confidential")?.value;
         const player = teamBot.findPCLPlayerByDiscord(interaction.user.id);
         const registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
-        let captainOnTeamFlag;
-        let coCaptainOnTeamFlag;
         let cocap;
         if (!player)
             return interaction.reply({ embeds: [RegisterTeamEmbeds.NotRegisteredError] });
@@ -79,10 +77,14 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
             return PCLTeam.captain == player.discordID || PCLTeam.coCap == player.discordID;
         }))
             return interaction.reply({ embeds: [RegisterTeamEmbeds.AlreadyCaptainError] });
-        if (registeredTeams.some((PCLTeam) => {
-            return PCLTeam.captain == team.coCap || PCLTeam.coCap == team.coCap;
-        }))
-            return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapOccuipiedError] });
+        if (team.coCap != undefined) {
+            if (registeredTeams.some((PCLTeam) => {
+                return PCLTeam.captain == team.coCap || PCLTeam.coCap == team.coCap;
+            }))
+                return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapOccuipiedError] });
+            if (interaction.user.id === team.coCap)
+                return interaction.reply({ embeds: [RegisterTeamEmbeds.CaptainCoCapMatchError] });
+        }
         registeredTeams.push(team);
         fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
         RegisterTeamEmbeds.TeamCreateSuccess.setFields({

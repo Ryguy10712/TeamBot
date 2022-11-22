@@ -1,5 +1,5 @@
 import { TeamBot } from "../../Bot";
-import { EmbedBuilder } from "discord.js";
+import { Embed, EmbedBuilder } from "discord.js";
 
 //INFO EMBEDS
 export const GuildConfirmationEmbed = new EmbedBuilder()
@@ -67,3 +67,11 @@ export const TeamNameMatchError = new EmbedBuilder()
         }
     )
     .setColor("Red")
+
+export const CaptainCoCapMatchError = new EmbedBuilder()
+        .setTitle("That makes no sense")
+        .addFields({
+            name: "Failed",
+            value: "You cannot be the captain, and the cocaptain of the same team"
+        })
+        .setColor("Red")
