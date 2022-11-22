@@ -5,7 +5,7 @@ const fs_1 = tslib_1.__importDefault(require("fs"));
 const DiscordCommand_1 = require("../DiscordCommand");
 const Embeds = tslib_1.__importStar(require("../embeds/DeleteTeamEmbeds"));
 class DeleteTeamCommand extends DiscordCommand_1.DiscordCommand {
-    inDev = true;
+    inDev = false;
     constructor() {
         super();
         this.properties

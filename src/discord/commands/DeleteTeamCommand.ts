@@ -6,7 +6,7 @@ import { PCLTeam } from "../../interfaces/PCLTeam";
 import * as Embeds from "../embeds/DeleteTeamEmbeds"
 
 export default class DeleteTeamCommand extends DiscordCommand {
-    public inDev: boolean = true;
+    public inDev: boolean = false;
 
 	constructor(){
 		super()

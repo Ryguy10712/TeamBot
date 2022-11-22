@@ -13,6 +13,7 @@ const RegisterCommand_1 = tslib_1.__importDefault(require("./discord/commands/Re
 const RegisterTeamCommand_1 = tslib_1.__importDefault(require("./discord/commands/RegisterTeamCommand"));
 const TeamMenuCommand_1 = tslib_1.__importDefault(require("./discord/commands/TeamMenuCommand"));
 const DeleteTeamCommand_1 = tslib_1.__importDefault(require("./discord/commands/DeleteTeamCommand"));
+const TeamInfoCommand_1 = tslib_1.__importDefault(require("./discord/commands/TeamInfoCommand"));
 dotenv_1.default.config();
 class TeamBot {
     client;
@@ -32,6 +33,7 @@ class TeamBot {
         this.initCommand(new PingCommand_1.PingCommand());
         this.initCommand(new PongCommand_1.PongCommand());
         this.initCommand(new DeleteTeamCommand_1.default());
+        this.initCommand(new TeamInfoCommand_1.default());
     }
     async start() {
         await this.client.login(process.env.TOKEN);
