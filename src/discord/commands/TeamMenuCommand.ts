@@ -100,7 +100,6 @@ export default class TeamConfigCommand extends DiscordCommand {
                         if(!team!.players.includes(playerForRemoval)) return interaction.followUp({embeds: [Embeds.PlayerNotOnError]})
                         registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
                         registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.players = registeredTeams.find(PCLTeam => {return PCLTeam.name === team!.name})!.players.filter(player => {return player != playerForRemoval})
-                        console.log(registeredTeams)
                         fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
                         team = teamBot.findTeamByCoCap(interaction.user.id)
                         interaction.followUp({embeds: [Embeds.RemovePlayerSuccess]})
