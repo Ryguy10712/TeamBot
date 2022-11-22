@@ -11,6 +11,7 @@ import RegisterCommand from "./discord/commands/RegisterCommand";
 import RegisterTeamCommand from "./discord/commands/RegisterTeamCommand";
 import PCLPlayer from "./interfaces/PCLPlayer";
 import TeamMenuCommand from "./discord/commands/TeamMenuCommand";
+import DeleteTeamCommand from "./discord/commands/DeleteTeamCommand"
 import { PCLTeam } from "./interfaces/PCLTeam";
 dotenv.config();
 
@@ -36,6 +37,7 @@ export class TeamBot {
         this.initCommand(new TeamMenuCommand());
         this.initCommand(new PingCommand());
         this.initCommand(new PongCommand());
+        this.initCommand(new DeleteTeamCommand())
     }
 
     async start(): Promise<void> {
