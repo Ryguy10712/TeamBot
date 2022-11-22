@@ -10,7 +10,7 @@ import fs from "fs";
 import RegisterCommand from "./discord/commands/RegisterCommand";
 import RegisterTeamCommand from "./discord/commands/RegisterTeamCommand";
 import PCLPlayer from "./interfaces/PCLPlayer";
-import TeamConfigCommand from "./discord/commands/TeamConfigCommand";
+import TeamMenuCommand from "./discord/commands/TeamMenuCommand";
 import { PCLTeam } from "./interfaces/PCLTeam";
 dotenv.config();
 
@@ -33,7 +33,7 @@ export class TeamBot {
         //initializing all commands
         this.initCommand(new RegisterCommand());
         this.initCommand(new RegisterTeamCommand());
-        this.initCommand(new TeamConfigCommand());
+        this.initCommand(new TeamMenuCommand());
         this.initCommand(new PingCommand());
         this.initCommand(new PongCommand());
     }
