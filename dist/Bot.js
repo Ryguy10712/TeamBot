@@ -14,6 +14,10 @@ const RegisterTeamCommand_1 = tslib_1.__importDefault(require("./discord/command
 const TeamMenuCommand_1 = tslib_1.__importDefault(require("./discord/commands/TeamMenuCommand"));
 const DeleteTeamCommand_1 = tslib_1.__importDefault(require("./discord/commands/DeleteTeamCommand"));
 const TeamInfoCommand_1 = tslib_1.__importDefault(require("./discord/commands/TeamInfoCommand"));
+const ScheduleRequestCommand_1 = tslib_1.__importDefault(require("./discord/commands/ScheduleRequestCommand"));
+const SchedulingChannelCommand_1 = require("./discord/commands/SchedulingChannelCommand");
+const MessageReactionAddListener_1 = require("./discord/listeners/MessageReactionAddListener");
+const ReactionRemoveListener_1 = require("./discord/listeners/ReactionRemoveListener");
 dotenv_1.default.config();
 class TeamBot {
     client;
@@ -23,10 +27,13 @@ class TeamBot {
         this.rest = new discord_js_1.REST({ version: "10" }).setToken(process.env.TOKEN);
         this.client = new discord_js_1.Client({
             intents: ["Guilds", "GuildMembers", "MessageContent", "GuildMessages", "DirectMessages", "GuildMessageReactions", "DirectMessageReactions"],
+            partials: [discord_js_1.Partials.Message, discord_js_1.Partials.Reaction]
         });
         this.commands = new Map();
         this.registerListener(new ReadyListener_1.ReadyListener());
         this.registerListener(new InteractionCreateListener_1.InteractionCreateListener());
+        this.registerListener(new MessageReactionAddListener_1.MessageReactionAddListender());
+        this.registerListener(new ReactionRemoveListener_1.ReactionRemoveListener());
         this.initCommand(new RegisterCommand_1.default());
         this.initCommand(new RegisterTeamCommand_1.default());
         this.initCommand(new TeamMenuCommand_1.default());
@@ -34,6 +41,8 @@ class TeamBot {
         this.initCommand(new PongCommand_1.PongCommand());
         this.initCommand(new DeleteTeamCommand_1.default());
         this.initCommand(new TeamInfoCommand_1.default());
+        this.initCommand(new SchedulingChannelCommand_1.SchedulingChannelCommand());
+        this.initCommand(new ScheduleRequestCommand_1.default());
     }
     async start() {
         await this.client.login(process.env.TOKEN);

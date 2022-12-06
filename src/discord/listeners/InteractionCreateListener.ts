@@ -11,6 +11,19 @@ export class InteractionCreateListener extends DiscordListener {
             } catch (e) {
                 console.error(e)
             }
+            
+            if(interaction.isButton()){
+                if(!interaction.customId.startsWith("schedreq")) return;
+                if(interaction.customId.includes("Accept")){
+                    interaction.deferUpdate();
+                    const poo = import("../../events/ScheduleRequestAccept").then(poo=>{
+                        poo.HandleScheduleRequestAccept(teamBot, interaction)
+                    })
+                } else if (interaction.customId.includes("Deny")){
+                    interaction.deferUpdate()
+                    
+                }
+            }
         })
     }
 }

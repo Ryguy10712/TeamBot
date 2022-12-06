@@ -86,6 +86,8 @@ export default class RegisterTeamCommand extends DiscordCommand {
             isWeeklySchedulingPollsEnabled: undefined,
             confidential: confidentiality,
             name: teamName,
+            schedulingChannel: null,
+            availability: null
         };
         if (cocap!) {
             team.players.push(cocap.discordID);

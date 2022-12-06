@@ -1,4 +1,4 @@
-import { chatInputApplicationCommandMention, Client, REST, Routes, SystemChannelFlagsBitField } from "discord.js";
+import {  Client, Partials, REST, Routes, SystemChannelFlagsBitField } from "discord.js";
 import dotenv from "dotenv";
 import { DiscordCommand } from "./discord/DiscordCommand";
 import { DiscordListener } from "./discord/DiscordListener";
@@ -14,23 +14,31 @@ import TeamMenuCommand from "./discord/commands/TeamMenuCommand";
 import DeleteTeamCommand from "./discord/commands/DeleteTeamCommand"
 import { PCLTeam } from "./interfaces/PCLTeam";
 import TeamInfoCommand from "./discord/commands/TeamInfoCommand";
+import ScheduleRequestCommand from "./discord/commands/ScheduleRequestCommand";
+import { SchedulingChannelCommand } from "./discord/commands/SchedulingChannelCommand";
+import { MessageReactionAddListender } from "./discord/listeners/MessageReactionAddListener";
+import {ReactionRemoveListener} from "./discord/listeners/ReactionRemoveListener"
 dotenv.config();
 
 export class TeamBot {
     public readonly client: Client;
     public readonly commands: Map<String, DiscordCommand>;
     public readonly rest: REST;
+    
 
     constructor() {
         this.rest = new REST({ version: "10" }).setToken(process.env.TOKEN!);
-
+        
         this.client = new Client({
             intents: ["Guilds", "GuildMembers", "MessageContent", "GuildMessages", "DirectMessages", "GuildMessageReactions", "DirectMessageReactions"],
+            partials: [Partials.Message, Partials.Reaction]
         });
         this.commands = new Map<string, DiscordCommand>();
 
         this.registerListener(new ReadyListener());
         this.registerListener(new InteractionCreateListener());
+        this.registerListener(new MessageReactionAddListender());
+        this.registerListener(new ReactionRemoveListener());
 
         //initializing all commands
         this.initCommand(new RegisterCommand());
@@ -40,6 +48,9 @@ export class TeamBot {
         this.initCommand(new PongCommand());
         this.initCommand(new DeleteTeamCommand());
         this.initCommand(new TeamInfoCommand());
+        this.initCommand(new SchedulingChannelCommand());
+        this.initCommand(new ScheduleRequestCommand());
+        
     }
 
     async start(): Promise<void> {
@@ -74,6 +85,8 @@ export class TeamBot {
             return PCLTeam.captain === discordId;
         });
     }
+
+    
 }
 
 (async () => {

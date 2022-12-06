@@ -49,6 +49,12 @@ class TeamInfoCommand extends DiscordCommand_1.DiscordCommand {
                 TeamInfoEmbed.addFields({ name: "Rank:", value: "Unranked", inline: true });
                 break;
         }
+        if (issuerTeam.schedulingChannel === null) {
+            TeamInfoEmbed.addFields({ name: "Scheduling Channel:", value: "None", inline: true });
+        }
+        else {
+            TeamInfoEmbed.addFields({ name: "Scheduling Channel:", value: `<#${issuerTeam.schedulingChannel}>`, inline: true });
+        }
         if (issuerTeam.confidential)
             TeamInfoEmbed.addFields({ name: "Confidential?", value: "Yes", inline: true });
         else

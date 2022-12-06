@@ -1,4 +1,4 @@
-import { Client, CommandInteraction, CacheType, EmbedBuilder } from "discord.js";
+import { Client, CommandInteraction, CacheType, EmbedBuilder, BaseGuildTextChannel } from "discord.js";
 import { TeamBot } from "../../Bot";
 import fs from "fs";
 import { DiscordCommand } from "../DiscordCommand";
@@ -53,6 +53,12 @@ export default class TeamInfoCommand extends DiscordCommand {
             default: 
                 TeamInfoEmbed.addFields({name: "Rank:", value: "Unranked", inline: true})
                 break;
+        }
+        //set scheduling channel
+        if(issuerTeam.schedulingChannel === null){
+            TeamInfoEmbed.addFields({name: "Scheduling Channel:", value: "None", inline: true})
+        } else {
+            TeamInfoEmbed.addFields({name: "Scheduling Channel:", value: `<#${issuerTeam.schedulingChannel}>`, inline: true})
         }
         //setting confidentiality
         if (issuerTeam.confidential) TeamInfoEmbed.addFields({name: "Confidential?", value: "Yes", inline: true})
