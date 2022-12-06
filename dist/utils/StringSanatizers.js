@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isoculusidClean = void 0;
 function isoculusidClean(oculusid) {
-    const CHAR_LIMIT = 15;
+    const CHAR_LIMIT = 30;
     const CHAR_MIN = 3;
     if (oculusid.length > CHAR_LIMIT || oculusid.length < CHAR_MIN)
         return false;
