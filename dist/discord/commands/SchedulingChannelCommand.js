@@ -6,7 +6,7 @@ const discord_js_1 = require("discord.js");
 const DiscordCommand_1 = require("../DiscordCommand");
 const fs_1 = tslib_1.__importDefault(require("fs"));
 class SchedulingChannelCommand extends DiscordCommand_1.DiscordCommand {
-    inDev = true;
+    inDev = false;
     constructor() {
         super();
         this.properties

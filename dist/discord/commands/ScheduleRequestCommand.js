@@ -7,7 +7,7 @@ const fs_1 = tslib_1.__importDefault(require("fs"));
 const ScheduleRequestComponents_1 = require("../components/ScheduleRequestComponents");
 const ScheduleRequest_1 = require("../../interfaces/ScheduleRequest");
 class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
-    inDev = true;
+    inDev = false;
     constructor() {
         super();
         this.properties.setName("schedule_request").setDescription("poopoo pee pee cacac");

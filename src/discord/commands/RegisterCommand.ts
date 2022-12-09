@@ -6,7 +6,7 @@ import * as Embeds from "../embeds/RegisterEmbeds";
 import { isoculusidClean } from "../../utils/StringSanatizers";
 
 export default class RegisterCommand extends DiscordCommand {
-    public inDev: boolean = true;
+    public inDev: boolean = false;
     constructor() {
         super();
         this.properties

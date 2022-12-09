@@ -7,7 +7,7 @@ const fs_1 = tslib_1.__importDefault(require("fs"));
 const Embeds = tslib_1.__importStar(require("../embeds/RegisterEmbeds"));
 const StringSanatizers_1 = require("../../utils/StringSanatizers");
 class RegisterCommand extends DiscordCommand_1.DiscordCommand {
-    inDev = true;
+    inDev = false;
     constructor() {
         super();
         this.properties

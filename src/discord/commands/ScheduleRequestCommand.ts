@@ -8,7 +8,7 @@ import { ScheduleRequest, MatchType } from "../../interfaces/ScheduleRequest";
 import { register } from "ts-node";
 
 export default class ScheduleRequestCommand extends DiscordCommand {
-    public inDev: boolean = true;
+    public inDev: boolean = false;
 
     constructor() {
         super();

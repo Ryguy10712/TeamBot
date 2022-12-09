@@ -5,7 +5,7 @@ import fs from "fs";
 import { PCLTeam, HourReaction } from "../../interfaces/PCLTeam";
 
 export class SchedulingChannelCommand extends DiscordCommand {
-    public inDev: boolean = true;
+    public inDev: boolean = false;
 
     constructor() {
         super();
