@@ -7,7 +7,7 @@ export enum Ranks {
 
 export type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday"
 
-export type HourReaction = "1️⃣" | "2️⃣" | "3️⃣" | "4️⃣" | "5️⃣" | "6️⃣" | "7️⃣" | "8️⃣" | "9️⃣" | "🔟" | "🕚" | "🕛"
+export type HourReaction = "1PM" | "2PM" | "3PM" | "4PM" | "5PM" | "6PM" | "7PM" | "8PM" | "9PM" | "10PM" | "11PM" | "12PM"
 
 export interface PCLTeam {
     name: string
@@ -21,12 +21,12 @@ export interface PCLTeam {
     schedulingChannel: string | null,
     availability : {
         messageIds: string[],
-        tuesday: {"1️⃣": string[], "2️⃣": string[], "3️⃣": string[], "4️⃣": string[], "5️⃣":string[], "6️⃣":string[],"7️⃣":string[],"8️⃣":string[], "9️⃣":string[], "🔟":string[],"🕚":string[], "🕛":string[]},
-        wednesday: {"1️⃣": string[], "2️⃣": string[], "3️⃣": string[], "4️⃣": string[], "5️⃣":string[], "6️⃣":string[],"7️⃣":string[],"8️⃣":string[], "9️⃣":string[], "🔟":string[],"🕚":string[], "🕛":string[]},
-        thursday: {"1️⃣": string[], "2️⃣": string[], "3️⃣": string[], "4️⃣": string[], "5️⃣":string[], "6️⃣":string[],"7️⃣":string[],"8️⃣":string[], "9️⃣":string[], "🔟":string[],"🕚":string[], "🕛":string[]},
-        friday: {"1️⃣": string[], "2️⃣": string[], "3️⃣": string[], "4️⃣": string[], "5️⃣":string[], "6️⃣":string[],"7️⃣":string[],"8️⃣":string[], "9️⃣":string[], "🔟":string[],"🕚":string[], "🕛":string[]},
-        saturday: {"1️⃣": string[], "2️⃣": string[], "3️⃣": string[], "4️⃣": string[], "5️⃣":string[], "6️⃣":string[],"7️⃣":string[],"8️⃣":string[], "9️⃣":string[], "🔟":string[],"🕚":string[], "🕛":string[]},
-        sunday: {"1️⃣": string[], "2️⃣": string[], "3️⃣": string[], "4️⃣": string[], "5️⃣":string[], "6️⃣":string[],"7️⃣":string[],"8️⃣":string[], "9️⃣":string[], "🔟":string[],"🕚":string[], "🕛":string[]},
-        monday: {"1️⃣": string[], "2️⃣": string[], "3️⃣": string[], "4️⃣": string[], "5️⃣":string[], "6️⃣":string[],"7️⃣":string[],"8️⃣":string[], "9️⃣":string[], "🔟":string[],"🕚":string[], "🕛":string[]},
+        tuesday: {"1PM": string[], "2PM": string[], "3PM": string[], "4PM": string[], "5PM":string[], "6PM":string[],"7PM":string[],"8PM":string[], "9PM":string[], "10PM":string[],"11PM":string[], "12PM":string[]},
+        wednesday: {"1PM": string[], "2PM": string[], "3PM": string[], "4PM": string[], "5PM":string[], "6PM":string[],"7PM":string[],"8PM":string[], "9PM":string[], "10PM":string[],"11PM":string[], "12PM":string[]},
+        thursday: {"1PM": string[], "2PM": string[], "3PM": string[], "4PM": string[], "5PM":string[], "6PM":string[],"7PM":string[],"8PM":string[], "9PM":string[], "10PM":string[],"11PM":string[], "12PM":string[]},
+        friday: {"1PM": string[], "2PM": string[], "3PM": string[], "4PM": string[], "5PM":string[], "6PM":string[],"7PM":string[],"8PM":string[], "9PM":string[], "10PM":string[],"11PM":string[], "12PM":string[]},
+        saturday: {"1PM": string[], "2PM": string[], "3PM": string[], "4PM": string[], "5PM":string[], "6PM":string[],"7PM":string[],"8PM":string[], "9PM":string[], "10PM":string[],"11PM":string[], "12PM":string[]},
+        sunday: {"1PM": string[], "2PM": string[], "3PM": string[], "4PM": string[], "5PM":string[], "6PM":string[],"7PM":string[],"8PM":string[], "9PM":string[], "10PM":string[],"11PM":string[], "12PM":string[]},
+        monday: {"1PM": string[], "2PM": string[], "3PM": string[], "4PM": string[], "5PM":string[], "6PM":string[],"7PM":string[],"8PM":string[], "9PM":string[], "10PM":string[],"11PM":string[], "12PM":string[]},
     } | null
 }

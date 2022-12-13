@@ -27,7 +27,7 @@ exports.InteractionCreateListener = void 0;
 const DiscordListener_1 = require("../DiscordListener");
 class InteractionCreateListener extends DiscordListener_1.DiscordListener {
     startListener(teamBot) {
-        teamBot.client.on("interactionCreate", (interaction) => {
+        teamBot.client.on("interactionCreate", async (interaction) => {
             try {
                 if (interaction.isCommand()) {
                     teamBot.commands.get(interaction.commandName)?.executeInteraction(teamBot.client, interaction, teamBot);
@@ -37,16 +37,22 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
                 console.error(e);
             }
             if (interaction.isButton()) {
-                if (!interaction.customId.startsWith("schedreq"))
-                    return;
-                if (interaction.customId.includes("Accept")) {
-                    interaction.deferUpdate();
-                    const poo = Promise.resolve().then(() => __importStar(require("../../events/ScheduleRequestAccept"))).then(poo => {
+                if (interaction.customId.startsWith("schedreq")) {
+                    if (interaction.customId.includes("Accept")) {
+                        interaction.deferUpdate();
+                        const poo = await Promise.resolve().then(() => __importStar(require("../../events/ScheduleRequestAccept")));
                         poo.HandleScheduleRequestAccept(teamBot, interaction);
-                    });
+                    }
+                    else if (interaction.customId.includes("Deny")) {
+                        interaction.deferUpdate();
+                    }
                 }
-                else if (interaction.customId.includes("Deny")) {
-                    interaction.deferUpdate();
+                else if (interaction.customId.startsWith("matchOrganizer")) {
+                    if (interaction.customId.includes("update")) {
+                        interaction.deferUpdate();
+                        const MatchOrganizerUpdate = await Promise.resolve().then(() => __importStar(require("../../events/MatchOrganizerUpdate")));
+                        MatchOrganizerUpdate.execute(teamBot, interaction);
+                    }
                 }
             }
         });
