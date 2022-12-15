@@ -3,7 +3,7 @@ import fs from "fs";
 import { TeamBot } from "../Bot";
 import { PCLTeam } from "../interfaces/PCLTeam";
 import { ScheduleRequest } from "../interfaces/ScheduleRequest";
-import { MatchOrganizerEmbed } from "../discord/components/RequestAcceptComponents";
+import { MatchOrganizerEmbed, UpdateButton, UpdateButtonRow } from "../discord/components/RequestAcceptComponents";
 
 export async function HandleScheduleRequestAccept(teamBot: TeamBot, interaction: ButtonInteraction) {
     const scheduleRequests: ScheduleRequest[] = JSON.parse(fs.readFileSync("./db/scheduleRequests.json", "utf-8"));
@@ -33,8 +33,8 @@ export async function HandleScheduleRequestAccept(teamBot: TeamBot, interaction:
     const requesterSchedulingChan = await teamBot.client.channels.fetch(requesterPclTeam.schedulingChannel!) as GuildTextBasedChannel
     const accepeterSchedulingChan = await teamBot.client.channels.fetch(accepterPclTeam.schedulingChannel!) as GuildTextBasedChannel
     try {
-      requesterSchedulingChan.send({embeds: [new MatchOrganizerEmbed(accepterPclTeam.name, schedReq.type)]})
-      accepeterSchedulingChan.send({embeds: [new MatchOrganizerEmbed(requesterPclTeam.name, schedReq.type)]})
+      requesterSchedulingChan.send({embeds: [new MatchOrganizerEmbed(requesterPclTeam, accepterPclTeam, schedReq.type)], components: [new UpdateButtonRow(schedReq.id)]})
+      accepeterSchedulingChan.send({embeds: [new MatchOrganizerEmbed(accepterPclTeam, requesterPclTeam, schedReq.type)], components: [new UpdateButtonRow(schedReq.id)]})
     } 
     catch {
       //Bot aint in server or some STUPID bullshit that people will do

@@ -22,8 +22,8 @@ export class InteractionCreateListener extends DiscordListener {
                         interaction.deferUpdate();
                     }
                 } else if (interaction.customId.startsWith("matchOrganizer")) {
-                    if (interaction.customId.includes("update")) {
-                        interaction.deferUpdate();
+                    if (interaction.customId.includes("Update")) {
+                        interaction.deferUpdate()
                         const MatchOrganizerUpdate = await import("../../events/MatchOrganizerUpdate")
                         MatchOrganizerUpdate.execute(teamBot, interaction)
                     }

@@ -21,6 +21,8 @@ class MessageReactionAddListender extends DiscordListener_1.DiscordListener {
             "🕛": "12PM",
         };
         teamBot.client.on("messageReactionAdd", async (reaction, reactionUser) => {
+            if (reactionUser.id === teamBot.client.user?.id)
+                return;
             if (!Object.keys(reactionToTime).includes(reaction.emoji.name))
                 return;
             const teamsDb = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));

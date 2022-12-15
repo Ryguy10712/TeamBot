@@ -48,7 +48,7 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
                     }
                 }
                 else if (interaction.customId.startsWith("matchOrganizer")) {
-                    if (interaction.customId.includes("update")) {
+                    if (interaction.customId.includes("Update")) {
                         interaction.deferUpdate();
                         const MatchOrganizerUpdate = await Promise.resolve().then(() => __importStar(require("../../events/MatchOrganizerUpdate")));
                         MatchOrganizerUpdate.execute(teamBot, interaction);

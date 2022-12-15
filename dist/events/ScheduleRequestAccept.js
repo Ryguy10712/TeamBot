@@ -26,8 +26,8 @@ async function HandleScheduleRequestAccept(teamBot, interaction) {
     const requesterSchedulingChan = await teamBot.client.channels.fetch(requesterPclTeam.schedulingChannel);
     const accepeterSchedulingChan = await teamBot.client.channels.fetch(accepterPclTeam.schedulingChannel);
     try {
-        requesterSchedulingChan.send({ embeds: [new RequestAcceptComponents_1.MatchOrganizerEmbed(accepterPclTeam.name, schedReq.type)] });
-        accepeterSchedulingChan.send({ embeds: [new RequestAcceptComponents_1.MatchOrganizerEmbed(requesterPclTeam.name, schedReq.type)] });
+        requesterSchedulingChan.send({ embeds: [new RequestAcceptComponents_1.MatchOrganizerEmbed(requesterPclTeam, accepterPclTeam, schedReq.type)], components: [new RequestAcceptComponents_1.UpdateButtonRow(schedReq.id)] });
+        accepeterSchedulingChan.send({ embeds: [new RequestAcceptComponents_1.MatchOrganizerEmbed(accepterPclTeam, requesterPclTeam, schedReq.type)], components: [new RequestAcceptComponents_1.UpdateButtonRow(schedReq.id)] });
     }
     catch {
     }
