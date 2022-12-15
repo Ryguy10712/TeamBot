@@ -41,6 +41,8 @@ class MessageReactionAddListender extends DiscordListener_1.DiscordListener {
             const fullMsgContent = fullMsg.content.toLowerCase();
             const r = reaction.emoji.name;
             const rt = reactionToTime[r];
+            if (newAvailability[fullMsgContent][rt].includes(reactionUser.id))
+                return;
             newAvailability[fullMsgContent][rt].push(reactionUser.id);
             teamsDb.find((pclTeam) => {
                 return pclTeam.name === messageTeam.name;

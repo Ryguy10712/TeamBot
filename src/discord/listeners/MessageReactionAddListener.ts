@@ -48,6 +48,7 @@ export class MessageReactionAddListender extends DiscordListener {
             //fuck you, typescript type-checking 
             const r = reaction.emoji.name as validReaction;
             const rt = reactionToTime[r] as time;
+            if (newAvailability[fullMsgContent][rt].includes(reactionUser.id)) return; //prevents duplicate reaction logging
             newAvailability[fullMsgContent][rt].push(reactionUser.id);
 
             teamsDb.find((pclTeam) => { //write newAvailability to database
