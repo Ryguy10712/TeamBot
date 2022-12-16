@@ -19,7 +19,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
         let team = teamBot.findTeamByCoCap(interaction.user.id);
         if (!team)
             return interaction.reply({ embeds: [Embeds.NoTeamError] });
-        const reply = await interaction.reply({ components: [new Components.TeamConfigRow(0), Components.AddPlayerButton], embeds: [Embeds.AddPlayerEmbed] });
+        const reply = await interaction.reply({ components: [new Components.TeamConfigRow(0), Components.AddPlayerButton], embeds: [Embeds.AddPlayerEmbed], ephemeral: true });
         const menuFilter = (i) => {
             if (i.deferred || i.customId != "teamcfgMenu")
                 return false;
