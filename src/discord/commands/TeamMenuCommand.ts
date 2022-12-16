@@ -70,19 +70,19 @@ export default class TeamConfigCommand extends DiscordCommand {
                             const response = modalData.fields.getTextInputValue("addPlayerText");
                             const pclPlayer = teamBot.findPCLPlayerByOculus(response);
                             //check to see if the provided player is registered
-                            if (!pclPlayer) return interaction.followUp({ embeds: [Embeds.PlayerNotFoundError] });
+                            if (!pclPlayer) return interaction.editReply({ embeds: [Embeds.PlayerNotFoundError] });
                             registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
                             //return if the provided player is already on a team
                             if (
                                 registeredTeams.some((PCLTeam) => {
                                     return PCLTeam.players.includes(teamBot.findPCLPlayerByOculus(response)?.discordID!);
                                 })
-                            ) return interaction.followUp({ embeds: [Embeds.PlayerAlreadyOnError] });
+                            ) return interaction.editReply({ embeds: [Embeds.PlayerAlreadyOnError] });
                             //at this point the username is valid
                             registeredTeams.find(PCLTeam => {return PCLTeam.captain === buttonInteraction.user.id})?.players.push(pclPlayer.discordID)
                             fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
                             team = teamBot.findTeamByCoCap(interaction.user.id)
-                            interaction.followUp({embeds: [Embeds.AddPlayerSuccess]})
+                            interaction.editReply({embeds: [Embeds.AddPlayerSuccess]})
                             success = true;
                         })
                         .catch(() => { //ignore timeout
@@ -96,13 +96,13 @@ export default class TeamConfigCommand extends DiscordCommand {
                         modalData.deferUpdate()
                         const resposne = modalData.fields.getTextInputValue("removePlayerText")
                         const playerForRemoval = teamBot.findPCLPlayerByOculus(resposne)?.discordID
-                        if(!playerForRemoval) return interaction.followUp({embeds: [Embeds.PlayerNotFoundError]});
+                        if(!playerForRemoval) return interaction.editReply({embeds: [Embeds.PlayerNotFoundError]});
                         if(!team!.players.includes(playerForRemoval)) return interaction.followUp({embeds: [Embeds.PlayerNotOnError]})
                         registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
                         registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.players = registeredTeams.find(PCLTeam => {return PCLTeam.name === team!.name})!.players.filter(player => {return player != playerForRemoval})
                         fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
                         team = teamBot.findTeamByCoCap(interaction.user.id)
-                        interaction.followUp({embeds: [Embeds.RemovePlayerSuccess]})
+                        interaction.editReply({embeds: [Embeds.RemovePlayerSuccess]})
                         success = true;
                     })
                     break;
@@ -117,7 +117,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                             registeredTeams.find(PCLTeam => {return PCLTeam.name === team!.name})!.name = response
                             fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
                             team = teamBot.findTeamByCoCap(interaction.user.id)
-                            interaction.followUp({embeds: [Embeds.EditNameSuccess]})
+                            interaction.editReply({embeds: [Embeds.EditNameSuccess]})
                             success = true
                         })
                         .catch(() => { //ignore timeout
@@ -131,7 +131,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.confidential = true;
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
                     team = teamBot.findTeamByCoCap(interaction.user.id)
-                    interaction.followUp({embeds: [Embeds.ConfidentialitySuccess]})
+                    interaction.editReply({embeds: [Embeds.ConfidentialitySuccess]})
                     success = true;
                     break;
 
@@ -141,7 +141,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.confidential = false;
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
                     team = teamBot.findTeamByCoCap(interaction.user.id)
-                    interaction.followUp({embeds: [Embeds.ConfidentialitySuccess]})
+                    interaction.editReply({embeds: [Embeds.ConfidentialitySuccess]})
                     success = true;
                     break;
 
@@ -151,7 +151,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.rank = 0
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
                     team = teamBot.findTeamByCoCap(interaction.user.id)
-                    interaction.followUp({embeds: [Embeds.RankSuccessEmbed]})
+                    interaction.editReply({embeds: [Embeds.RankSuccessEmbed]})
                     success = true;
                     break;
 
@@ -161,7 +161,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.rank = 1
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
                     team = teamBot.findTeamByCoCap(interaction.user.id)
-                    interaction.followUp({embeds: [Embeds.RankSuccessEmbed]})
+                    interaction.editReply({embeds: [Embeds.RankSuccessEmbed]})
                     success = true;
                     break;
 
@@ -171,7 +171,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.rank = 2
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
                     team = teamBot.findTeamByCoCap(interaction.user.id)
-                    interaction.followUp({embeds: [Embeds.RankSuccessEmbed]})
+                    interaction.editReply({embeds: [Embeds.RankSuccessEmbed]})
                     success = true;
                     break;
 

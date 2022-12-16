@@ -68,16 +68,16 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                         const response = modalData.fields.getTextInputValue("addPlayerText");
                         const pclPlayer = teamBot.findPCLPlayerByOculus(response);
                         if (!pclPlayer)
-                            return interaction.followUp({ embeds: [Embeds.PlayerNotFoundError] });
+                            return interaction.editReply({ embeds: [Embeds.PlayerNotFoundError] });
                         registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
                         if (registeredTeams.some((PCLTeam) => {
                             return PCLTeam.players.includes(teamBot.findPCLPlayerByOculus(response)?.discordID);
                         }))
-                            return interaction.followUp({ embeds: [Embeds.PlayerAlreadyOnError] });
+                            return interaction.editReply({ embeds: [Embeds.PlayerAlreadyOnError] });
                         registeredTeams.find(PCLTeam => { return PCLTeam.captain === buttonInteraction.user.id; })?.players.push(pclPlayer.discordID);
                         fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
                         team = teamBot.findTeamByCoCap(interaction.user.id);
-                        interaction.followUp({ embeds: [Embeds.AddPlayerSuccess] });
+                        interaction.editReply({ embeds: [Embeds.AddPlayerSuccess] });
                         success = true;
                     })
                         .catch(() => {
@@ -91,14 +91,14 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                         const resposne = modalData.fields.getTextInputValue("removePlayerText");
                         const playerForRemoval = teamBot.findPCLPlayerByOculus(resposne)?.discordID;
                         if (!playerForRemoval)
-                            return interaction.followUp({ embeds: [Embeds.PlayerNotFoundError] });
+                            return interaction.editReply({ embeds: [Embeds.PlayerNotFoundError] });
                         if (!team.players.includes(playerForRemoval))
                             return interaction.followUp({ embeds: [Embeds.PlayerNotOnError] });
                         registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
                         registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).players = registeredTeams.find(PCLTeam => { return PCLTeam.name === team.name; }).players.filter(player => { return player != playerForRemoval; });
                         fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
                         team = teamBot.findTeamByCoCap(interaction.user.id);
-                        interaction.followUp({ embeds: [Embeds.RemovePlayerSuccess] });
+                        interaction.editReply({ embeds: [Embeds.RemovePlayerSuccess] });
                         success = true;
                     });
                     break;
@@ -112,7 +112,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                         registeredTeams.find(PCLTeam => { return PCLTeam.name === team.name; }).name = response;
                         fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
                         team = teamBot.findTeamByCoCap(interaction.user.id);
-                        interaction.followUp({ embeds: [Embeds.EditNameSuccess] });
+                        interaction.editReply({ embeds: [Embeds.EditNameSuccess] });
                         success = true;
                     })
                         .catch(() => {
@@ -125,7 +125,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                     registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).confidential = true;
                     fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
                     team = teamBot.findTeamByCoCap(interaction.user.id);
-                    interaction.followUp({ embeds: [Embeds.ConfidentialitySuccess] });
+                    interaction.editReply({ embeds: [Embeds.ConfidentialitySuccess] });
                     success = true;
                     break;
                 case "teamcfgFalse":
@@ -134,7 +134,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                     registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).confidential = false;
                     fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
                     team = teamBot.findTeamByCoCap(interaction.user.id);
-                    interaction.followUp({ embeds: [Embeds.ConfidentialitySuccess] });
+                    interaction.editReply({ embeds: [Embeds.ConfidentialitySuccess] });
                     success = true;
                     break;
                 case "teamcfgGold":
@@ -143,7 +143,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                     registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).rank = 0;
                     fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
                     team = teamBot.findTeamByCoCap(interaction.user.id);
-                    interaction.followUp({ embeds: [Embeds.RankSuccessEmbed] });
+                    interaction.editReply({ embeds: [Embeds.RankSuccessEmbed] });
                     success = true;
                     break;
                 case "teamcfgSilver":
@@ -152,7 +152,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                     registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).rank = 1;
                     fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
                     team = teamBot.findTeamByCoCap(interaction.user.id);
-                    interaction.followUp({ embeds: [Embeds.RankSuccessEmbed] });
+                    interaction.editReply({ embeds: [Embeds.RankSuccessEmbed] });
                     success = true;
                     break;
                 case "teamcfgBronze":
@@ -161,7 +161,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                     registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).rank = 2;
                     fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
                     team = teamBot.findTeamByCoCap(interaction.user.id);
-                    interaction.followUp({ embeds: [Embeds.RankSuccessEmbed] });
+                    interaction.editReply({ embeds: [Embeds.RankSuccessEmbed] });
                     success = true;
                     break;
             }

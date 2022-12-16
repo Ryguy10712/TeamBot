@@ -53,7 +53,9 @@ class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
             i.deferUpdate();
             return i.user.id === interaction.user.id;
         };
-        const buttonInteraction = await reply.awaitMessageComponent({ filter: buttonFilter, componentType: discord_js_1.ComponentType.Button, time: 120_000 });
+        const buttonInteraction = await reply.awaitMessageComponent({ filter: buttonFilter, componentType: discord_js_1.ComponentType.Button, time: 120_000 }).catch(() => { return; });
+        if (!buttonInteraction)
+            return interaction.followUp("Interaction Disposed");
         if (!selectedTeam)
             return interaction.followUp("Select a team first");
         let matchType;

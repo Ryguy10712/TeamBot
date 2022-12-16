@@ -57,7 +57,8 @@ export default class ScheduleRequestCommand extends DiscordCommand {
             i.deferUpdate()
             return i.user.id === interaction.user.id
         }
-        const buttonInteraction = await reply.awaitMessageComponent({filter: buttonFilter, componentType: ComponentType.Button, time: 120_000})
+        const buttonInteraction = await reply.awaitMessageComponent({filter: buttonFilter, componentType: ComponentType.Button, time: 120_000}).catch(() => {return}) as ButtonInteraction<CacheType>
+        if(!buttonInteraction) return interaction.followUp("Interaction Disposed") //user did not pick a button
         if(!selectedTeam) return interaction.followUp("Select a team first")
         //determine matchType
         let matchType: MatchType;
