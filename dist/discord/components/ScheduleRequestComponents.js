@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RequestRow = exports.MatchTypeRow = exports.TeamListRow = exports.DenyButton = exports.AcceptButton = exports.MatchButton = exports.ChallengeButton = exports.ScrimButton = exports.TeamListMenu = void 0;
 const discord_js_1 = require("discord.js");
+const ScheduleRequestAccept_1 = require("../buttons/ScheduleRequestAccept");
 class TeamListMenu extends discord_js_1.SelectMenuBuilder {
     constructor(params) {
         super();
@@ -46,6 +47,12 @@ class MatchTypeRow extends discord_js_1.ActionRowBuilder {
     }
 }
 exports.MatchTypeRow = MatchTypeRow;
-exports.RequestRow = new discord_js_1.ActionRowBuilder()
-    .setComponents(exports.AcceptButton, exports.DenyButton);
+class RequestRow extends discord_js_1.ActionRowBuilder {
+    constructor(teamBot) {
+        super();
+        this.addComponents(new ScheduleRequestAccept_1.ScheduleRequestAcceptButton());
+        this.addComponents(new ScheduleRequestAccept_1.ScheduleRequestAcceptButton());
+    }
+}
+exports.RequestRow = RequestRow;
 //# sourceMappingURL=ScheduleRequestComponents.js.map

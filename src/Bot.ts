@@ -18,11 +18,17 @@ import ScheduleRequestCommand from "./discord/commands/ScheduleRequestCommand";
 import { SchedulingChannelCommand } from "./discord/commands/SchedulingChannelCommand";
 import { MessageReactionAddListender } from "./discord/listeners/MessageReactionAddListener";
 import {ReactionRemoveListener} from "./discord/listeners/ReactionRemoveListener"
+import { DiscordButton } from "./discord/DiscordButton";
+import { UpdateButton } from "./discord/components/RequestAcceptComponents";
+import { MatchOrganizerUpdateButton } from "./discord/buttons/OrganizerUpdate";
+import { ScheduleRequestAcceptButton } from "./discord/buttons/ScheduleRequestAccept";
+import { ScheduleRequestDenyButton } from "./discord/buttons/ScheduleRequestDeny";
 dotenv.config();
 
 export class TeamBot {
     public readonly client: Client;
     public readonly commands: Map<String, DiscordCommand>;
+    public readonly persistentButtons: Map<string, DiscordButton>;
     public readonly rest: REST;
     
 
@@ -34,6 +40,7 @@ export class TeamBot {
             partials: [Partials.Message, Partials.Reaction]
         });
         this.commands = new Map<string, DiscordCommand>();
+        this.persistentButtons = new Map<string, DiscordButton>()
 
         this.registerListener(new ReadyListener());
         this.registerListener(new InteractionCreateListener());
@@ -50,6 +57,10 @@ export class TeamBot {
         this.initCommand(new TeamInfoCommand());
         this.initCommand(new SchedulingChannelCommand());
         this.initCommand(new ScheduleRequestCommand());
+
+        this.initButton(new ScheduleRequestAcceptButton())
+        this.initButton(new ScheduleRequestDenyButton())
+
         
     }
 
@@ -63,6 +74,10 @@ export class TeamBot {
 
     initCommand(discordCommand: DiscordCommand) {
         this.commands.set(discordCommand.properties.name, discordCommand);
+    }
+
+    initButton(discordButton: DiscordButton){
+        this.persistentButtons.set(discordButton.id, discordButton)
     }
 
     findPCLPlayerByDiscord(discordId: string): PCLPlayer | undefined {

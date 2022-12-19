@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateButtonRow = exports.UpdateButton = exports.MatchOrganizerEmbed = void 0;
 const discord_js_1 = require("discord.js");
 const ScheduleRequest_1 = require("../../interfaces/ScheduleRequest");
+const OrganizerUpdate_1 = require("../buttons/OrganizerUpdate");
 class MatchOrganizerEmbed extends discord_js_1.EmbedBuilder {
     constructor(team, opponent, type) {
         super();
@@ -68,9 +69,11 @@ class UpdateButton extends discord_js_1.ButtonBuilder {
 }
 exports.UpdateButton = UpdateButton;
 class UpdateButtonRow extends discord_js_1.ActionRowBuilder {
-    constructor(scheduleRequestId) {
+    constructor(scheduleRequestId, teamBot) {
         super();
-        this.addComponents(new UpdateButton(scheduleRequestId));
+        const btn = new OrganizerUpdate_1.MatchOrganizerUpdateButton(scheduleRequestId);
+        this.addComponents(btn);
+        teamBot.persistentButtons.set(`matchOrganizerUpdate${scheduleRequestId}`, btn);
     }
 }
 exports.UpdateButtonRow = UpdateButtonRow;

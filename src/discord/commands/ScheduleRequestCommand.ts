@@ -73,8 +73,9 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         const opponentCaptainUser = await client.users.fetch(opponentCaptainId);
         //evaluate wether or not a co-captain exists
         const opponentCoCaptainUser = opponentCoCaptainId ? await client.users.fetch(opponentCoCaptainId) : null 
-        const capMsg = await opponentCaptainUser.send({content: "this is maybe a scheduling request", components: [RequestRow]})
+        const capMsg = await opponentCaptainUser.send({content: "this is maybe a scheduling request", components: [new RequestRow(teamBot)]})
         const coCapMsg = opponentCoCaptainUser ? await opponentCoCaptainUser.send("||RUNRUNRUNRUN||") : null
+        buttonInteraction.reply("Request sent")
         //co cap msg id is null if co cap doesnt exist
         const schedRequest: ScheduleRequest = coCapMsg ? {
             id: requestId,

@@ -18,10 +18,13 @@ const ScheduleRequestCommand_1 = tslib_1.__importDefault(require("./discord/comm
 const SchedulingChannelCommand_1 = require("./discord/commands/SchedulingChannelCommand");
 const MessageReactionAddListener_1 = require("./discord/listeners/MessageReactionAddListener");
 const ReactionRemoveListener_1 = require("./discord/listeners/ReactionRemoveListener");
+const ScheduleRequestAccept_1 = require("./discord/buttons/ScheduleRequestAccept");
+const ScheduleRequestDeny_1 = require("./discord/buttons/ScheduleRequestDeny");
 dotenv_1.default.config();
 class TeamBot {
     client;
     commands;
+    persistentButtons;
     rest;
     constructor() {
         this.rest = new discord_js_1.REST({ version: "10" }).setToken(process.env.TOKEN);
@@ -30,6 +33,7 @@ class TeamBot {
             partials: [discord_js_1.Partials.Message, discord_js_1.Partials.Reaction]
         });
         this.commands = new Map();
+        this.persistentButtons = new Map();
         this.registerListener(new ReadyListener_1.ReadyListener());
         this.registerListener(new InteractionCreateListener_1.InteractionCreateListener());
         this.registerListener(new MessageReactionAddListener_1.MessageReactionAddListender());
@@ -43,6 +47,8 @@ class TeamBot {
         this.initCommand(new TeamInfoCommand_1.default());
         this.initCommand(new SchedulingChannelCommand_1.SchedulingChannelCommand());
         this.initCommand(new ScheduleRequestCommand_1.default());
+        this.initButton(new ScheduleRequestAccept_1.ScheduleRequestAcceptButton());
+        this.initButton(new ScheduleRequestDeny_1.ScheduleRequestDenyButton());
     }
     async start() {
         await this.client.login(process.env.TOKEN);
@@ -52,6 +58,9 @@ class TeamBot {
     }
     initCommand(discordCommand) {
         this.commands.set(discordCommand.properties.name, discordCommand);
+    }
+    initButton(discordButton) {
+        this.persistentButtons.set(discordButton.id, discordButton);
     }
     findPCLPlayerByDiscord(discordId) {
         const registeredPlayers = JSON.parse(fs_1.default.readFileSync("./db/registeredPlayers.json", "utf-8"));

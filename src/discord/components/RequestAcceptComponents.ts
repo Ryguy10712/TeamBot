@@ -1,6 +1,8 @@
 import {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder} from "discord.js"
+import { TeamBot } from "../../Bot"
 import { PCLTeam } from "../../interfaces/PCLTeam"
 import { MatchType } from "../../interfaces/ScheduleRequest"
+import { MatchOrganizerUpdateButton } from "../buttons/OrganizerUpdate"
 
 export class MatchOrganizerEmbed extends EmbedBuilder {
   
@@ -74,9 +76,11 @@ export class UpdateButton extends ButtonBuilder {
     }
 }
 
-export class UpdateButtonRow extends ActionRowBuilder<UpdateButton> {
-    constructor(scheduleRequestId: number){
+export class UpdateButtonRow extends ActionRowBuilder<MatchOrganizerUpdateButton> {
+    constructor(scheduleRequestId: number, teamBot: TeamBot){
         super()
-        this.addComponents(new UpdateButton(scheduleRequestId))
-    }
+        const btn = new MatchOrganizerUpdateButton(scheduleRequestId)
+        this.addComponents(btn)
+        teamBot.persistentButtons.set(`matchOrganizerUpdate${scheduleRequestId}`, btn)
+    } 
 }

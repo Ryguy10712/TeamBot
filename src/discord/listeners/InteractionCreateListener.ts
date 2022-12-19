@@ -13,21 +13,17 @@ export class InteractionCreateListener extends DiscordListener {
             }
 
             if (interaction.isButton()) {
-                if (interaction.customId.startsWith("schedreq")) {
-                    if (interaction.customId.includes("Accept")) {
-                        interaction.deferUpdate();
-                        const poo = await import("../../events/ScheduleRequestAccept");
-                        poo.HandleScheduleRequestAccept(teamBot, interaction);
-                    } else if (interaction.customId.includes("Deny")) {
-                        interaction.deferUpdate();
-                    }
-                } else if (interaction.customId.startsWith("matchOrganizer")) {
-                    if (interaction.customId.includes("Update")) {
-                        interaction.deferUpdate()
-                        const MatchOrganizerUpdate = await import("../../events/MatchOrganizerUpdate")
-                        MatchOrganizerUpdate.execute(teamBot, interaction)
-                    }
+                if(!teamBot.persistentButtons.has(interaction.customId)){
+                    interaction.deferReply()
+                    setTimeout(() => {
+                        if(!interaction.replied){
+                            interaction.followUp({content: "I do not understand. Try refreshing the buttons eh?", ephemeral: true})
+                            return;
+                        }
+                    }, 10_000)
                 }
+                teamBot.persistentButtons.get(interaction.customId)?.execute(teamBot, teamBot.client, interaction)
+                
             }
         });
     }

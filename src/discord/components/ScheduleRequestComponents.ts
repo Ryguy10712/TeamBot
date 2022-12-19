@@ -1,4 +1,8 @@
 import {SelectMenuBuilder, ButtonBuilder, ActionRowBuilder, Team, ButtonStyle, SelectMenuOptionBuilder} from "discord.js"
+import { TeamBot } from "../../Bot"
+import { ScheduleRequestAcceptButton } from "../buttons/ScheduleRequestAccept"
+import { ScheduleRequestDenyButton } from "../buttons/ScheduleRequestDeny"
+import { DiscordButton } from "../DiscordButton"
 
 //Components
 export class TeamListMenu extends SelectMenuBuilder {
@@ -52,5 +56,14 @@ export class MatchTypeRow extends ActionRowBuilder<ButtonBuilder> {
 
 }
 
-export const RequestRow = new ActionRowBuilder<ButtonBuilder>()
-.setComponents(AcceptButton, DenyButton)
+
+export class RequestRow extends ActionRowBuilder<DiscordButton> {
+  constructor(teamBot: TeamBot){
+    super()
+    this.addComponents(new ScheduleRequestAcceptButton())
+    this.addComponents(new ScheduleRequestAcceptButton())
+    
+    
+    
+  }
+}
