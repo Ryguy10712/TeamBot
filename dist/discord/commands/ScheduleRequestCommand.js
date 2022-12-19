@@ -73,6 +73,7 @@ class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
         const opponentCoCaptainUser = opponentCoCaptainId ? await client.users.fetch(opponentCoCaptainId) : null;
         const capMsg = await opponentCaptainUser.send({ content: "this is maybe a scheduling request", components: [new ScheduleRequestComponents_1.RequestRow(teamBot)] });
         const coCapMsg = opponentCoCaptainUser ? await opponentCoCaptainUser.send("||RUNRUNRUNRUN||") : null;
+        buttonInteraction.reply("Request sent");
         const schedRequest = coCapMsg ? {
             id: requestId,
             requester: issuerTeam.name,

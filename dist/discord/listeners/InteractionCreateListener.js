@@ -15,8 +15,13 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
             }
             if (interaction.isButton()) {
                 if (!teamBot.persistentButtons.has(interaction.customId)) {
-                    interaction.reply({ ephemeral: true, content: "I do not know how to handle this button" });
-                    return;
+                    interaction.deferReply();
+                    setTimeout(() => {
+                        if (!interaction.replied) {
+                            interaction.followUp({ content: "I do not understand. Try refreshing the buttons eh?", ephemeral: true });
+                            return;
+                        }
+                    }, 10_000);
                 }
                 teamBot.persistentButtons.get(interaction.customId)?.execute(teamBot, teamBot.client, interaction);
             }
