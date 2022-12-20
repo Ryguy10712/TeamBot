@@ -15,7 +15,7 @@ class ScheduleRequestDenyButton extends DiscordButton_1.DiscordButton {
         this.setCustomId(this.id);
     }
     async execute(teamBot, client, interaction) {
-        const schedReqDb = JSON.parse(fs_1.default.readFileSync("./db/scheduleRequests.ts", "utf-8"));
+        const schedReqDb = JSON.parse(fs_1.default.readFileSync("./db/scheduleRequests.json", "utf-8"));
         const teamsDb = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
         const schedReq = schedReqDb.find((schedReq) => {
             return schedReq.captainMsgId === interaction.message.id || schedReq.coCaptainMsgId === interaction.message.id;

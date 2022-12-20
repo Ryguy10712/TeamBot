@@ -4,6 +4,7 @@ exports.InteractionCreateListener = void 0;
 const DiscordListener_1 = require("../DiscordListener");
 class InteractionCreateListener extends DiscordListener_1.DiscordListener {
     startListener(teamBot) {
+        const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze"];
         teamBot.client.on("interactionCreate", async (interaction) => {
             try {
                 if (interaction.isCommand()) {
@@ -15,6 +16,10 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
             }
             if (interaction.isButton()) {
                 if (!teamBot.persistentButtons.has(interaction.customId)) {
+                    if (nonReplyButtonIds.includes(interaction.customId)) {
+                        interaction.deferUpdate();
+                        return;
+                    }
                     interaction.deferReply();
                     setTimeout(() => {
                         if (!interaction.replied) {

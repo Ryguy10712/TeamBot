@@ -53,8 +53,6 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         })
         //handle button press
         const buttonFilter = (i: ButtonInteraction) => {
-            if(i.deferred) return false;
-            i.deferUpdate()
             return i.user.id === interaction.user.id
         }
         const buttonInteraction = await reply.awaitMessageComponent({filter: buttonFilter, componentType: ComponentType.Button, time: 120_000}).catch(() => {return}) as ButtonInteraction<CacheType>
@@ -73,9 +71,10 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         const opponentCaptainUser = await client.users.fetch(opponentCaptainId);
         //evaluate wether or not a co-captain exists
         const opponentCoCaptainUser = opponentCoCaptainId ? await client.users.fetch(opponentCoCaptainId) : null 
-        const capMsg = await opponentCaptainUser.send({content: "this is maybe a scheduling request", components: [new RequestRow(teamBot)]})
+        const capMsg = await opponentCaptainUser.send({content: "this is maybe a scheduling request", components: [new RequestRow()]})
         const coCapMsg = opponentCoCaptainUser ? await opponentCoCaptainUser.send("||RUNRUNRUNRUN||") : null
-        buttonInteraction.reply("Request sent")
+        buttonInteraction.followUp({content: "Request Sent", ephemeral: true}) 
+        buttonInteraction.replied = true; //button handler will acknowledge this
         //co cap msg id is null if co cap doesnt exist
         const schedRequest: ScheduleRequest = coCapMsg ? {
             id: requestId,

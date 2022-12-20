@@ -29,7 +29,7 @@ export default class TeamConfigCommand extends DiscordCommand {
             return i.user == interaction.user;
         };
         const buttonFilter = (i: ButtonInteraction) => {
-            if (i.deferred || !i.customId.includes("teamcfg")) return false;
+            if (!i.customId.includes("teamcfg")) return false;
             return i.user === interaction.user;
         };
         const menuCollector = reply.createMessageComponentCollector({ filter: menuFilter, componentType: ComponentType.StringSelect, time: 120_000 });
@@ -146,7 +146,6 @@ export default class TeamConfigCommand extends DiscordCommand {
                     break;
 
                 case "teamcfgGold":
-                    buttonInteraction.deferUpdate()
                     registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.rank = 0
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))

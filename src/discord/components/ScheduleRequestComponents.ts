@@ -58,10 +58,16 @@ export class MatchTypeRow extends ActionRowBuilder<ButtonBuilder> {
 
 
 export class RequestRow extends ActionRowBuilder<DiscordButton> {
-  constructor(teamBot: TeamBot){
+  constructor(enabled?: boolean){
     super()
-    this.addComponents(new ScheduleRequestAcceptButton())
-    this.addComponents(new ScheduleRequestAcceptButton())
+    const acceptBtn = new ScheduleRequestAcceptButton()
+    const denyBtn = new ScheduleRequestDenyButton()
+    if(enabled === false) {
+      acceptBtn.setDisabled(true)
+      denyBtn.setDisabled(true)
+    }
+    this.addComponents(acceptBtn)
+    this.addComponents(denyBtn)
     
     
     

@@ -3,6 +3,7 @@ import { TeamBot } from "../../Bot";
 
 export class InteractionCreateListener extends DiscordListener {
     startListener(teamBot: TeamBot): void {
+        const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze"]
         teamBot.client.on("interactionCreate", async (interaction) => {
             try {
                 if (interaction.isCommand()) {
@@ -13,7 +14,14 @@ export class InteractionCreateListener extends DiscordListener {
             }
 
             if (interaction.isButton()) {
+                /** if it isn't a persistent button, either wait for a 
+                 * reply or defer an update if it's a non-reply button */
                 if(!teamBot.persistentButtons.has(interaction.customId)){
+                    if(nonReplyButtonIds.includes(interaction.customId)) { //non-reply button
+                        interaction.deferUpdate();
+                        return;
+                    }
+                    //not a persitent button, but should hava a reply
                     interaction.deferReply()
                     setTimeout(() => {
                         if(!interaction.replied){

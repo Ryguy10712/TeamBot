@@ -27,7 +27,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
             return i.user == interaction.user;
         };
         const buttonFilter = (i) => {
-            if (i.deferred || !i.customId.includes("teamcfg"))
+            if (!i.customId.includes("teamcfg"))
                 return false;
             return i.user === interaction.user;
         };
@@ -138,7 +138,6 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                     success = true;
                     break;
                 case "teamcfgGold":
-                    buttonInteraction.deferUpdate();
                     registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
                     registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).rank = 0;
                     fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));

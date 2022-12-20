@@ -4,6 +4,7 @@ import { ScheduleRequest } from "../../interfaces/ScheduleRequest";
 import { DiscordButton } from "../DiscordButton";
 import fs from "fs"
 import { MatchOrganizerEmbed, UpdateButtonRow } from "../components/RequestAcceptComponents";
+import { RequestRow } from "../components/ScheduleRequestComponents";
 import { TeamBot } from "../../Bot";
 
 export class ScheduleRequestAcceptButton extends DiscordButton {
@@ -18,12 +19,13 @@ export class ScheduleRequestAcceptButton extends DiscordButton {
     }
 
     async execute(teamBot: TeamBot, client: Client<boolean>, interaction: ButtonInteraction<CacheType>) {
-        interaction.deferUpdate()
         const scheduleRequests: ScheduleRequest[] = JSON.parse(fs.readFileSync("./db/scheduleRequests.json", "utf-8"));
         const registeredTeams: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
         const schedReq = scheduleRequests.find((schedreq) => {
             return interaction.message.id == schedreq.captainMsgId;
         })!;
+
+        if(!schedReq) return interaction.reply("this schedule request is no longer available")
 
         const requesterCaptainId = registeredTeams.find((pclTeam) => {
             return pclTeam.name === schedReq.requester;
@@ -35,7 +37,10 @@ export class ScheduleRequestAcceptButton extends DiscordButton {
         const requesterCoCaptainUser = requesterCoCaptainId ? await client.users.fetch(requesterCoCaptainId) : null;
         
         //let requester captain know 
-        requesterCaptainUser.send("THE REQUEST HAS BEEN ACCEPTED RAHHHHHH"); 
+        requesterCaptainUser.send("THE REQUEST HAS BEEN ACCEPTED RAHHHHHH");
+        //disable the buttons
+        interaction.deferUpdate() //prevents failed msg
+        interaction.message.edit({components: [new RequestRow(false)]})
         //if applicable, let requester coCap know
         if (requesterCoCaptainUser) requesterCoCaptainUser.send("THE SCHEDULE REQUEST HAS BEEN ACCEPTED RAHHH (you are a stinky co captain)");
 

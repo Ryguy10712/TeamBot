@@ -48,9 +48,6 @@ class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
             selectedTeam = menuInteraction.values[0].replace("schedreq", "");
         });
         const buttonFilter = (i) => {
-            if (i.deferred)
-                return false;
-            i.deferUpdate();
             return i.user.id === interaction.user.id;
         };
         const buttonInteraction = await reply.awaitMessageComponent({ filter: buttonFilter, componentType: discord_js_1.ComponentType.Button, time: 120_000 }).catch(() => { return; });
@@ -71,9 +68,10 @@ class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
         const opponentCoCaptainId = registeredTeams.find(pclTeam => { return pclTeam.name === selectedTeam; }).coCap;
         const opponentCaptainUser = await client.users.fetch(opponentCaptainId);
         const opponentCoCaptainUser = opponentCoCaptainId ? await client.users.fetch(opponentCoCaptainId) : null;
-        const capMsg = await opponentCaptainUser.send({ content: "this is maybe a scheduling request", components: [new ScheduleRequestComponents_1.RequestRow(teamBot)] });
+        const capMsg = await opponentCaptainUser.send({ content: "this is maybe a scheduling request", components: [new ScheduleRequestComponents_1.RequestRow()] });
         const coCapMsg = opponentCoCaptainUser ? await opponentCoCaptainUser.send("||RUNRUNRUNRUN||") : null;
-        buttonInteraction.reply("Request sent");
+        buttonInteraction.followUp({ content: "Request Sent", ephemeral: true });
+        buttonInteraction.replied = true;
         const schedRequest = coCapMsg ? {
             id: requestId,
             requester: issuerTeam.name,

@@ -6,6 +6,7 @@ const discord_js_1 = require("discord.js");
 const DiscordButton_1 = require("../DiscordButton");
 const fs_1 = tslib_1.__importDefault(require("fs"));
 const RequestAcceptComponents_1 = require("../components/RequestAcceptComponents");
+const ScheduleRequestComponents_1 = require("../components/ScheduleRequestComponents");
 class ScheduleRequestAcceptButton extends DiscordButton_1.DiscordButton {
     id;
     constructor() {
@@ -16,12 +17,13 @@ class ScheduleRequestAcceptButton extends DiscordButton_1.DiscordButton {
         this.setCustomId(this.id);
     }
     async execute(teamBot, client, interaction) {
-        interaction.deferUpdate();
         const scheduleRequests = JSON.parse(fs_1.default.readFileSync("./db/scheduleRequests.json", "utf-8"));
         const registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
         const schedReq = scheduleRequests.find((schedreq) => {
             return interaction.message.id == schedreq.captainMsgId;
         });
+        if (!schedReq)
+            return interaction.reply("this schedule request is no longer available");
         const requesterCaptainId = registeredTeams.find((pclTeam) => {
             return pclTeam.name === schedReq.requester;
         }).captain;
@@ -31,6 +33,8 @@ class ScheduleRequestAcceptButton extends DiscordButton_1.DiscordButton {
         const requesterCaptainUser = await client.users.fetch(requesterCaptainId);
         const requesterCoCaptainUser = requesterCoCaptainId ? await client.users.fetch(requesterCoCaptainId) : null;
         requesterCaptainUser.send("THE REQUEST HAS BEEN ACCEPTED RAHHHHHH");
+        interaction.deferUpdate();
+        interaction.message.edit({ components: [new ScheduleRequestComponents_1.RequestRow(false)] });
         if (requesterCoCaptainUser)
             requesterCoCaptainUser.send("THE SCHEDULE REQUEST HAS BEEN ACCEPTED RAHHH (you are a stinky co captain)");
         const requesterPclTeam = registeredTeams.find(pclTeam => { return pclTeam.name === schedReq.requester; });

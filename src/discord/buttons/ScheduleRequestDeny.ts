@@ -17,7 +17,7 @@ export class ScheduleRequestDenyButton extends DiscordButton {
     }
 
     async execute(teamBot: TeamBot, client: Client<boolean>, interaction: ButtonInteraction<CacheType>) {
-        const schedReqDb: ScheduleRequest[] = JSON.parse(fs.readFileSync("./db/scheduleRequests.ts", "utf-8"));
+        const schedReqDb: ScheduleRequest[] = JSON.parse(fs.readFileSync("./db/scheduleRequests.json", "utf-8"));
         const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
 
         const schedReq = schedReqDb.find((schedReq) => {
