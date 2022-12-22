@@ -19,7 +19,7 @@ class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
         if (!registeredTeams.some((pclPlayer) => {
             return pclPlayer.captain === interaction.user.id || pclPlayer.coCap === interaction.user.id;
         })) {
-            return interaction.reply("poopoo");
+            return interaction.reply({ content: "poopoo" });
         }
         const issuerTeam = registeredTeams.find((pclTeam) => {
             return pclTeam.captain === interaction.user.id || pclTeam.coCap === interaction.user.id;
@@ -36,7 +36,7 @@ class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
             }
         }
         const menu = new ScheduleRequestComponents_1.TeamListMenu(TeamListMenuParams);
-        const reply = await interaction.reply({ components: [new ScheduleRequestComponents_1.TeamListRow(menu), new ScheduleRequestComponents_1.MatchTypeRow], content: "poopoo" });
+        const reply = await interaction.reply({ components: [new ScheduleRequestComponents_1.TeamListRow(menu), new ScheduleRequestComponents_1.MatchTypeRow], embeds: [new ScheduleRequestEmbeds_1.SchedReqPrimaryEmbed] });
         let selectedTeam = undefined;
         const menuFilter = (i) => {
             if (i.deferred || i.customId != "schedreqTeams")

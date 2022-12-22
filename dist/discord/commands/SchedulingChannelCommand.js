@@ -16,7 +16,7 @@ class SchedulingChannelCommand extends DiscordCommand_1.DiscordCommand {
             .addChannelOption(new discord_js_1.SlashCommandChannelOption().setName("channel").setDescription("make sure you are in your team's server").setRequired(true));
     }
     async executeInteraction(client, interaction, teamBot) {
-        interaction.deferReply();
+        await interaction.deferReply();
         const REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "🕚", "🕛"];
         const channel = interaction.options.get("channel").value;
         let teamsDb = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
@@ -24,13 +24,13 @@ class SchedulingChannelCommand extends DiscordCommand_1.DiscordCommand {
             return pclTeam.captain === interaction.user.id || pclTeam.coCap === interaction.user.id;
         });
         if (!issuerTeam)
-            return interaction.reply("you are not part of a team");
+            return interaction.followUp("you are not part of a team");
         teamsDb.find((pclTeam) => {
             return pclTeam.name === issuerTeam.name;
         }).schedulingChannel = channel;
         const guildChan = (await client.channels.fetch(channel));
-        if (!guildChan.isTextBased)
-            return interaction.reply({ embeds: [new SchedChannelEmbeds_1.WrongChannelTypeEmbed()], ephemeral: true });
+        if (guildChan.type != discord_js_1.ChannelType.GuildText)
+            return interaction.followUp({ embeds: [new SchedChannelEmbeds_1.WrongChannelTypeEmbed()], ephemeral: true });
         const messages = [];
         messages.push(await guildChan.send("Tuesday"), await guildChan.send("Wednesday"), await guildChan.send("Thursday"), await guildChan.send("Friday"), await guildChan.send("Saturday"), await guildChan.send("Sunday"), await guildChan.send("Monday"));
         const teamAvailability = {

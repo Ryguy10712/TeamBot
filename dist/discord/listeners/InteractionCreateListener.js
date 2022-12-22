@@ -5,6 +5,7 @@ const tslib_1 = require("tslib");
 const DiscordListener_1 = require("../DiscordListener");
 const fs_1 = tslib_1.__importDefault(require("fs"));
 const OrganizerUpdate_1 = require("../buttons/OrganizerUpdate");
+const InteractionCreateEmbeds_1 = require("../embeds/InteractionCreateEmbeds");
 class InteractionCreateListener extends DiscordListener_1.DiscordListener {
     startListener(teamBot) {
         const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze", "teamcfgTrue", "teamcfgFalse"];
@@ -33,7 +34,7 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
                     interaction.deferReply();
                     setTimeout(() => {
                         if (!interaction.replied) {
-                            interaction.followUp({ content: "I do not understand. Try refreshing the buttons eh?", ephemeral: true });
+                            interaction.followUp({ embeds: [new InteractionCreateEmbeds_1.MisunderstoodButtonEmbed(interaction.customId)], ephemeral: true });
                             return;
                         }
                     }, 10_000);
