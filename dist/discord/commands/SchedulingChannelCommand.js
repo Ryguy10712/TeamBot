@@ -24,7 +24,7 @@ class SchedulingChannelCommand extends DiscordCommand_1.DiscordCommand {
             return pclTeam.captain === interaction.user.id || pclTeam.coCap === interaction.user.id;
         });
         if (!issuerTeam)
-            return interaction.followUp("you are not part of a team");
+            return interaction.followUp({ embeds: [new SchedChannelEmbeds_1.NoTeamEmbed] });
         teamsDb.find((pclTeam) => {
             return pclTeam.name === issuerTeam.name;
         }).schedulingChannel = channel;

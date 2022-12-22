@@ -3,7 +3,7 @@ import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import fs from "fs";
 import { PCLTeam, HourReaction } from "../../interfaces/PCLTeam";
-import { SchedChanSetEmbed, WrongChannelTypeEmbed } from "../embeds/SchedChannelEmbeds";
+import { NoTeamEmbed, SchedChanSetEmbed, WrongChannelTypeEmbed } from "../embeds/SchedChannelEmbeds";
 
 export class SchedulingChannelCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -25,7 +25,7 @@ export class SchedulingChannelCommand extends DiscordCommand {
             return pclTeam.captain === interaction.user.id || pclTeam.coCap === interaction.user.id; //evaluate wether the user is a cap or cocap of a team
         });
 
-        if (!issuerTeam) return interaction.followUp("you are not part of a team");
+        if (!issuerTeam) return interaction.followUp({embeds: [new NoTeamEmbed]});
         teamsDb.find((pclTeam) => {
             return pclTeam.name === issuerTeam!.name;
         })!.schedulingChannel = channel;
