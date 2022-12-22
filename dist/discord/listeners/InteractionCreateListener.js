@@ -1,10 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InteractionCreateListener = void 0;
+const tslib_1 = require("tslib");
 const DiscordListener_1 = require("../DiscordListener");
+const fs_1 = tslib_1.__importDefault(require("fs"));
+const OrganizerUpdate_1 = require("../buttons/OrganizerUpdate");
 class InteractionCreateListener extends DiscordListener_1.DiscordListener {
     startListener(teamBot) {
-        const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze"];
+        const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze", "teamcfgTrue", "teamcfgFalse"];
+        const buttonCache = JSON.parse(fs_1.default.readFileSync("./cache/persistentButtons.json", "utf-8"));
+        for (const buttonId of buttonCache) {
+            if (buttonId.startsWith("matchOrganizerUpdate")) {
+                const btn = new OrganizerUpdate_1.MatchOrganizerUpdateButton(parseInt(buttonId.replace("matchOrganizerUpdate", "")));
+                teamBot.persistentButtons.set(btn.id, btn);
+            }
+        }
         teamBot.client.on("interactionCreate", async (interaction) => {
             try {
                 if (interaction.isCommand()) {

@@ -5,7 +5,7 @@ import { MatchOrganizerUpdateButton } from "../buttons/OrganizerUpdate";
 
 export class InteractionCreateListener extends DiscordListener {
     startListener(teamBot: TeamBot): void {
-        const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze"];
+        const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze", "teamcfgTrue", "teamcfgFalse"];
         //get buttons in case of crash and/or restart, and add them to non-replies
         const buttonCache: string[] = JSON.parse(fs.readFileSync("./cache/persistentButtons.json", "utf-8"));
         //sort the different kinds of buttons
