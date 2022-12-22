@@ -2,7 +2,6 @@
   "dependencies": {
     "discord.js": "^14.6.0",
     "dotenv": "^16.0.3",
-    "fs": "^0.0.1-security",
-    "ts-node": "^10.9.1"
+    "fs": "^0.0.1-security"
   }
 }

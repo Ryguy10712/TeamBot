@@ -19,7 +19,6 @@ import fs from "fs";
 import { DiscordCommand } from "../DiscordCommand";
 import { TeamBot } from "../../Bot";
 import * as RegisterTeamEmbeds from "../embeds/RegisterTeamEmbeds";
-import { register } from "ts-node";
 
 export default class RegisterTeamCommand extends DiscordCommand {
     public inDev: boolean = false;
