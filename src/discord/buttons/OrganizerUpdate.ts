@@ -14,9 +14,14 @@ export class MatchOrganizerUpdateButton extends DiscordButton {
         this.setLabel("Update")
         this.setStyle(ButtonStyle.Primary)
         this.setCustomId(this.id)
+        const buttonCache: string[] = JSON.parse(fs.readFileSync("./cache/persistentButtons.json", "utf-8"))
+        if(buttonCache.includes(this.id)) return; //prevents duplicate entries
+        buttonCache.push(this.id);
+        fs.writeFileSync("./cache/persistentButtons.json", JSON.stringify(buttonCache))
     }
     
     async execute(teamBot: TeamBot, client: Client, interaction: ButtonInteraction) {
+        interaction.deferUpdate()
         const schedReqDb: ScheduleRequest[] = JSON.parse(fs.readFileSync("./db/scheduleRequests.json", "utf-8"))
         const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
         const schedReqId = parseInt(interaction.customId.replace("matchOrganizerUpdate", ""))
