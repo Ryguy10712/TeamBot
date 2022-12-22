@@ -7,7 +7,7 @@ export class MisunderstoodButtonEmbed extends EmbedBuilder{
         this.setTitle("I don't understand...")
         this.setFields({
             "name": "Notice:",
-            "value": "I do not know what to do with this button. Try creating a new one eh?"
+            "value": "I don't know what to do with this button. Try creating a new one eh?"
         })
         this.setFooter({text: `Id: ${buttonId}`})
     }
