@@ -81,6 +81,6 @@ export class UpdateButtonRow extends ActionRowBuilder<MatchOrganizerUpdateButton
         super()
         const btn = new MatchOrganizerUpdateButton(scheduleRequestId)
         this.addComponents(btn)
-        teamBot.persistentButtons.set(`matchOrganizerUpdate${scheduleRequestId}`, btn)
+        teamBot.persistentButtons.set(btn.id, btn)
     } 
 }
