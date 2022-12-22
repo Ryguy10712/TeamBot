@@ -2,6 +2,7 @@ import { DiscordListener } from "../DiscordListener";
 import { TeamBot } from "../../Bot";
 import fs from "fs";
 import { MatchOrganizerUpdateButton } from "../buttons/OrganizerUpdate";
+import { MisunderstoodButtonEmbed } from "../embeds/InteractionCreateEmbeds";
 
 export class InteractionCreateListener extends DiscordListener {
     startListener(teamBot: TeamBot): void {
@@ -15,7 +16,6 @@ export class InteractionCreateListener extends DiscordListener {
                 teamBot.persistentButtons.set(btn.id, btn);
             }
         }
-
         //start the listener
         teamBot.client.on("interactionCreate", async (interaction) => {
             try {
@@ -39,7 +39,7 @@ export class InteractionCreateListener extends DiscordListener {
                     interaction.deferReply();
                     setTimeout(() => {
                         if (!interaction.replied) {
-                            interaction.followUp({ content: "I do not understand. Try refreshing the buttons eh?", ephemeral: true });
+                            interaction.followUp({ embeds: [new MisunderstoodButtonEmbed(interaction.customId)], ephemeral: true });
                             return;
                         }
                     }, 10_000);

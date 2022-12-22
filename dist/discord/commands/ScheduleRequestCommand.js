@@ -6,6 +6,7 @@ const DiscordCommand_1 = require("../DiscordCommand");
 const fs_1 = tslib_1.__importDefault(require("fs"));
 const ScheduleRequestComponents_1 = require("../components/ScheduleRequestComponents");
 const ScheduleRequest_1 = require("../../interfaces/ScheduleRequest");
+const ScheduleRequestEmbeds_1 = require("../embeds/ScheduleRequestEmbeds");
 class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
     inDev = false;
     constructor() {
@@ -70,7 +71,7 @@ class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
         const opponentCoCaptainUser = opponentCoCaptainId ? await client.users.fetch(opponentCoCaptainId) : null;
         const capMsg = await opponentCaptainUser.send({ content: "this is maybe a scheduling request", components: [new ScheduleRequestComponents_1.RequestRow()] });
         const coCapMsg = opponentCoCaptainUser ? await opponentCoCaptainUser.send("||RUNRUNRUNRUN||") : null;
-        buttonInteraction.followUp({ content: "Request Sent", ephemeral: true });
+        buttonInteraction.followUp({ embeds: [new ScheduleRequestEmbeds_1.RequestSentEmbed(selectedTeam)], ephemeral: true });
         buttonInteraction.replied = true;
         const schedRequest = coCapMsg ? {
             id: requestId,

@@ -5,7 +5,7 @@ import fs from "fs";
 import { PCLTeam } from "../../interfaces/PCLTeam";
 import { AcceptButton, DenyButton, MatchTypeRow, RequestRow, TeamListMenu, TeamListRow } from "../components/ScheduleRequestComponents";
 import { ScheduleRequest, MatchType } from "../../interfaces/ScheduleRequest";
-import { register } from "ts-node";
+import { RequestSentEmbed, SchedReqPrimaryEmbed } from "../embeds/ScheduleRequestEmbeds";
 
 export default class ScheduleRequestCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -23,7 +23,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
                 return pclPlayer.captain === interaction.user.id || pclPlayer.coCap === interaction.user.id;
             })
           ) {
-            return interaction.reply("poopoo"); //poopoo pee pee
+            return interaction.reply({content: "poopoo"}); //poopoo pee pee
         }
         //at this point the user IS a cocaptain
         const issuerTeam = registeredTeams.find((pclTeam) => {
@@ -40,7 +40,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
               }
         }
         const menu = new TeamListMenu(TeamListMenuParams)
-        const reply = await interaction.reply({components: [new TeamListRow(menu!), new MatchTypeRow], content: "poopoo"})
+        const reply = await interaction.reply({components: [new TeamListRow(menu!), new MatchTypeRow], embeds: [new SchedReqPrimaryEmbed]})
         let selectedTeam: string | undefined = undefined
         const menuFilter = (i: SelectMenuInteraction) => {
           if (i.deferred || i.customId != "schedreqTeams") return false;
@@ -73,7 +73,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         const opponentCoCaptainUser = opponentCoCaptainId ? await client.users.fetch(opponentCoCaptainId) : null 
         const capMsg = await opponentCaptainUser.send({content: "this is maybe a scheduling request", components: [new RequestRow()]})
         const coCapMsg = opponentCoCaptainUser ? await opponentCoCaptainUser.send("||RUNRUNRUNRUN||") : null
-        buttonInteraction.followUp({content: "Request Sent", ephemeral: true}) 
+        buttonInteraction.followUp({embeds: [new RequestSentEmbed(selectedTeam)], ephemeral: true}) 
         buttonInteraction.replied = true; //button handler will acknowledge this
         //co cap msg id is null if co cap doesnt exist
         const schedRequest: ScheduleRequest = coCapMsg ? {

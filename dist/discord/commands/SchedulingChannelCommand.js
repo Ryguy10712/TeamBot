@@ -5,6 +5,7 @@ const tslib_1 = require("tslib");
 const discord_js_1 = require("discord.js");
 const DiscordCommand_1 = require("../DiscordCommand");
 const fs_1 = tslib_1.__importDefault(require("fs"));
+const SchedChannelEmbeds_1 = require("../embeds/SchedChannelEmbeds");
 class SchedulingChannelCommand extends DiscordCommand_1.DiscordCommand {
     inDev = false;
     constructor() {
@@ -28,12 +29,27 @@ class SchedulingChannelCommand extends DiscordCommand_1.DiscordCommand {
             return pclTeam.name === issuerTeam.name;
         }).schedulingChannel = channel;
         const guildChan = (await client.channels.fetch(channel));
+        if (!guildChan.isTextBased)
+            return interaction.reply({ embeds: [new SchedChannelEmbeds_1.WrongChannelTypeEmbed()], ephemeral: true });
         const messages = [];
         messages.push(await guildChan.send("Tuesday"), await guildChan.send("Wednesday"), await guildChan.send("Thursday"), await guildChan.send("Friday"), await guildChan.send("Saturday"), await guildChan.send("Sunday"), await guildChan.send("Monday"));
         const teamAvailability = {
             messageIds: [],
             tuesday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
-            wednesday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
+            wednesday: {
+                "1PM": [],
+                "2PM": [],
+                "3PM": [],
+                "4PM": [],
+                "5PM": [],
+                "6PM": [],
+                "7PM": [],
+                "8PM": [],
+                "9PM": [],
+                "10PM": [],
+                "11PM": [],
+                "12PM": [],
+            },
             thursday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
             friday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
             saturday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
@@ -51,7 +67,7 @@ class SchedulingChannelCommand extends DiscordCommand_1.DiscordCommand {
             return pclTeam.name === issuerTeam.name;
         }).availability = teamAvailability;
         fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(teamsDb));
-        interaction.followUp("Success");
+        interaction.followUp({ embeds: [new SchedChannelEmbeds_1.SchedChanSetEmbed(guildChan.id)] });
     }
 }
 exports.SchedulingChannelCommand = SchedulingChannelCommand;
