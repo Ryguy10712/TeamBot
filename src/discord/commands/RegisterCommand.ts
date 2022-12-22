@@ -11,7 +11,7 @@ export default class RegisterCommand extends DiscordCommand {
         super();
         this.properties
             .setName("register")
-            .setDescription("registers player and/or team")
+            .setDescription("registers your oculus username")
             .addStringOption(new SlashCommandStringOption().setName("oculusid").setDescription("your oculus username in exact casing").setRequired(true));
     }
 

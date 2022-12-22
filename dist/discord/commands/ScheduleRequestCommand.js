@@ -11,7 +11,7 @@ class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
     inDev = false;
     constructor() {
         super();
-        this.properties.setName("schedule_request").setDescription("poopoo pee pee cacac");
+        this.properties.setName("schedule_request").setDescription("Set up a match with another team");
     }
     async executeInteraction(client, interaction, teamBot) {
         const registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));

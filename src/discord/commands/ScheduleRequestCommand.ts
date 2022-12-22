@@ -12,7 +12,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
 
     constructor() {
         super();
-        this.properties.setName("schedule_request").setDescription("poopoo pee pee cacac");
+        this.properties.setName("schedule_request").setDescription("Set up a match with another team");
     }
 
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
