@@ -14,8 +14,14 @@ class MatchOrganizerUpdateButton extends DiscordButton_1.DiscordButton {
         this.setLabel("Update");
         this.setStyle(discord_js_1.ButtonStyle.Primary);
         this.setCustomId(this.id);
+        const buttonCache = JSON.parse(fs_1.default.readFileSync("./cache/persistentButtons.json", "utf-8"));
+        if (buttonCache.includes(this.id))
+            return;
+        buttonCache.push(this.id);
+        fs_1.default.writeFileSync("./cache/persistentButtons.json", JSON.stringify(buttonCache));
     }
     async execute(teamBot, client, interaction) {
+        interaction.deferUpdate();
         const schedReqDb = JSON.parse(fs_1.default.readFileSync("./db/scheduleRequests.json", "utf-8"));
         const teamsDb = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
         const schedReqId = parseInt(interaction.customId.replace("matchOrganizerUpdate", ""));

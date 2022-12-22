@@ -73,7 +73,7 @@ class UpdateButtonRow extends discord_js_1.ActionRowBuilder {
         super();
         const btn = new OrganizerUpdate_1.MatchOrganizerUpdateButton(scheduleRequestId);
         this.addComponents(btn);
-        teamBot.persistentButtons.set(`matchOrganizerUpdate${scheduleRequestId}`, btn);
+        teamBot.persistentButtons.set(btn.id, btn);
     }
 }
 exports.UpdateButtonRow = UpdateButtonRow;
