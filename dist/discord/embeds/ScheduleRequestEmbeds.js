@@ -19,7 +19,7 @@ class SchedReqPrimaryEmbed extends discord_js_1.EmbedBuilder {
         super();
         this.setColor("DarkButNotBlack");
         this.setTitle("Pick a team and match type");
-        this.setDescription("If a team isn't listed, they have not set their scheduling channel yet.");
+        this.setDescription("If a team isn't listed, they have not set their scheduling channel yet. Maybe let them know eh?");
     }
 }
 exports.SchedReqPrimaryEmbed = SchedReqPrimaryEmbed;
