@@ -6,7 +6,9 @@ import { MisunderstoodButtonEmbed } from "../embeds/InteractionCreateEmbeds";
 
 export class InteractionCreateListener extends DiscordListener {
     startListener(teamBot: TeamBot): void {
+        //SPECIAL CASES
         const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze", "teamcfgTrue", "teamcfgFalse"];
+        const nonDeferUpdateIds = ["teamcfgAdd", "teamcfgRemove", "teamcfgEdit"];
         //get buttons in case of crash and/or restart, and add them to non-replies
         const buttonCache: string[] = JSON.parse(fs.readFileSync("./cache/persistentButtons.json", "utf-8"));
         //sort the different kinds of buttons
@@ -34,8 +36,16 @@ export class InteractionCreateListener extends DiscordListener {
                         //non-reply button
                         interaction.deferUpdate();
                         return;
+                    } else if (nonDeferUpdateIds.includes(interaction.customId)) {
+                        //non defer, usually if a modal is needed
+                        setTimeout(() => {
+                            if (!interaction.replied) {
+                                interaction.reply({ embeds: [new MisunderstoodButtonEmbed(interaction.customId)], ephemeral: true });
+                            }
+                        }, 4_000);
+                        return;
                     }
-                    //not a persitent button, but should hava a reply
+                    //not a persitent button, but should have a reply
                     interaction.deferReply();
                     setTimeout(() => {
                         if (!interaction.replied) {

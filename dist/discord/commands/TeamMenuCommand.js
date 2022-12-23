@@ -61,7 +61,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
             let registeredTeams;
             switch (buttonInteraction.customId) {
                 case "teamcfgAdd":
-                    buttonInteraction.showModal(Components.AddPlayerModal);
+                    await buttonInteraction.showModal(Components.AddPlayerModal);
                     await buttonInteraction.awaitModalSubmit({ time: 120_000 })
                         .then((modalData) => {
                         modalData.deferUpdate();
@@ -93,7 +93,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                         if (!playerForRemoval)
                             return interaction.editReply({ embeds: [Embeds.PlayerNotFoundError] });
                         if (!team.players.includes(playerForRemoval))
-                            return interaction.followUp({ embeds: [Embeds.PlayerNotOnError] });
+                            return interaction.editReply({ embeds: [Embeds.PlayerNotOnError] });
                         registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
                         registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).players = registeredTeams.find(PCLTeam => { return PCLTeam.name === team.name; }).players.filter(player => { return player != playerForRemoval; });
                         fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
@@ -120,7 +120,6 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                     });
                     break;
                 case "teamcfgTrue":
-                    buttonInteraction.deferUpdate();
                     registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
                     registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).confidential = true;
                     fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
@@ -129,7 +128,6 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                     success = true;
                     break;
                 case "teamcfgFalse":
-                    buttonInteraction.deferUpdate();
                     registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
                     registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).confidential = false;
                     fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
@@ -146,7 +144,6 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                     success = true;
                     break;
                 case "teamcfgSilver":
-                    buttonInteraction.deferUpdate();
                     registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
                     registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).rank = 1;
                     fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
@@ -155,7 +152,6 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
                     success = true;
                     break;
                 case "teamcfgBronze":
-                    buttonInteraction.deferUpdate();
                     registeredTeams = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
                     registeredTeams.find(pclTeam => { return pclTeam.name === team.name; }).rank = 2;
                     fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
