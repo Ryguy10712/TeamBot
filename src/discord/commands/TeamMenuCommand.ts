@@ -8,7 +8,7 @@ import { PCLTeam } from "../../interfaces/PCLTeam";
 import { isoculusidClean } from "../../utils/StringSanatizers";
 
 export default class TeamConfigCommand extends DiscordCommand {
-    public inDev: boolean = true;
+    public inDev: boolean = false;
 
     constructor() {
         super();

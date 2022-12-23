@@ -7,7 +7,7 @@ const Embeds = tslib_1.__importStar(require("../embeds/TeamMenuEmbeds"));
 const Components = tslib_1.__importStar(require("../components/TeamMenuComponents"));
 const fs_1 = tslib_1.__importDefault(require("fs"));
 class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
-    inDev = true;
+    inDev = false;
     constructor() {
         super();
         this.properties.setName("team_menu").setDescription("Edit various aspects of your team");
