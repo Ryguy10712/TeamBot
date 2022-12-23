@@ -3,6 +3,8 @@ import { TeamBot } from "../../Bot";
 import fs from "fs";
 import { MatchOrganizerUpdateButton } from "../buttons/OrganizerUpdate";
 import { MisunderstoodButtonEmbed } from "../embeds/InteractionCreateEmbeds";
+import { DiscordCommand } from "../DiscordCommand";
+import { DiscordContextMenu } from "../DiscordContextMenu";
 
 export class InteractionCreateListener extends DiscordListener {
     startListener(teamBot: TeamBot): void {
@@ -21,8 +23,11 @@ export class InteractionCreateListener extends DiscordListener {
         //start the listener
         teamBot.client.on("interactionCreate", async (interaction) => {
             try {
-                if (interaction.isCommand()) {
-                    teamBot.commands.get(interaction.commandName)?.executeInteraction(teamBot.client, interaction, teamBot);
+                if (interaction.isChatInputCommand()) {
+                    (teamBot.commands.get(interaction.commandName) as DiscordCommand).executeInteraction(teamBot.client, interaction, teamBot);
+                }
+                if (interaction.isContextMenuCommand()) {
+                    (teamBot.commands.get(interaction.commandName) as DiscordContextMenu).executeInteraction(teamBot.client, interaction, teamBot);
                 }
             } catch (e) {
                 console.error(e);

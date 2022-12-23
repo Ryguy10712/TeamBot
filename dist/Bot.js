@@ -20,6 +20,7 @@ const MessageReactionAddListener_1 = require("./discord/listeners/MessageReactio
 const ReactionRemoveListener_1 = require("./discord/listeners/ReactionRemoveListener");
 const ScheduleRequestAccept_1 = require("./discord/buttons/ScheduleRequestAccept");
 const ScheduleRequestDeny_1 = require("./discord/buttons/ScheduleRequestDeny");
+const AddToTeamCommand_1 = require("./discord/commands/context/AddToTeamCommand");
 dotenv_1.default.config();
 class TeamBot {
     client;
@@ -47,6 +48,7 @@ class TeamBot {
         this.initCommand(new TeamInfoCommand_1.default());
         this.initCommand(new SchedulingChannelCommand_1.SchedulingChannelCommand());
         this.initCommand(new ScheduleRequestCommand_1.default());
+        this.initCommand(new AddToTeamCommand_1.AddToTeamCommand());
         this.initButton(new ScheduleRequestAccept_1.ScheduleRequestAcceptButton());
         this.initButton(new ScheduleRequestDeny_1.ScheduleRequestDenyButton());
     }

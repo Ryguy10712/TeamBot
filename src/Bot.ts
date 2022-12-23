@@ -23,11 +23,13 @@ import { UpdateButton } from "./discord/components/RequestAcceptComponents";
 import { MatchOrganizerUpdateButton } from "./discord/buttons/OrganizerUpdate";
 import { ScheduleRequestAcceptButton } from "./discord/buttons/ScheduleRequestAccept";
 import { ScheduleRequestDenyButton } from "./discord/buttons/ScheduleRequestDeny";
+import { DiscordContextMenu } from "./discord/DiscordContextMenu";
+import { AddToTeamCommand } from "./discord/commands/context/AddToTeamCommand";
 dotenv.config();
 
 export class TeamBot {
     public readonly client: Client;
-    public readonly commands: Map<String, DiscordCommand>;
+    public readonly commands: Map<String, DiscordCommand | DiscordContextMenu>;
     public readonly persistentButtons: Map<string, DiscordButton>;
     public readonly rest: REST;
     
@@ -39,7 +41,7 @@ export class TeamBot {
             intents: ["Guilds", "GuildMembers", "MessageContent", "GuildMessages", "DirectMessages", "GuildMessageReactions", "DirectMessageReactions"],
             partials: [Partials.Message, Partials.Reaction]
         });
-        this.commands = new Map<string, DiscordCommand>();
+        this.commands = new Map<string, DiscordCommand | DiscordContextMenu>();
         this.persistentButtons = new Map<string, DiscordButton>()
 
         this.registerListener(new ReadyListener());
@@ -57,9 +59,10 @@ export class TeamBot {
         this.initCommand(new TeamInfoCommand());
         this.initCommand(new SchedulingChannelCommand());
         this.initCommand(new ScheduleRequestCommand());
+        this.initCommand(new AddToTeamCommand());
 
-        this.initButton(new ScheduleRequestAcceptButton())
-        this.initButton(new ScheduleRequestDenyButton())
+        this.initButton(new ScheduleRequestAcceptButton());
+        this.initButton(new ScheduleRequestDenyButton());
 
         
     }
@@ -72,7 +75,7 @@ export class TeamBot {
         discordListener.startListener(this);
     }
 
-    initCommand(discordCommand: DiscordCommand) {
+    initCommand(discordCommand: DiscordCommand | DiscordContextMenu) {
         this.commands.set(discordCommand.properties.name, discordCommand);
     }
 

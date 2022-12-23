@@ -19,8 +19,11 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
         }
         teamBot.client.on("interactionCreate", async (interaction) => {
             try {
-                if (interaction.isCommand()) {
-                    teamBot.commands.get(interaction.commandName)?.executeInteraction(teamBot.client, interaction, teamBot);
+                if (interaction.isChatInputCommand()) {
+                    teamBot.commands.get(interaction.commandName).executeInteraction(teamBot.client, interaction, teamBot);
+                }
+                if (interaction.isContextMenuCommand()) {
+                    teamBot.commands.get(interaction.commandName).executeInteraction(teamBot.client, interaction, teamBot);
                 }
             }
             catch (e) {

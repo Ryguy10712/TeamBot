@@ -1,0 +1,1 @@
+{"version":3,"file":"DiscordContextMenu.js","sourceRoot":"","sources":["../../src/discord/DiscordContextMenu.ts"],"names":[],"mappings":";;;AAAA,2CAA8F;AAG9F,MAAsB,kBAAkB;IAE7B,UAAU,CAA4B;IAE7C;QACI,IAAI,CAAC,UAAU,GAAG,IAAI,sCAAyB,EAAE,CAAA;IACrD,CAAC;CAGJ;AATD,gDASC"}
