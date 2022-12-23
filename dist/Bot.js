@@ -30,7 +30,7 @@ class TeamBot {
     constructor() {
         this.rest = new discord_js_1.REST({ version: "10" }).setToken(process.env.TOKEN);
         this.client = new discord_js_1.Client({
-            intents: ["Guilds", "GuildMembers", "MessageContent", "GuildMessages", "DirectMessages", "GuildMessageReactions", "DirectMessageReactions"],
+            intents: ["Guilds", "GuildMessages", "DirectMessages", "GuildMessageReactions", "DirectMessageReactions"],
             partials: [discord_js_1.Partials.Message, discord_js_1.Partials.Reaction]
         });
         this.commands = new Map();

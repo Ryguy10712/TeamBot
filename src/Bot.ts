@@ -38,7 +38,7 @@ export class TeamBot {
         this.rest = new REST({ version: "10" }).setToken(process.env.TOKEN!);
         
         this.client = new Client({
-            intents: ["Guilds", "GuildMembers", "MessageContent", "GuildMessages", "DirectMessages", "GuildMessageReactions", "DirectMessageReactions"],
+            intents: ["Guilds", "GuildMessages", "DirectMessages", "GuildMessageReactions", "DirectMessageReactions"],
             partials: [Partials.Message, Partials.Reaction]
         });
         this.commands = new Map<string, DiscordCommand | DiscordContextMenu>();
