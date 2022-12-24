@@ -25,6 +25,8 @@ import { ScheduleRequestAcceptButton } from "./discord/buttons/ScheduleRequestAc
 import { ScheduleRequestDenyButton } from "./discord/buttons/ScheduleRequestDeny";
 import { DiscordContextMenu } from "./discord/DiscordContextMenu";
 import { AddToTeamCommand } from "./discord/commands/context/AddToTeamCommand";
+import { GuildJoinListener } from "./discord/listeners/GuildJoinListener";
+import { RemoveFromTeamCommand } from "./discord/commands/context/RemoveFromTeamCommand";
 dotenv.config();
 
 export class TeamBot {
@@ -48,6 +50,7 @@ export class TeamBot {
         this.registerListener(new InteractionCreateListener());
         this.registerListener(new MessageReactionAddListender());
         this.registerListener(new ReactionRemoveListener());
+        //this.registerListener(new GuildJoinListener());
 
         //initializing all commands
         this.initCommand(new RegisterCommand());
@@ -60,6 +63,7 @@ export class TeamBot {
         this.initCommand(new SchedulingChannelCommand());
         this.initCommand(new ScheduleRequestCommand());
         this.initCommand(new AddToTeamCommand());
+        this.initCommand(new RemoveFromTeamCommand());
 
         this.initButton(new ScheduleRequestAcceptButton());
         this.initButton(new ScheduleRequestDenyButton());

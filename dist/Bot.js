@@ -21,6 +21,7 @@ const ReactionRemoveListener_1 = require("./discord/listeners/ReactionRemoveList
 const ScheduleRequestAccept_1 = require("./discord/buttons/ScheduleRequestAccept");
 const ScheduleRequestDeny_1 = require("./discord/buttons/ScheduleRequestDeny");
 const AddToTeamCommand_1 = require("./discord/commands/context/AddToTeamCommand");
+const RemoveFromTeamCommand_1 = require("./discord/commands/context/RemoveFromTeamCommand");
 dotenv_1.default.config();
 class TeamBot {
     client;
@@ -49,6 +50,7 @@ class TeamBot {
         this.initCommand(new SchedulingChannelCommand_1.SchedulingChannelCommand());
         this.initCommand(new ScheduleRequestCommand_1.default());
         this.initCommand(new AddToTeamCommand_1.AddToTeamCommand());
+        this.initCommand(new RemoveFromTeamCommand_1.RemoveFromTeamCommand());
         this.initButton(new ScheduleRequestAccept_1.ScheduleRequestAcceptButton());
         this.initButton(new ScheduleRequestDeny_1.ScheduleRequestDenyButton());
     }

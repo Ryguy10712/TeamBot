@@ -41,20 +41,22 @@ export class MessageReactionAddListender extends DiscordListener {
                 return pclTeam.availability!.messageIds.includes(reaction.message.id);
             });
             if (!messageTeam) return; //not a scheduling message
-            if (!messageTeam.players.includes(reactionUser.id)) return; //not on the team
+            if (!messageTeam.players.includes(reactionUser.id)) {
+                reaction.remove()
+                return;
+            }
 
-            const newAvailability = messageTeam.availability!;
             const fullMsg = await reaction.message.fetch(); //reaction.message is a partial structure, must fetch content
             const fullMsgContent = fullMsg.content.toLowerCase() as dayOfWeek;
             //fuck you, typescript type-checking 
             const r = reaction.emoji.name as validReaction;
             const rt = reactionToTime[r] as time;
-            if (newAvailability[fullMsgContent][rt].includes(reactionUser.id)) return; //prevents duplicate reaction logging
-            newAvailability[fullMsgContent][rt].push(reactionUser.id);
+            if (messageTeam.availability![fullMsgContent][rt].includes(reactionUser.id)) return; //prevents duplicate reaction logging
+            messageTeam.availability![fullMsgContent][rt].push(reactionUser.id);
 
             teamsDb.find((pclTeam) => { //write newAvailability to database
                 return pclTeam.name === messageTeam.name;
-            })!.availability = newAvailability;
+            })!.availability = messageTeam.availability;
             fs.writeFileSync("./db/teams.json", JSON.stringify(teamsDb));
         });
     }

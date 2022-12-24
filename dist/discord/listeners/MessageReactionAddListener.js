@@ -36,19 +36,20 @@ class MessageReactionAddListender extends DiscordListener_1.DiscordListener {
             });
             if (!messageTeam)
                 return;
-            if (!messageTeam.players.includes(reactionUser.id))
+            if (!messageTeam.players.includes(reactionUser.id)) {
+                reaction.remove();
                 return;
-            const newAvailability = messageTeam.availability;
+            }
             const fullMsg = await reaction.message.fetch();
             const fullMsgContent = fullMsg.content.toLowerCase();
             const r = reaction.emoji.name;
             const rt = reactionToTime[r];
-            if (newAvailability[fullMsgContent][rt].includes(reactionUser.id))
+            if (messageTeam.availability[fullMsgContent][rt].includes(reactionUser.id))
                 return;
-            newAvailability[fullMsgContent][rt].push(reactionUser.id);
+            messageTeam.availability[fullMsgContent][rt].push(reactionUser.id);
             teamsDb.find((pclTeam) => {
                 return pclTeam.name === messageTeam.name;
-            }).availability = newAvailability;
+            }).availability = messageTeam.availability;
             fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(teamsDb));
         });
     }

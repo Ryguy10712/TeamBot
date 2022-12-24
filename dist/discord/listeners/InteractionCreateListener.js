@@ -20,9 +20,11 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
         teamBot.client.on("interactionCreate", async (interaction) => {
             try {
                 if (interaction.isChatInputCommand()) {
+                    console.log(`${interaction.user.username} used ${interaction.commandName}`);
                     teamBot.commands.get(interaction.commandName).executeInteraction(teamBot.client, interaction, teamBot);
                 }
                 if (interaction.isContextMenuCommand()) {
+                    console.log(`${interaction.user.username} used ${interaction.commandName}`);
                     teamBot.commands.get(interaction.commandName).executeInteraction(teamBot.client, interaction, teamBot);
                 }
             }
@@ -30,6 +32,7 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
                 console.error(e);
             }
             if (interaction.isButton()) {
+                console.log(`${interaction.user.username} pressed ${interaction.customId}`);
                 if (!teamBot.persistentButtons.has(interaction.customId)) {
                     if (nonReplyButtonIds.includes(interaction.customId)) {
                         interaction.deferUpdate();
@@ -40,7 +43,7 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
                             if (!interaction.replied) {
                                 interaction.reply({ embeds: [new InteractionCreateEmbeds_1.MisunderstoodButtonEmbed(interaction.customId)], ephemeral: true });
                             }
-                        }, 4_000);
+                        }, 2_700);
                         return;
                     }
                     interaction.deferReply();
@@ -49,9 +52,12 @@ class InteractionCreateListener extends DiscordListener_1.DiscordListener {
                             interaction.followUp({ embeds: [new InteractionCreateEmbeds_1.MisunderstoodButtonEmbed(interaction.customId)], ephemeral: true });
                             return;
                         }
-                    }, 10_000);
+                    }, 2_700);
                 }
                 teamBot.persistentButtons.get(interaction.customId)?.execute(teamBot, teamBot.client, interaction);
+            }
+            if (interaction.isModalSubmit()) {
+                console.timeLog(`${interaction.user.username} submit ${interaction.customId}`);
             }
         });
     }
