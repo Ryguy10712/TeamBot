@@ -22,7 +22,16 @@ class TeamInfoCommand extends DiscordCommand_1.DiscordCommand {
         }
         let description = "";
         const TeamInfoEmbed = new discord_js_1.EmbedBuilder().setTitle(`${issuerTeam.name}:`).setColor("Blue");
-        issuerTeam.players.forEach(player => { description += `-${teamBot.findPCLPlayerByDiscord(player)?.oculusId}\n`; });
+        for (const player of issuerTeam.players) {
+            const pclPlayer = teamBot.findPCLPlayerByDiscord(player);
+            if (!pclPlayer?.oculusId) {
+                const playerDiscord = await client.users.fetch(player);
+                description += `-${playerDiscord.username} (Discord)\n`;
+            }
+            else {
+                description += `-${pclPlayer.oculusId}\n`;
+            }
+        }
         TeamInfoEmbed.setDescription(description);
         TeamInfoEmbed.addFields({
             name: "Captain:",
@@ -59,7 +68,7 @@ class TeamInfoCommand extends DiscordCommand_1.DiscordCommand {
             TeamInfoEmbed.addFields({ name: "Confidential?", value: "Yes", inline: true });
         else
             TeamInfoEmbed.addFields({ name: "Confidential?", value: "No", inline: true });
-        interaction.reply({ embeds: [TeamInfoEmbed] });
+        interaction.reply({ embeds: [TeamInfoEmbed], ephemeral: true });
     }
 }
 exports.default = TeamInfoCommand;

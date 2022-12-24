@@ -12,7 +12,7 @@ export default class TeamInfoCommand extends DiscordCommand {
         this.properties.setName("team_info").setDescription("Shows your team's information");
     }
 
-    async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
+async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
         const registeredTeams: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
         const issuerTeam: PCLTeam | undefined = registeredTeams.find(pclTeam => {return pclTeam.players.includes(interaction.user.id)})
         if(!issuerTeam) { //the user is not part of any tam
@@ -25,7 +25,15 @@ export default class TeamInfoCommand extends DiscordCommand {
         //at this point the user is on a team
         let description: string = ""
         const TeamInfoEmbed = new EmbedBuilder().setTitle(`${issuerTeam.name}:`).setColor("Blue")
-        issuerTeam.players.forEach(player => {description += `-${teamBot.findPCLPlayerByDiscord(player)?.oculusId}\n`})
+        for(const player of issuerTeam.players){
+            const pclPlayer = teamBot.findPCLPlayerByDiscord(player)
+            if(!pclPlayer?.oculusId){
+                const playerDiscord = await client.users.fetch(player)
+                description += `-${playerDiscord.username} (Discord)\n`
+            } else {
+                description += `-${pclPlayer.oculusId}\n`
+            }
+        }
         TeamInfoEmbed.setDescription(description)
         //setting captain
         TeamInfoEmbed.addFields({
@@ -63,6 +71,6 @@ export default class TeamInfoCommand extends DiscordCommand {
         //setting confidentiality
         if (issuerTeam.confidential) TeamInfoEmbed.addFields({name: "Confidential?", value: "Yes", inline: true})
         else TeamInfoEmbed.addFields({name: "Confidential?", value: "No", inline: true});
-        interaction.reply({embeds: [TeamInfoEmbed]})
+        interaction.reply({embeds: [TeamInfoEmbed], ephemeral: true})
     }
 }
