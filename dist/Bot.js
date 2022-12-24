@@ -21,6 +21,7 @@ const ReactionRemoveListener_1 = require("./discord/listeners/ReactionRemoveList
 const ScheduleRequestAccept_1 = require("./discord/buttons/ScheduleRequestAccept");
 const ScheduleRequestDeny_1 = require("./discord/buttons/ScheduleRequestDeny");
 const AddToTeamCommand_1 = require("./discord/commands/context/AddToTeamCommand");
+const GuildJoinListener_1 = require("./discord/listeners/GuildJoinListener");
 const RemoveFromTeamCommand_1 = require("./discord/commands/context/RemoveFromTeamCommand");
 dotenv_1.default.config();
 class TeamBot {
@@ -40,6 +41,7 @@ class TeamBot {
         this.registerListener(new InteractionCreateListener_1.InteractionCreateListener());
         this.registerListener(new MessageReactionAddListener_1.MessageReactionAddListender());
         this.registerListener(new ReactionRemoveListener_1.ReactionRemoveListener());
+        this.registerListener(new GuildJoinListener_1.GuildJoinListener());
         this.initCommand(new RegisterCommand_1.default());
         this.initCommand(new RegisterTeamCommand_1.default());
         this.initCommand(new TeamMenuCommand_1.default());

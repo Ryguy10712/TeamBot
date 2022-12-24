@@ -11,8 +11,8 @@ class MissingPermissionsEmbed extends discord_js_1.EmbedBuilder {
         this.setFooter({ text: "I have left the server, please reinvite me with the proper perms" });
         for (const perm of missingPerms) {
             this.addFields({
-                name: "",
-                value: "Not Permitted"
+                name: `-${perm.toString()}`,
+                value: "Status: Not permitted"
             });
         }
     }

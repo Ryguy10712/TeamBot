@@ -1,8 +1,8 @@
-import { EmbedBuilder, PermissionsBitField } from "discord.js";
+import { EmbedBuilder, PermissionResolvable } from "discord.js";
 type NeededPerm = "ManageMessages" | "SendMessages" | "AddReactions" | "EmbedLinks" | "UseExternalEmojis" | "UseExternalStickers"
 
 export class MissingPermissionsEmbed extends EmbedBuilder {
-    constructor(missingPerms: PermissionsBitField[]){
+    constructor(missingPerms: PermissionResolvable[]){
         super()
         this.setColor("Orange")
         this.setTitle("Hold up!")
@@ -12,8 +12,8 @@ export class MissingPermissionsEmbed extends EmbedBuilder {
         for(const perm of missingPerms){
             
             this.addFields({
-                name: "",
-                value: "Not Permitted"
+                name: `-${perm.toString()}`,
+                value: "Status: Not permitted"
             })
         }
 

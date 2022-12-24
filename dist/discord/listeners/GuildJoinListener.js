@@ -7,8 +7,9 @@ const GuildJoinEmbeds_1 = require("../embeds/GuildJoinEmbeds");
 class GuildJoinListener extends DiscordListener_1.DiscordListener {
     startListener(teamBot) {
         teamBot.client.on("guildCreate", async (guild) => {
-            const currentPerms = (await guild.members.fetchMe()).permissions;
-            const neededPerms = [discord_js_1.PermissionsBitField.Flags.AddReactions, discord_js_1.PermissionsBitField.Flags.SendMessages, discord_js_1.PermissionsBitField.Flags.UseExternalEmojis, discord_js_1.PermissionsBitField.Flags.UseExternalStickers, discord_js_1.PermissionsBitField.Flags.ManageMessages, discord_js_1.PermissionsBitField.Flags.EmbedLinks];
+            const me = await guild.members.fetchMe();
+            const currentPerms = me.permissions;
+            const neededPerms = ["AddReactions", "SendMessages", "ManageMessages", "EmbedLinks", "UseExternalEmojis", "UseExternalStickers"];
             const missingPerms = [];
             for (const perm of neededPerms) {
                 if (!currentPerms.has(perm)) {
@@ -17,19 +18,26 @@ class GuildJoinListener extends DiscordListener_1.DiscordListener {
             }
             if (missingPerms.length === 0)
                 return;
-            const chan = guild.channels.cache.find(channel => { return channel.type === discord_js_1.ChannelType.GuildText && channel.permissionsFor(guild.members.me).has("SendMessages"); });
-            if (!chan) {
-                await (await guild.fetchOwner()).send({ embeds: [new GuildJoinEmbeds_1.MissingPermissionsEmbed(missingPerms)] });
-                guild.leave();
-                return;
+            const notifyChans = (await guild.channels.fetch()).filter(channel => {
+                if (!channel)
+                    return false;
+                return channel.type == discord_js_1.ChannelType.GuildText;
+            });
+            const owner = await guild.fetchOwner();
+            let msg = null;
+            if (!notifyChans) {
+                owner.send({ embeds: [new GuildJoinEmbeds_1.MissingPermissionsEmbed(missingPerms)] });
             }
-            try {
-                await chan.send({ embeds: [new GuildJoinEmbeds_1.MissingPermissionsEmbed(missingPerms)] });
+            else {
+                for (const channel of notifyChans) {
+                    msg = await channel[1].send({ embeds: [new GuildJoinEmbeds_1.MissingPermissionsEmbed(missingPerms)] }).catch(() => { return; });
+                    if (msg)
+                        break;
+                }
+                if (!msg) {
+                    owner.send({ embeds: [new GuildJoinEmbeds_1.MissingPermissionsEmbed(missingPerms)] });
+                }
             }
-            catch {
-                (await guild.fetchOwner()).send({ embeds: [new GuildJoinEmbeds_1.MissingPermissionsEmbed(missingPerms)] });
-            }
-            guild.leave();
         });
     }
 }

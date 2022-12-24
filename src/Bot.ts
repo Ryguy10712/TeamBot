@@ -50,7 +50,7 @@ export class TeamBot {
         this.registerListener(new InteractionCreateListener());
         this.registerListener(new MessageReactionAddListender());
         this.registerListener(new ReactionRemoveListener());
-        //this.registerListener(new GuildJoinListener());
+        this.registerListener(new GuildJoinListener());
 
         //initializing all commands
         this.initCommand(new RegisterCommand());
