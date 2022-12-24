@@ -32,7 +32,13 @@ class SchedulingChannelCommand extends DiscordCommand_1.DiscordCommand {
         if (guildChan.type != discord_js_1.ChannelType.GuildText)
             return interaction.followUp({ embeds: [new SchedChannelEmbeds_1.WrongChannelTypeEmbed()], ephemeral: true });
         const messages = [];
-        messages.push(await guildChan.send("Tuesday"), await guildChan.send("Wednesday"), await guildChan.send("Thursday"), await guildChan.send("Friday"), await guildChan.send("Saturday"), await guildChan.send("Sunday"), await guildChan.send("Monday"));
+        try {
+            messages.push(await guildChan.send("Tuesday"), await guildChan.send("Wednesday"), await guildChan.send("Thursday"), await guildChan.send("Friday"), await guildChan.send("Saturday"), await guildChan.send("Sunday"), await guildChan.send("Monday"));
+        }
+        catch (e) {
+            interaction.followUp({ embeds: [new SchedChannelEmbeds_1.MissingAccessEmbed] });
+            return;
+        }
         const teamAvailability = {
             messageIds: [],
             tuesday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },

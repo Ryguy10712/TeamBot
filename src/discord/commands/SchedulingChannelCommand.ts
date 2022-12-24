@@ -3,7 +3,7 @@ import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import fs from "fs";
 import { PCLTeam, HourReaction } from "../../interfaces/PCLTeam";
-import { NoTeamEmbed, SchedChanSetEmbed, WrongChannelTypeEmbed } from "../embeds/SchedChannelEmbeds";
+import { MissingAccessEmbed, NoTeamEmbed, SchedChanSetEmbed, WrongChannelTypeEmbed } from "../embeds/SchedChannelEmbeds";
 
 export class SchedulingChannelCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -34,15 +34,21 @@ export class SchedulingChannelCommand extends DiscordCommand {
         const guildChan = (await client.channels.fetch(channel))!;
         if(guildChan.type != ChannelType.GuildText) return interaction.followUp({embeds: [new WrongChannelTypeEmbed()], ephemeral: true})
         const messages = [];
-        messages.push(
-            await guildChan.send("Tuesday"),
-            await guildChan.send("Wednesday"),
-            await guildChan.send("Thursday"),
-            await guildChan.send("Friday"),
-            await guildChan.send("Saturday"),
-            await guildChan.send("Sunday"),
-            await guildChan.send("Monday")
-        );
+        try{
+            messages.push(
+                await guildChan.send("Tuesday"),
+                await guildChan.send("Wednesday"),
+                await guildChan.send("Thursday"),
+                await guildChan.send("Friday"),
+                await guildChan.send("Saturday"),
+                await guildChan.send("Sunday"),
+                await guildChan.send("Monday")
+                
+            );
+        } catch(e){
+            interaction.followUp({embeds: [new MissingAccessEmbed]});
+            return;
+        }
 
         const teamAvailability: PCLTeam["availability"] = {
             messageIds: [],

@@ -36,3 +36,15 @@ export class NoTeamEmbed extends EmbedBuilder {
         this.setFooter({text: "stupid"})
     }
 }
+
+export class MissingAccessEmbed extends EmbedBuilder {
+    constructor(){
+        super()
+        this.setTitle("Whups...")
+        this.setColor("Red")
+        this.setFields({
+            name: "Failed:",
+            value: "I could not set your scheduling channel. Check to see if I have the proper permissions to view the channel"
+        })
+    }
+}

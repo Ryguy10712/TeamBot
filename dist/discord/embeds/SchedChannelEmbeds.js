@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NoTeamEmbed = exports.WrongChannelTypeEmbed = exports.SchedChanSetEmbed = void 0;
+exports.MissingAccessEmbed = exports.NoTeamEmbed = exports.WrongChannelTypeEmbed = exports.SchedChanSetEmbed = void 0;
 const discord_js_1 = require("discord.js");
 class SchedChanSetEmbed extends discord_js_1.EmbedBuilder {
     constructor(schedChanId) {
@@ -39,4 +39,16 @@ class NoTeamEmbed extends discord_js_1.EmbedBuilder {
     }
 }
 exports.NoTeamEmbed = NoTeamEmbed;
+class MissingAccessEmbed extends discord_js_1.EmbedBuilder {
+    constructor() {
+        super();
+        this.setTitle("Whups...");
+        this.setColor("Red");
+        this.setFields({
+            name: "Failed:",
+            value: "I could not set your scheduling channel. Check to see if I have the proper permissions to view the channel"
+        });
+    }
+}
+exports.MissingAccessEmbed = MissingAccessEmbed;
 //# sourceMappingURL=SchedChannelEmbeds.js.map
