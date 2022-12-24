@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Development Debug",
+      "name": "ts-node",
       "skipFiles": [
         "<node_internals>/**",
         "./dist"
@@ -18,7 +18,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Production Launch",
+      "name": "node",
       "program": "./dist/Bot.js",
       "runtimeExecutable": "node",
     }
