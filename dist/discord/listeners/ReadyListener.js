@@ -14,7 +14,7 @@ class ReadyListener extends DiscordListener_1.DiscordListener {
                 const auth = { "Authorization": `Bot ${process.env.TOKEN}` };
                 let inDevBody = [];
                 let body = [];
-                await teamBot.commands.forEach(command => {
+                teamBot.commands.forEach(command => {
                     if (command.inDev) {
                         inDevBody.push(command.properties.toJSON());
                     }

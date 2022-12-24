@@ -1,19 +1,18 @@
-import { Client, CommandInteraction, CacheType, ContextMenuCommandBuilder, ApplicationCommandType, ContextMenuCommandInteraction } from "discord.js";
+import { Client, CommandInteraction, CacheType, ContextMenuCommandInteraction, ApplicationCommandType } from "discord.js";
 import { TeamBot } from "../../../Bot";
-import { DiscordCommand } from "../../DiscordCommand";
-import { DiscordContextMenu } from "../../DiscordContextMenu";
-import fs from "fs";
 import { PCLTeam } from "../../../interfaces/PCLTeam";
-import { PlayerAlreadyOnEmbed, UserNotCaptainEmbed, UserNotOnTeamEmbed } from "../../embeds/CommonEmbeds";
-import { PlayerAddSuccess } from "../../embeds/AddToTeamEmbeds";
+import { DiscordContextMenu } from "../../DiscordContextMenu";
+import { PlayerNotOnUserTeamEmbed, UserNotCaptainEmbed, UserNotOnTeamEmbed } from "../../embeds/CommonEmbeds";
+import fs from "fs";
+import { PlayerRemoveSuccess } from "../../embeds/AddToTeamEmbeds";
 
-export class AddToTeamCommand extends DiscordContextMenu {
+export class RemoveFromTeamCommand extends DiscordContextMenu {
     public inDev: boolean;
 
     constructor() {
         super();
         this.inDev = true;
-        this.properties = new ContextMenuCommandBuilder().setName("Add to team").setType(ApplicationCommandType.User);
+        this.properties.setName("Remove from team").setType(ApplicationCommandType.User);
     }
     async executeInteraction(client: Client<boolean>, interaction: ContextMenuCommandInteraction<CacheType>, teamBot: TeamBot) {
         const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
@@ -26,13 +25,13 @@ export class AddToTeamCommand extends DiscordContextMenu {
             interaction.reply({ embeds: [new UserNotCaptainEmbed()], ephemeral: true });
             return;
         }
-        if(teamsDb.find(pclTeam => {return pclTeam.players.includes(interaction.targetId)})){
-            return interaction.reply({embeds: [new PlayerAlreadyOnEmbed], ephemeral: true})
+        if (!issuerTeam.players.includes(interaction.targetId)) {
+            interaction.reply({ embeds: [new PlayerNotOnUserTeamEmbed()], ephemeral: true });
+            return;
         }
 
-        issuerTeam.players.push(interaction.targetId)
+        issuerTeam.players.splice(issuerTeam.players.indexOf(interaction.targetId), 1);
         fs.writeFileSync("./db/teams.json", JSON.stringify(teamsDb))
-        interaction.reply({embeds: [new PlayerAddSuccess], ephemeral: true})
-        
+        interaction.reply({embeds: [new PlayerRemoveSuccess], ephemeral: true})
     }
 }

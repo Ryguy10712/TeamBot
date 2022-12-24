@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AddToTeamCommand = void 0;
+exports.RemoveFromTeamCommand = void 0;
 const tslib_1 = require("tslib");
 const discord_js_1 = require("discord.js");
 const DiscordContextMenu_1 = require("../../DiscordContextMenu");
-const fs_1 = tslib_1.__importDefault(require("fs"));
 const CommonEmbeds_1 = require("../../embeds/CommonEmbeds");
+const fs_1 = tslib_1.__importDefault(require("fs"));
 const AddToTeamEmbeds_1 = require("../../embeds/AddToTeamEmbeds");
-class AddToTeamCommand extends DiscordContextMenu_1.DiscordContextMenu {
+class RemoveFromTeamCommand extends DiscordContextMenu_1.DiscordContextMenu {
     inDev;
     constructor() {
         super();
         this.inDev = true;
-        this.properties = new discord_js_1.ContextMenuCommandBuilder().setName("Add to team").setType(discord_js_1.ApplicationCommandType.User);
+        this.properties.setName("Remove from team").setType(discord_js_1.ApplicationCommandType.User);
     }
     async executeInteraction(client, interaction, teamBot) {
         const teamsDb = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
@@ -25,13 +25,14 @@ class AddToTeamCommand extends DiscordContextMenu_1.DiscordContextMenu {
             interaction.reply({ embeds: [new CommonEmbeds_1.UserNotCaptainEmbed()], ephemeral: true });
             return;
         }
-        if (teamsDb.find(pclTeam => { return pclTeam.players.includes(interaction.targetId); })) {
-            return interaction.reply({ embeds: [new CommonEmbeds_1.PlayerAlreadyOnEmbed], ephemeral: true });
+        if (!issuerTeam.players.includes(interaction.targetId)) {
+            interaction.reply({ embeds: [new CommonEmbeds_1.PlayerNotOnUserTeamEmbed()], ephemeral: true });
+            return;
         }
-        issuerTeam.players.push(interaction.targetId);
+        issuerTeam.players.splice(issuerTeam.players.indexOf(interaction.targetId), 1);
         fs_1.default.writeFileSync("./db/teams.json", JSON.stringify(teamsDb));
-        interaction.reply({ embeds: [new AddToTeamEmbeds_1.PlayerAddSuccess], ephemeral: true });
+        interaction.reply({ embeds: [new AddToTeamEmbeds_1.PlayerRemoveSuccess], ephemeral: true });
     }
 }
-exports.AddToTeamCommand = AddToTeamCommand;
-//# sourceMappingURL=AddToTeamCommand.js.map
+exports.RemoveFromTeamCommand = RemoveFromTeamCommand;
+//# sourceMappingURL=RemoveFromTeamCommand.js.map

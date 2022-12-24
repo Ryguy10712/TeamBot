@@ -13,14 +13,14 @@ export class ReadyListener extends DiscordListener {
                 const auth = {"Authorization": `Bot ${process.env.TOKEN}`}
                 let inDevBody: Array<any> = []
                 let body: any = []
-                await teamBot.commands.forEach(command => {
+                teamBot.commands.forEach(command => {
                     if(command.inDev){
                         inDevBody.push(command.properties.toJSON())
                     } else {
                         body.push(command.properties.toJSON())
                     }
                 })
-
+                
                 if(inDevBody.length){
                     await teamBot.rest.put(
                         Routes.applicationGuildCommands(process.env.APPLICATION_ID!, process.env.TESTING_GUILD_ID!),
@@ -33,6 +33,7 @@ export class ReadyListener extends DiscordListener {
                         {body: body}
                     )
                 }
+                
             }
             catch (error) {
                 console.error(error)
