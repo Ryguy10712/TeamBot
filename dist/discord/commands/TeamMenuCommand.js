@@ -36,7 +36,7 @@ class TeamConfigCommand extends DiscordCommand_1.DiscordCommand {
         menuCollector.on("collect", (menuInteraction) => {
             switch (menuInteraction.values[0]) {
                 case "addPlayer":
-                    interaction.editReply({ components: [new Components.TeamConfigRow(0), Components.RemovePlayerButton], embeds: [Embeds.AddPlayerEmbed] });
+                    interaction.editReply({ components: [new Components.TeamConfigRow(0), Components.AddPlayerButton], embeds: [Embeds.AddPlayerEmbed] });
                     break;
                 case "removePlayer":
                     interaction.editReply({ components: [new Components.TeamConfigRow(1), Components.RemovePlayerButton], embeds: [Embeds.RemovePlayerEmbed] });
