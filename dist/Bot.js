@@ -23,6 +23,7 @@ const ScheduleRequestDeny_1 = require("./discord/buttons/ScheduleRequestDeny");
 const AddToTeamCommand_1 = require("./discord/commands/context/AddToTeamCommand");
 const GuildJoinListener_1 = require("./discord/listeners/GuildJoinListener");
 const RemoveFromTeamCommand_1 = require("./discord/commands/context/RemoveFromTeamCommand");
+const SetCoCapCommand_1 = require("./discord/commands/context/SetCoCapCommand");
 dotenv_1.default.config();
 class TeamBot {
     client;
@@ -53,6 +54,7 @@ class TeamBot {
         this.initCommand(new ScheduleRequestCommand_1.default());
         this.initCommand(new AddToTeamCommand_1.AddToTeamCommand());
         this.initCommand(new RemoveFromTeamCommand_1.RemoveFromTeamCommand());
+        this.initCommand(new SetCoCapCommand_1.SetCoCapCommand());
         this.initButton(new ScheduleRequestAccept_1.ScheduleRequestAcceptButton());
         this.initButton(new ScheduleRequestDeny_1.ScheduleRequestDenyButton());
     }

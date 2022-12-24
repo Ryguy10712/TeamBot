@@ -9,7 +9,7 @@ const InteractionCreateEmbeds_1 = require("../embeds/InteractionCreateEmbeds");
 class InteractionCreateListener extends DiscordListener_1.DiscordListener {
     startListener(teamBot) {
         const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze", "teamcfgTrue", "teamcfgFalse"];
-        const nonDeferUpdateIds = ["teamcfgAdd", "teamcfgRemove", "teamcfgEdit"];
+        const nonDeferUpdateIds = ["teamcfgAdd", "teamcfgRemove", "teamcfgEdit", "teamcfgCoCap"];
         const buttonCache = JSON.parse(fs_1.default.readFileSync("./cache/persistentButtons.json", "utf-8"));
         for (const buttonId of buttonCache) {
             if (buttonId.startsWith("matchOrganizerUpdate")) {

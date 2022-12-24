@@ -37,6 +37,11 @@ export const RankEmbed = new EmbedBuilder()
     .setTitle("Set team rank")
     .setDescription("Choose one of the buttons below to set your team's rank accordingly")
 
+export const SetCoCapEmbed = new EmbedBuilder()
+    .setColor("DarkButNotBlack")
+    .setTitle("Set team co-captain")
+    .setDescription("Sets your cocaptain, or replaces the current one")
+
 //ERROR
 export const NotRegisteredError = new EmbedBuilder().setColor("Red").setTitle("Who even are you?").setFields({
     name: "Failed:",

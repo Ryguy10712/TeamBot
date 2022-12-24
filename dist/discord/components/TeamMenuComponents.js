@@ -1,116 +1,61 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RankButtons = exports.ConfidentialityButtons = exports.RemovePlayerButton = exports.AddPlayerButton = exports.EditButton = exports.EditModal = exports.RemovePlayerModal = exports.AddPlayerModal = exports.TeamConfigRow = void 0;
+exports.RankButtons = exports.ConfidentialityButtons = exports.SetCoCapButton = exports.RemovePlayerButton = exports.AddPlayerButton = exports.EditButton = exports.SetCoCapModal = exports.EditModal = exports.RemovePlayerModal = exports.AddPlayerModal = exports.TeamConfigMenu = exports.TeamConfigRow = void 0;
 const builders_1 = require("@discordjs/builders");
 const discord_js_1 = require("discord.js");
+var MenuState;
+(function (MenuState) {
+    MenuState[MenuState["addPlayer"] = 0] = "addPlayer";
+    MenuState[MenuState["removePlayer"] = 1] = "removePlayer";
+    MenuState[MenuState["setCoCap"] = 2] = "setCoCap";
+    MenuState[MenuState["editName"] = 3] = "editName";
+    MenuState[MenuState["confidential"] = 4] = "confidential";
+    MenuState[MenuState["rank"] = 5] = "rank";
+})(MenuState || (MenuState = {}));
 class TeamConfigRow extends discord_js_1.ActionRowBuilder {
-    constructor(type) {
+    constructor(state) {
         super();
-        switch (type) {
-            case 0:
-                this.setComponents(TeamConfigMenu0);
-                break;
-            case 1:
-                this.setComponents(TeamConfigMenu1);
-                break;
-            case 2:
-                this.setComponents(TeamConfigMenu2);
-                break;
-            case 3:
-                this.setComponents(TeamConfigMenu3);
-                break;
-            case 4:
-                this.setComponents(TeamConfigMenu4);
-                break;
-        }
+        this.setComponents(new TeamConfigMenu(state));
     }
 }
 exports.TeamConfigRow = TeamConfigRow;
-const TeamConfigMenu0 = new builders_1.SelectMenuBuilder().setCustomId("teamcfgMenu").setOptions({
-    label: "Add a player",
-    default: true,
-    value: "addPlayer",
-}, {
-    label: "Remove a player",
-    value: "removePlayer",
-}, {
-    label: "Edit team name",
-    value: "editName",
-}, {
-    label: "Set team confidentiality",
-    value: "confidential",
-}, {
-    label: "Set team rank",
-    value: "rank",
-});
-const TeamConfigMenu1 = new builders_1.SelectMenuBuilder().setCustomId("teamcfgMenu").setOptions({
-    label: "Add a player",
-    value: "addPlayer",
-}, {
-    label: "Remove a player",
-    default: true,
-    value: "removePlayer",
-}, {
-    label: "Edit team name",
-    value: "editName",
-}, {
-    label: "Set team confidentiality",
-    value: "confidential",
-}, {
-    label: "Set team rank",
-    value: "rank",
-});
-const TeamConfigMenu2 = new builders_1.SelectMenuBuilder().setCustomId("teamcfgMenu").setOptions({
-    label: "Add a player",
-    value: "addPlayer",
-}, {
-    label: "Remove a player",
-    value: "removePlayer",
-}, {
-    label: "Edit team name",
-    default: true,
-    value: "editName",
-}, {
-    label: "Set team confidentiality",
-    value: "confidential",
-}, {
-    label: "Set team rank",
-    value: "rank",
-});
-const TeamConfigMenu3 = new builders_1.SelectMenuBuilder().setCustomId("teamcfgMenu").setOptions({
-    label: "Add a player",
-    value: "addPlayer",
-}, {
-    label: "Remove a player",
-    value: "removePlayer",
-}, {
-    label: "Edit team name",
-    value: "editName",
-}, {
-    label: "Set team confidentiality",
-    default: true,
-    value: "confidential",
-}, {
-    label: "Set team rank",
-    value: "rank",
-});
-const TeamConfigMenu4 = new builders_1.SelectMenuBuilder().setCustomId("teamcfgMenu").setOptions({
-    label: "Add a player",
-    value: "addPlayer",
-}, {
-    label: "Remove a player",
-    value: "removePlayer",
-}, {
-    label: "Edit team name",
-    value: "editName",
-}, {
-    label: "Set team confidentiality",
-    value: "confidential",
-}, {
-    label: "Set team rank",
-    default: true,
-    value: "rank",
-});
+class TeamConfigMenu extends builders_1.SelectMenuBuilder {
+    constructor(state) {
+        super();
+        this.setCustomId("teamcfgMenu");
+        this.setOptions([
+            {
+                label: "Add player",
+                value: "addPlayer"
+            },
+            {
+                label: "Remove player",
+                value: "removePlayer",
+            },
+            {
+                label: "Set co-captain",
+                value: "setCoCap",
+            },
+            {
+                label: "Edit team name",
+                value: "editName",
+            },
+            {
+                label: "Set team confidentiality",
+                value: "confidential"
+            },
+            {
+                label: "Set team rank",
+                value: "rank"
+            }
+        ]);
+        const data = this.toJSON();
+        data.options.find(option => {
+            return option.value == MenuState[state];
+        }).default = true;
+    }
+}
+exports.TeamConfigMenu = TeamConfigMenu;
 exports.AddPlayerModal = new builders_1.ModalBuilder()
     .setTitle("Add a player")
     .setCustomId("addPlayerModal")
@@ -123,9 +68,14 @@ exports.EditModal = new builders_1.ModalBuilder()
     .setTitle("Edit team name")
     .setCustomId("editModal")
     .addComponents(new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder().setCustomId("editText").setLabel("Poopoo fard").setStyle(discord_js_1.TextInputStyle.Short)));
+exports.SetCoCapModal = new builders_1.ModalBuilder()
+    .setTitle("Set co-captain")
+    .setCustomId("setCoCapModal")
+    .addComponents(new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder().setLabel("Oculus username").setCustomId("setCoCapText").setStyle(discord_js_1.TextInputStyle.Short)));
 exports.EditButton = new discord_js_1.ActionRowBuilder().addComponents(new builders_1.ButtonBuilder().setCustomId("teamcfgEdit").setStyle(discord_js_1.ButtonStyle.Secondary).setLabel("Edit"));
 exports.AddPlayerButton = new discord_js_1.ActionRowBuilder().addComponents(new builders_1.ButtonBuilder().setCustomId("teamcfgAdd").setStyle(discord_js_1.ButtonStyle.Secondary).setLabel("Add Player"));
 exports.RemovePlayerButton = new discord_js_1.ActionRowBuilder().addComponents(new builders_1.ButtonBuilder().setCustomId("teamcfgRemove").setStyle(discord_js_1.ButtonStyle.Secondary).setLabel("Remove Player"));
+exports.SetCoCapButton = new discord_js_1.ActionRowBuilder().addComponents(new builders_1.ButtonBuilder().setCustomId("teamcfgCoCap").setStyle(discord_js_1.ButtonStyle.Secondary).setLabel("Set co-captain"));
 exports.ConfidentialityButtons = new discord_js_1.ActionRowBuilder()
     .addComponents(new builders_1.ButtonBuilder().setCustomId("teamcfgTrue").setLabel("Enable").setStyle(discord_js_1.ButtonStyle.Success))
     .addComponents(new builders_1.ButtonBuilder().setCustomId("teamcfgFalse").setLabel("Disable").setStyle(discord_js_1.ButtonStyle.Danger));

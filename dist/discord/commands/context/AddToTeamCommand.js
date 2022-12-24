@@ -11,7 +11,7 @@ class AddToTeamCommand extends DiscordContextMenu_1.DiscordContextMenu {
     inDev;
     constructor() {
         super();
-        this.inDev = true;
+        this.inDev = false;
         this.properties = new discord_js_1.ContextMenuCommandBuilder().setName("Add to team").setType(discord_js_1.ApplicationCommandType.User);
     }
     async executeInteraction(client, interaction, teamBot) {

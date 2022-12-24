@@ -42,18 +42,21 @@ export default class TeamConfigCommand extends DiscordCommand {
                 case "removePlayer":
                     interaction.editReply({ components: [new Components.TeamConfigRow(1), Components.RemovePlayerButton], embeds: [Embeds.RemovePlayerEmbed] });
                     break;
+                case "setCoCap":
+                    interaction.editReply({components: [new Components.TeamConfigRow(2), Components.SetCoCapButton], embeds: [Embeds.SetCoCapEmbed]})
+                    break;
                 case "editName":
-                    interaction.editReply({ components: [new Components.TeamConfigRow(2), Components.EditButton], embeds: [Embeds.EditNameEmbed] });
+                    interaction.editReply({ components: [new Components.TeamConfigRow(3), Components.EditButton], embeds: [Embeds.EditNameEmbed] });
                     break;
                 case "confidential":
                     interaction.editReply({
-                        components: [new Components.TeamConfigRow(3), Components.ConfidentialityButtons],
+                        components: [new Components.TeamConfigRow(4), Components.ConfidentialityButtons],
                         embeds: [Embeds.ConfidentialityEmbed],
                     });
                     break;
                 case "rank":
                     interaction.editReply({
-                        components: [new Components.TeamConfigRow(4), Components.RankButtons],
+                        components: [new Components.TeamConfigRow(5), Components.RankButtons],
                         embeds: [Embeds.RankEmbed]
                     })
             }
@@ -100,12 +103,33 @@ export default class TeamConfigCommand extends DiscordCommand {
                         if(!team!.players.includes(playerForRemoval)) return interaction.editReply({embeds: [Embeds.PlayerNotOnError]})
                         registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
                         registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.players = registeredTeams.find(PCLTeam => {return PCLTeam.name === team!.name})!.players.filter(player => {return player != playerForRemoval})
+                        if(team!.coCap === playerForRemoval) team!.coCap = undefined;
                         fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
                         team = teamBot.findTeamByCoCap(interaction.user.id)
                         interaction.editReply({embeds: [Embeds.RemovePlayerSuccess]})
                         success = true;
                     })
                     break;
+
+                case "teamcfgCoCap":
+                    buttonInteraction.showModal(Components.SetCoCapModal)
+                    await buttonInteraction.awaitModalSubmit({time: 120_000}).then(modalData => {
+                        modalData.deferUpdate()
+                        const response = modalData.fields.getTextInputValue("setCoCapText")
+                        const responsePlayer = teamBot.findPCLPlayerByOculus(response)
+                        
+                        if(!responsePlayer) return interaction.editReply({embeds: [Embeds.PlayerNotFoundError]});
+                        if(!team!.players.includes(responsePlayer.discordID)){
+                            interaction.editReply({embeds: [Embeds.PlayerNotOnError]})
+                            return;
+                        }
+                        registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
+                        const team1 = registeredTeams.find(pclTeam => {return pclTeam.name == team?.name})
+                        team1!.coCap = responsePlayer.discordID
+                        fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
+                        success = true;
+                    })
+                break;
 
                 case "teamcfgEdit":
                     buttonInteraction.showModal(Components.EditModal);

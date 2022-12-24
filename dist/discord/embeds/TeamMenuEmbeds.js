@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RankSuccessEmbed = exports.ConfidentialitySuccess = exports.EditNameSuccess = exports.RemovePlayerSuccess = exports.AddPlayerSuccess = exports.PlayerNotOnError = exports.PlayerAlreadyOnError = exports.NoTeamError = exports.PlayerNotFoundError = exports.NotRegisteredError = exports.RankEmbed = exports.EditNameEmbed = exports.RemovePlayerEmbed = exports.DisposedInteraction = exports.AddPlayerEmbed = exports.ConfidentialityEmbed = void 0;
+exports.RankSuccessEmbed = exports.ConfidentialitySuccess = exports.EditNameSuccess = exports.RemovePlayerSuccess = exports.AddPlayerSuccess = exports.PlayerNotOnError = exports.PlayerAlreadyOnError = exports.NoTeamError = exports.PlayerNotFoundError = exports.NotRegisteredError = exports.SetCoCapEmbed = exports.RankEmbed = exports.EditNameEmbed = exports.RemovePlayerEmbed = exports.DisposedInteraction = exports.AddPlayerEmbed = exports.ConfidentialityEmbed = void 0;
 const discord_js_1 = require("discord.js");
 exports.ConfidentialityEmbed = new discord_js_1.EmbedBuilder()
     .setColor("DarkButNotBlack")
@@ -30,6 +30,10 @@ exports.RankEmbed = new discord_js_1.EmbedBuilder()
     .setColor("DarkButNotBlack")
     .setTitle("Set team rank")
     .setDescription("Choose one of the buttons below to set your team's rank accordingly");
+exports.SetCoCapEmbed = new discord_js_1.EmbedBuilder()
+    .setColor("DarkButNotBlack")
+    .setTitle("Set team co-captain")
+    .setDescription("Sets your cocaptain, or replaces the current one");
 exports.NotRegisteredError = new discord_js_1.EmbedBuilder().setColor("Red").setTitle("Who even are you?").setFields({
     name: "Failed:",
     value: "You must register and create a team in order to use this command.",

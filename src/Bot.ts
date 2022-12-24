@@ -27,6 +27,7 @@ import { DiscordContextMenu } from "./discord/DiscordContextMenu";
 import { AddToTeamCommand } from "./discord/commands/context/AddToTeamCommand";
 import { GuildJoinListener } from "./discord/listeners/GuildJoinListener";
 import { RemoveFromTeamCommand } from "./discord/commands/context/RemoveFromTeamCommand";
+import { SetCoCapCommand } from "./discord/commands/context/SetCoCapCommand";
 dotenv.config();
 
 export class TeamBot {
@@ -64,6 +65,7 @@ export class TeamBot {
         this.initCommand(new ScheduleRequestCommand());
         this.initCommand(new AddToTeamCommand());
         this.initCommand(new RemoveFromTeamCommand());
+        this.initCommand(new SetCoCapCommand());
 
         this.initButton(new ScheduleRequestAcceptButton());
         this.initButton(new ScheduleRequestDenyButton());

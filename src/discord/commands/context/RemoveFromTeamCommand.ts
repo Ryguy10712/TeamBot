@@ -11,7 +11,7 @@ export class RemoveFromTeamCommand extends DiscordContextMenu {
 
     constructor() {
         super();
-        this.inDev = true;
+        this.inDev = false;
         this.properties.setName("Remove from team").setType(ApplicationCommandType.User);
     }
     async executeInteraction(client: Client<boolean>, interaction: ContextMenuCommandInteraction<CacheType>, teamBot: TeamBot) {
@@ -31,6 +31,9 @@ export class RemoveFromTeamCommand extends DiscordContextMenu {
         }
 
         issuerTeam.players.splice(issuerTeam.players.indexOf(interaction.targetId), 1);
+        if(issuerTeam.coCap == interaction.targetId){
+            issuerTeam.coCap = undefined;
+        } 
         fs.writeFileSync("./db/teams.json", JSON.stringify(teamsDb))
         interaction.reply({embeds: [new PlayerRemoveSuccess], ephemeral: true})
     }

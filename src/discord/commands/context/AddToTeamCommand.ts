@@ -12,7 +12,7 @@ export class AddToTeamCommand extends DiscordContextMenu {
 
     constructor() {
         super();
-        this.inDev = true;
+        this.inDev = false;
         this.properties = new ContextMenuCommandBuilder().setName("Add to team").setType(ApplicationCommandType.User);
     }
     async executeInteraction(client: Client<boolean>, interaction: ContextMenuCommandInteraction<CacheType>, teamBot: TeamBot) {

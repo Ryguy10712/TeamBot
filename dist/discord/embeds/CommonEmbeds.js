@@ -73,9 +73,8 @@ class PlayerNotOnUserTeamEmbed extends discord_js_1.EmbedBuilder {
         this.setTitle("Can't do that");
         this.setFields({
             name: "Failed:",
-            value: "You cannot remove someone from somebody else's team"
+            value: "That player is not on your team"
         });
-        this.setFooter({ text: "Nice try" });
     }
 }
 exports.PlayerNotOnUserTeamEmbed = PlayerNotOnUserTeamEmbed;
