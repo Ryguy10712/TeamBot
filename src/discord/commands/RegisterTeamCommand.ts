@@ -29,7 +29,7 @@ export default class RegisterTeamCommand extends DiscordCommand {
             .setName("register_team")
             .setDescription("adds your team to the database")
             .addStringOption(new SlashCommandStringOption().setName("team_name").setDescription("the name of your team").setRequired(true))
-            .addBooleanOption(new SlashCommandBooleanOption().setName("confidential").setDescription("is this team visible to others?").setRequired(true))
+            .addBooleanOption(new SlashCommandBooleanOption().setName("confidential").setDescription("set as true if this team is a secret").setRequired(true))
             .addMentionableOption(new SlashCommandMentionableOption().setName("cocap_discord").setDescription("the co-captain of your team"))
             .addStringOption(new SlashCommandStringOption().setName("cocap_oculus").setDescription("use co_cap discord if you can"))
             .addStringOption(

@@ -14,7 +14,7 @@ class RegisterTeamCommand extends DiscordCommand_1.DiscordCommand {
             .setName("register_team")
             .setDescription("adds your team to the database")
             .addStringOption(new discord_js_1.SlashCommandStringOption().setName("team_name").setDescription("the name of your team").setRequired(true))
-            .addBooleanOption(new discord_js_1.SlashCommandBooleanOption().setName("confidential").setDescription("is this team visible to others?").setRequired(true))
+            .addBooleanOption(new discord_js_1.SlashCommandBooleanOption().setName("confidential").setDescription("set as true if this team is a secret").setRequired(true))
             .addMentionableOption(new discord_js_1.SlashCommandMentionableOption().setName("cocap_discord").setDescription("the co-captain of your team"))
             .addStringOption(new discord_js_1.SlashCommandStringOption().setName("cocap_oculus").setDescription("use co_cap discord if you can"))
             .addStringOption(new discord_js_1.SlashCommandStringOption()
