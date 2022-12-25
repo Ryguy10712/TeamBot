@@ -1,17 +1,38 @@
 import {SelectMenuBuilder, ButtonBuilder, ActionRowBuilder, Team, ButtonStyle, SelectMenuOptionBuilder} from "discord.js"
+import fs from "fs"
 import { TeamBot } from "../../Bot"
+import { PCLTeam } from "../../interfaces/PCLTeam"
 import { ScheduleRequestAcceptButton } from "../buttons/ScheduleRequestAccept"
 import { ScheduleRequestDenyButton } from "../buttons/ScheduleRequestDeny"
 import { DiscordButton } from "../DiscordButton"
 
 //Components
 export class TeamListMenu extends SelectMenuBuilder {
-  constructor(params: SelectMenuOptionBuilder[]){
+  constructor(issuerTeam: PCLTeam){
     super()
     this.setCustomId("schedreqTeams")
-    for(const option of params){
-      this.addOptions(option)
+    const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
+    let teamsList = teamsDb.filter(pclTeam => { //only return non-secret teams and has set scheduling channel
+      return pclTeam.schedulingChannel && !pclTeam.confidential 
+    })
+    //sort teams in the correct orderz
+    const teamsInOrder = teamsList.filter(team => {
+      return team.rank === issuerTeam.rank
+    })
+
+    for(const team of teamsList){
+      if(!teamsInOrder.includes(team)){
+        teamsInOrder.push(team)
+      }
     }
+
+    for(const team of teamsInOrder){
+      this.addOptions({
+        label: team.name,
+        value: `schedreq${team.name}`
+      })
+    }
+
   }
 }
 
@@ -42,9 +63,9 @@ export const DenyButton = new ButtonBuilder()
 
 //ActionRows
 export class TeamListRow extends ActionRowBuilder<SelectMenuBuilder> {
-  constructor(teamListMenu: TeamListMenu){
+  constructor(issuerTeam: PCLTeam){
     super()
-    this.setComponents(teamListMenu)
+    this.setComponents(new TeamListMenu(issuerTeam))
   }
 }
 

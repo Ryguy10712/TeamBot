@@ -1,15 +1,32 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RequestRow = exports.MatchTypeRow = exports.TeamListRow = exports.DenyButton = exports.AcceptButton = exports.MatchButton = exports.ChallengeButton = exports.ScrimButton = exports.TeamListMenu = void 0;
+const tslib_1 = require("tslib");
 const discord_js_1 = require("discord.js");
+const fs_1 = tslib_1.__importDefault(require("fs"));
 const ScheduleRequestAccept_1 = require("../buttons/ScheduleRequestAccept");
 const ScheduleRequestDeny_1 = require("../buttons/ScheduleRequestDeny");
 class TeamListMenu extends discord_js_1.SelectMenuBuilder {
-    constructor(params) {
+    constructor(issuerTeam) {
         super();
         this.setCustomId("schedreqTeams");
-        for (const option of params) {
-            this.addOptions(option);
+        const teamsDb = JSON.parse(fs_1.default.readFileSync("./db/teams.json", "utf-8"));
+        let teamsList = teamsDb.filter(pclTeam => {
+            return pclTeam.schedulingChannel && !pclTeam.confidential;
+        });
+        const teamsInOrder = teamsList.filter(team => {
+            return team.rank === issuerTeam.rank;
+        });
+        for (const team of teamsList) {
+            if (!teamsInOrder.includes(team)) {
+                teamsInOrder.push(team);
+            }
+        }
+        for (const team of teamsInOrder) {
+            this.addOptions({
+                label: team.name,
+                value: `schedreq${team.name}`
+            });
         }
     }
 }
@@ -35,9 +52,9 @@ exports.DenyButton = new discord_js_1.ButtonBuilder()
     .setLabel("Decline")
     .setStyle(discord_js_1.ButtonStyle.Danger);
 class TeamListRow extends discord_js_1.ActionRowBuilder {
-    constructor(teamListMenu) {
+    constructor(issuerTeam) {
         super();
-        this.setComponents(teamListMenu);
+        this.setComponents(new TeamListMenu(issuerTeam));
     }
 }
 exports.TeamListRow = TeamListRow;

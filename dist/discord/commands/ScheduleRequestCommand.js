@@ -28,15 +28,14 @@ class ScheduleRequestCommand extends DiscordCommand_1.DiscordCommand {
             return interaction.reply("In order to use this command you must have a scheduling channel");
         let TeamListMenuParams = [];
         for (const team of registeredTeams) {
-            if (team.rank === issuerTeam.rank && team.schedulingChannel) {
+            if (team.rank === issuerTeam.rank && team.schedulingChannel && !team.confidential) {
                 const option = new discord_js_1.SelectMenuOptionBuilder()
                     .setLabel(team.name)
                     .setValue(`schedreq${team.name}`);
                 TeamListMenuParams.push(option);
             }
         }
-        const menu = new ScheduleRequestComponents_1.TeamListMenu(TeamListMenuParams);
-        const reply = await interaction.reply({ components: [new ScheduleRequestComponents_1.TeamListRow(menu), new ScheduleRequestComponents_1.MatchTypeRow], embeds: [new ScheduleRequestEmbeds_1.SchedReqPrimaryEmbed] });
+        const reply = await interaction.reply({ components: [new ScheduleRequestComponents_1.TeamListRow(issuerTeam), new ScheduleRequestComponents_1.MatchTypeRow], embeds: [new ScheduleRequestEmbeds_1.SchedReqPrimaryEmbed] });
         let selectedTeam = undefined;
         const menuFilter = (i) => {
             if (i.deferred || i.customId != "schedreqTeams")

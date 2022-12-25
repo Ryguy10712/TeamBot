@@ -32,15 +32,14 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         if(!issuerTeam.schedulingChannel) return interaction.reply("In order to use this command you must have a scheduling channel")
         let TeamListMenuParams: SelectMenuOptionBuilder[] = []
         for (const team of registeredTeams) {
-            if (team.rank === issuerTeam.rank && team.schedulingChannel) { //the otherteam must have a scheduling channel in order for it to show up
+            if (team.rank === issuerTeam.rank && team.schedulingChannel && !team.confidential) { //the otherteam must have a scheduling channel in order for it to show up
                 const option = new SelectMenuOptionBuilder()
                     .setLabel(team.name)
                     .setValue(`schedreq${team.name}`)
                 TeamListMenuParams.push(option)
               }
         }
-        const menu = new TeamListMenu(TeamListMenuParams)
-        const reply = await interaction.reply({components: [new TeamListRow(menu!), new MatchTypeRow], embeds: [new SchedReqPrimaryEmbed]})
+        const reply = await interaction.reply({components: [new TeamListRow(issuerTeam), new MatchTypeRow], embeds: [new SchedReqPrimaryEmbed]})
         let selectedTeam: string | undefined = undefined
         const menuFilter = (i: SelectMenuInteraction) => {
           if (i.deferred || i.customId != "schedreqTeams") return false;
