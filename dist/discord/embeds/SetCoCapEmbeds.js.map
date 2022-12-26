@@ -1,1 +1,0 @@
-{"version":3,"file":"SetCoCapEmbeds.js","sourceRoot":"","sources":["../../../src/discord/embeds/SetCoCapEmbeds.ts"],"names":[],"mappings":";;;AAAA,2CAAyC;AAEzC,MAAa,aAAc,SAAQ,yBAAY;IAC3C;QACI,KAAK,EAAE,CAAA;QACP,IAAI,CAAC,QAAQ,CAAC,OAAO,CAAC,CAAA;QACtB,IAAI,CAAC,SAAS,CAAC;YACX,IAAI,EAAE,UAAU;YAChB,KAAK,EAAE,4CAA4C;SACtD,CAAC,CAAA;IACN,CAAC;CACJ;AATD,sCASC"}
