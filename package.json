@@ -7,7 +7,8 @@
   },
   "scripts": {
     "start": "node ./dist/Bot.js",
-    "build": "tsc -p ./tsconfig.json"
+    "build": "tsc -p ./tsconfig.json",
+    "build and run": "tsc -p ./tsconfig.json && node ./dist/Bot.js"
   },
   "engines": {
     "node": "18.x"
