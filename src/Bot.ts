@@ -1,4 +1,4 @@
-import {  Client, Partials, REST, Routes, SystemChannelFlagsBitField } from "discord.js";
+import { Client, Partials, REST, Routes, SystemChannelFlagsBitField } from "discord.js";
 import dotenv from "dotenv";
 import { DiscordCommand } from "./discord/DiscordCommand";
 import { DiscordListener } from "./discord/DiscordListener";
@@ -11,16 +11,14 @@ import RegisterCommand from "./discord/commands/RegisterCommand";
 import RegisterTeamCommand from "./discord/commands/RegisterTeamCommand";
 import PCLPlayer from "./interfaces/PCLPlayer";
 import TeamMenuCommand from "./discord/commands/TeamMenuCommand";
-import DeleteTeamCommand from "./discord/commands/DeleteTeamCommand"
+import DeleteTeamCommand from "./discord/commands/DeleteTeamCommand";
 import { PCLTeam } from "./interfaces/PCLTeam";
 import TeamInfoCommand from "./discord/commands/TeamInfoCommand";
 import ScheduleRequestCommand from "./discord/commands/ScheduleRequestCommand";
 import { SchedulingChannelCommand } from "./discord/commands/SchedulingChannelCommand";
 import { MessageReactionAddListender } from "./discord/listeners/MessageReactionAddListener";
-import {ReactionRemoveListener} from "./discord/listeners/ReactionRemoveListener"
+import { ReactionRemoveListener } from "./discord/listeners/ReactionRemoveListener";
 import { DiscordButton } from "./discord/DiscordButton";
-import { UpdateButton } from "./discord/components/RequestAcceptComponents";
-import { MatchOrganizerUpdateButton } from "./discord/buttons/OrganizerUpdate";
 import { ScheduleRequestAcceptButton } from "./discord/buttons/ScheduleRequestAccept";
 import { ScheduleRequestDenyButton } from "./discord/buttons/ScheduleRequestDeny";
 import { DiscordContextMenu } from "./discord/DiscordContextMenu";
@@ -35,17 +33,16 @@ export class TeamBot {
     public readonly commands: Map<String, DiscordCommand | DiscordContextMenu>;
     public readonly persistentButtons: Map<string, DiscordButton>;
     public readonly rest: REST;
-    
 
     constructor() {
         this.rest = new REST({ version: "10" }).setToken(process.env.TOKEN!);
-        
+
         this.client = new Client({
             intents: ["Guilds", "GuildMessages", "DirectMessages", "GuildMessageReactions", "DirectMessageReactions"],
-            partials: [Partials.Message, Partials.Reaction]
+            partials: [Partials.Message, Partials.Reaction],
         });
         this.commands = new Map<string, DiscordCommand | DiscordContextMenu>();
-        this.persistentButtons = new Map<string, DiscordButton>()
+        this.persistentButtons = new Map<string, DiscordButton>();
 
         this.registerListener(new ReadyListener());
         this.registerListener(new InteractionCreateListener());
@@ -69,8 +66,6 @@ export class TeamBot {
 
         this.initButton(new ScheduleRequestAcceptButton());
         this.initButton(new ScheduleRequestDenyButton());
-
-        
     }
 
     async start(): Promise<void> {
@@ -85,8 +80,8 @@ export class TeamBot {
         this.commands.set(discordCommand.properties.name, discordCommand);
     }
 
-    initButton(discordButton: DiscordButton){
-        this.persistentButtons.set(discordButton.id, discordButton)
+    initButton(discordButton: DiscordButton) {
+        this.persistentButtons.set(discordButton.id, discordButton);
     }
 
     findPCLPlayerByDiscord(discordId: string): PCLPlayer | undefined {
@@ -109,8 +104,6 @@ export class TeamBot {
             return PCLTeam.captain === discordId;
         });
     }
-
-    
 }
 
 (async () => {
