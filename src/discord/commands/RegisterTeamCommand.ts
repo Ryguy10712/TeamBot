@@ -56,7 +56,7 @@ export default class RegisterTeamCommand extends DiscordCommand {
         let cocap: PCLPlayer;
 
         //terminate if user isn't registered
-        if (!player) return interaction.reply({ embeds: [RegisterTeamEmbeds.NotRegisteredError] });
+        if (!player) return interaction.reply({ embeds: [RegisterTeamEmbeds.NotRegisteredError], ephemeral: true });
 
         //terminate if a team shares the same name
         if (
@@ -64,7 +64,7 @@ export default class RegisterTeamCommand extends DiscordCommand {
                 return PCLTeam.name.toLowerCase() == teamName.toLowerCase();
             })
         )
-            return interaction.reply({ embeds: [RegisterTeamEmbeds.TeamNameMatchError] });
+            return interaction.reply({ embeds: [RegisterTeamEmbeds.TeamNameMatchError], ephemeral: true });
 
         if (discordResponse) {
             cocap = teamBot.findPCLPlayerByDiscord(discordResponse)!;
@@ -73,8 +73,8 @@ export default class RegisterTeamCommand extends DiscordCommand {
         }
         //terminate if cocap isnt found, and user has provided one
         if (cocap! === undefined) {
-            if (discordResponse) return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
-            if (stringResponse) return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
+            if (discordResponse) return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError], ephemeral: true });
+            if (stringResponse) return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError], ephemeral: true });
         }
         let team: PCLTeam = {
             captain: player.discordID,
@@ -128,15 +128,15 @@ export default class RegisterTeamCommand extends DiscordCommand {
                 return PCLTeam.captain == player.discordID || PCLTeam.coCap == player.discordID;
             })
         )
-            return interaction.reply({ embeds: [RegisterTeamEmbeds.AlreadyCaptainError] });
+            return interaction.reply({ embeds: [RegisterTeamEmbeds.AlreadyCaptainError], ephemeral: true });
         if(team.coCap != undefined){
             if (
                 registeredTeams.some((PCLTeam) => {
                     return PCLTeam.captain == team.coCap || PCLTeam.coCap == team.coCap;
                 })
             )
-                return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapOccuipiedError] });
-            if(interaction.user.id === team.coCap) return interaction.reply({embeds: [RegisterTeamEmbeds.CaptainCoCapMatchError]})
+                return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapOccuipiedError], ephemeral: true });
+            if(interaction.user.id === team.coCap) return interaction.reply({embeds: [RegisterTeamEmbeds.CaptainCoCapMatchError], ephemeral: true})
         }
         //then push the team to registeredTeams
         registeredTeams.push(team);
@@ -147,6 +147,6 @@ export default class RegisterTeamCommand extends DiscordCommand {
                 interaction.options.get("rank")?.value
             }`,
         });
-        await interaction.reply({ embeds: [RegisterTeamEmbeds.TeamCreateSuccess] });
+        await interaction.reply({ embeds: [RegisterTeamEmbeds.TeamCreateSuccess], ephemeral: true });
     }
 }

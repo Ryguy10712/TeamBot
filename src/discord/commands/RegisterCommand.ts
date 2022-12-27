@@ -19,7 +19,7 @@ export default class RegisterCommand extends DiscordCommand {
         const optionResponse = interaction.options.get("oculusid")?.value as string;
 
         if (!isoculusidClean(optionResponse)) {
-            return interaction.reply({ embeds: [Embeds.InvalidIdError] });
+            return interaction.reply({ embeds: [Embeds.InvalidIdError], ephemeral: true });
         }
 
         if (interaction.options.get("oculusid")?.value) {
@@ -34,7 +34,7 @@ export default class RegisterCommand extends DiscordCommand {
                     return PCLPLayer.oculusId.toLowerCase() === optionResponse.toLowerCase();
                 })
             )
-                return interaction.reply({ embeds: [Embeds.UserNameExistsError] });
+                return interaction.reply({ embeds: [Embeds.UserNameExistsError], ephemeral: true });
 
             if (PCLPLayer) {
                 //at this point, the user has registered their discord
@@ -46,11 +46,13 @@ export default class RegisterCommand extends DiscordCommand {
                     fs.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
                     await interaction.reply({
                         embeds: [Embeds.UpdateSuccess.setFields({ name: "Success:", value: `Your username has been updated to **${optionResponse}**` })],
+                        ephemeral: true
                     });
                 } else {
                     //registered user re-registered with the same oculusid
                     await interaction.reply({
                         embeds: [Embeds.IdMatchError.setFields({ name: "Failed:", value: "You are already registered with that username!" })],
+                        ephemeral: true
                     });
                 }
             } else {
@@ -66,6 +68,7 @@ export default class RegisterCommand extends DiscordCommand {
                 fs.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
                 await interaction.reply({
                     embeds: [Embeds.RegisterSuccess.setFields({ name: "Success", value: "Successfully registered as **" + optionResponse + "**" })],
+                    ephemeral: true
                 });
             }
         }
