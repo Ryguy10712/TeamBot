@@ -19,7 +19,7 @@ export default class TeamConfigCommand extends DiscordCommand {
         let success: Boolean = false
         //terminate if player is not registerd
         if (!teamBot.findPCLPlayerByDiscord(interaction.user.id)) return interaction.reply({ embeds: [Embeds.NotRegisteredError] });
-        let team = teamBot.findTeamByCoCap(interaction.user.id)
+        let team = teamBot.findTeamByCaptain(interaction.user.id)
         if (!team) return interaction.reply({ embeds: [Embeds.NoTeamError] });
 
         const reply = await interaction.reply({ components: [new Components.TeamConfigRow(0), Components.AddPlayerButton], embeds: [Embeds.AddPlayerEmbed], ephemeral: true });
@@ -84,7 +84,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                             //at this point the username is valid
                             registeredTeams.find(PCLTeam => {return PCLTeam.captain === buttonInteraction.user.id})?.players.push(pclPlayer.discordID)
                             fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                            team = teamBot.findTeamByCoCap(interaction.user.id)
+                            team = teamBot.findTeamByCaptain(interaction.user.id)
                             interaction.editReply({embeds: [Embeds.AddPlayerSuccess]})
                             success = true;
                         })
@@ -105,7 +105,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                         registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.players = registeredTeams.find(PCLTeam => {return PCLTeam.name === team!.name})!.players.filter(player => {return player != playerForRemoval})
                         if(team!.coCap === playerForRemoval) team!.coCap = undefined;
                         fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                        team = teamBot.findTeamByCoCap(interaction.user.id)
+                        team = teamBot.findTeamByCaptain(interaction.user.id)
                         interaction.editReply({embeds: [Embeds.RemovePlayerSuccess]})
                         success = true;
                     })
@@ -140,7 +140,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                             registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
                             registeredTeams.find(PCLTeam => {return PCLTeam.name === team!.name})!.name = response
                             fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                            team = teamBot.findTeamByCoCap(interaction.user.id)
+                            team = teamBot.findTeamByCaptain(interaction.user.id)
                             interaction.editReply({embeds: [Embeds.EditNameSuccess]})
                             success = true
                         })
@@ -153,7 +153,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.confidential = true;
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                    team = teamBot.findTeamByCoCap(interaction.user.id)
+                    team = teamBot.findTeamByCaptain(interaction.user.id)
                     interaction.editReply({embeds: [Embeds.ConfidentialitySuccess]})
                     success = true;
                     break;
@@ -162,7 +162,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.confidential = false;
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                    team = teamBot.findTeamByCoCap(interaction.user.id)
+                    team = teamBot.findTeamByCaptain(interaction.user.id)
                     interaction.editReply({embeds: [Embeds.ConfidentialitySuccess]})
                     success = true;
                     break;
@@ -171,7 +171,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.rank = 0
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                    team = teamBot.findTeamByCoCap(interaction.user.id)
+                    team = teamBot.findTeamByCaptain(interaction.user.id)
                     interaction.editReply({embeds: [Embeds.RankSuccessEmbed]})
                     success = true;
                     break;
@@ -180,7 +180,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.rank = 1
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                    team = teamBot.findTeamByCoCap(interaction.user.id)
+                    team = teamBot.findTeamByCaptain(interaction.user.id)
                     interaction.editReply({embeds: [Embeds.RankSuccessEmbed]})
                     success = true;
                     break;
@@ -189,7 +189,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
                     registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.rank = 2
                     fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                    team = teamBot.findTeamByCoCap(interaction.user.id)
+                    team = teamBot.findTeamByCaptain(interaction.user.id)
                     interaction.editReply({embeds: [Embeds.RankSuccessEmbed]})
                     success = true;
                     break;

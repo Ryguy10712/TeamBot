@@ -26,6 +26,7 @@ import { AddToTeamCommand } from "./discord/commands/context/AddToTeamCommand";
 import { GuildJoinListener } from "./discord/listeners/GuildJoinListener";
 import { RemoveFromTeamCommand } from "./discord/commands/context/RemoveFromTeamCommand";
 import { SetCoCapCommand } from "./discord/commands/context/SetCoCapCommand";
+import { AvailabilityReset } from "./events/AvailabilityReset";
 dotenv.config();
 
 export class TeamBot {
@@ -70,6 +71,8 @@ export class TeamBot {
 
     async start(): Promise<void> {
         await this.client.login(process.env.TOKEN);
+        //initialize cron jobs
+        AvailabilityReset(this)
     }
 
     registerListener(discordListener: DiscordListener): void {
@@ -98,7 +101,7 @@ export class TeamBot {
         });
     }
 
-    findTeamByCoCap(discordId: string): PCLTeam | undefined {
+    findTeamByCaptain(discordId: string): PCLTeam | undefined {
         const registeredTeams: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
         return registeredTeams.find((PCLTeam) => {
             return PCLTeam.captain === discordId;
