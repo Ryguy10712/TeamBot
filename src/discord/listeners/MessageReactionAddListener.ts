@@ -1,3 +1,4 @@
+import { UserResolvable } from "discord.js";
 import fs from "fs";
 import { TeamBot } from "../../Bot";
 import { HourReaction, PCLTeam } from "../../interfaces/PCLTeam";
@@ -42,7 +43,7 @@ export class MessageReactionAddListender extends DiscordListener {
             });
             if (!messageTeam) return; //not a scheduling message
             if (!messageTeam.players.includes(reactionUser.id)) {
-                reaction.remove()
+                reaction.users.remove(reactionUser as UserResolvable)
                 return;
             }
 
