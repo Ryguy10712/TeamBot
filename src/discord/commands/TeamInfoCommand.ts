@@ -43,7 +43,13 @@ async executeInteraction(client: Client<boolean>, interaction: CommandInteractio
         })
         //setting co cap
         if(issuerTeam.coCap){
-            TeamInfoEmbed.addFields({name: "Co-Captain:", value: teamBot.findPCLPlayerByDiscord(issuerTeam.coCap)!.oculusId, inline: true})
+            if(teamBot.findPCLPlayerByDiscord(issuerTeam.coCap)!.oculusId){
+                TeamInfoEmbed.addFields({name: "Co-Captain:", value: teamBot.findPCLPlayerByDiscord(issuerTeam.coCap)!.oculusId, inline: true})
+            } else { //co captain isn't registered
+                const coCapUser = await client.users.fetch(issuerTeam.coCap)
+                TeamInfoEmbed.addFields({name: "Co-Captain:", value: `${coCapUser.username} (Discord)`, inline: true})
+            }
+            
         } else {
             TeamInfoEmbed.addFields({name: "Co-Captain:", value: "None", inline: true})
         }
