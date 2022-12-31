@@ -28,6 +28,7 @@ import { RemoveFromTeamCommand } from "./discord/commands/context/RemoveFromTeam
 import { SetCoCapCommand } from "./discord/commands/context/SetCoCapCommand";
 import { AvailabilityReset } from "./events/AvailabilityReset";
 import { TeamAvailabilityCommand } from "./discord/commands/TeamAvailability";
+import { ResetAvailability } from "./discord/commands/admin/ResetAvailability";
 dotenv.config();
 
 export class TeamBot {
@@ -66,6 +67,7 @@ export class TeamBot {
         this.initCommand(new RemoveFromTeamCommand());
         this.initCommand(new SetCoCapCommand());
         this.initCommand(new TeamAvailabilityCommand());
+        //this.initCommand(new ResetAvailability());
 
         this.initButton(new ScheduleRequestAcceptButton());
         this.initButton(new ScheduleRequestDenyButton());
