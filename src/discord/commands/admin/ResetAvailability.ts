@@ -8,6 +8,7 @@ class TeamOption extends SlashCommandStringOption {
     constructor(teamsDb: PCLTeam[]) {
         super()
         this.setName("team")
+        this.setDescription("the team that you'd like to remove availability from")
         for(const team of teamsDb){
             if(team.availability){
                 this.addChoices({
@@ -32,6 +33,7 @@ export class ResetAvailability extends DiscordCommand {
         .addStringOption(
             new TeamOption(this.teamDb)
         )
+        .setDescription("resets availability")
     }
 
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
@@ -63,6 +65,21 @@ export class ResetAvailability extends DiscordCommand {
 
             } catch {
                 interaction.reply({ephemeral: true, content: "Invalid channelId"})
+            }
+        } else {
+            for(const team of this.teamDb){
+                const schedChan = await client.channels.fetch(team.schedulingChannel!) as GuildTextBasedChannel
+                for (const messageId of team.availability!.messageIds) {
+                    const msg = await schedChan.messages.fetch(messageId)
+                    const reactions = msg.reactions.valueOf()
+                    for (const reaction of reactions){
+                        for (const reactionAuthor of reaction[1].users.valueOf()){
+                            if(reactionAuthor[1].id != client.user!.id){
+                                reaction[1].users.remove(reactionAuthor[1])
+                            }
+                        }
+                    }
+                }
             }
         }
 

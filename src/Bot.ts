@@ -67,7 +67,7 @@ export class TeamBot {
         this.initCommand(new RemoveFromTeamCommand());
         this.initCommand(new SetCoCapCommand());
         this.initCommand(new TeamAvailabilityCommand());
-        //this.initCommand(new ResetAvailability());
+        this.initCommand(new ResetAvailability());
 
         this.initButton(new ScheduleRequestAcceptButton());
         this.initButton(new ScheduleRequestDenyButton());

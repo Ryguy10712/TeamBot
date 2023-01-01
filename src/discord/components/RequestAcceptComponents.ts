@@ -84,3 +84,29 @@ export class UpdateButtonRow extends ActionRowBuilder<MatchOrganizerUpdateButton
         teamBot.persistentButtons.set(btn.id, btn)
     } 
 }
+
+export class RequesterChanDeleted extends EmbedBuilder {
+  constructor(){
+    super()
+    this.setColor("Red")
+    this.setTitle("Bruh")
+    this.setFields({
+      name: "Failed:",
+      value: "The requesting team has deleted their scheduling channel."
+    })
+    this.setFooter({text: "The schedule request has been terminated"})
+  }
+}
+
+export class AccepterChanDeleted extends EmbedBuilder {
+  constructor(){
+    super()
+    this.setColor("Red")
+    this.setTitle("Bruh")
+    this.setFields({
+      name: "Failed",
+      value: "You have deleted your set scheduling channel"
+    })
+    this.setFooter({text: "The schedule request has been terminated"})
+  }
+}
