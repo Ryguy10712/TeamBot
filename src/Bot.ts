@@ -125,9 +125,9 @@ export class TeamBot {
         let logFile = fs.readFileSync(`./cache/${this.currentLogName}`, "utf-8")
         if(isError){
             text = text as Error
-            const errorStr = `\nERROR!!!\n${text.name}\n${text.message}\n${text.cause}\n${text.stack}\n################################`
+            const errorStr = `\nERROR!!!\n${text.name.toString()}\n${text.message.toString()}\n${text.cause}\n${text.stack?.toString()}\n################################`
             fs.writeFileSync(`./cache/${this.currentLogName}`, logFile += errorStr)
-            console.error(Error)
+            console.error(errorStr)
         } else {
             text = text as string
             logFile += "\n"
