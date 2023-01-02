@@ -81,6 +81,7 @@ export class SchedulingChannelCommand extends DiscordCommand {
                 message.react(reaction);
             }
             message.react("❌");
+            message.react("❓")
         }
 
         teamsDb.find((pclTeam) => {
