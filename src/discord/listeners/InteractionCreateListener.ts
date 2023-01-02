@@ -24,19 +24,19 @@ export class InteractionCreateListener extends DiscordListener {
         teamBot.client.on("interactionCreate", async (interaction) => {
             try {
                 if (interaction.isChatInputCommand()) {
-                    console.log(`${interaction.user.username} used ${interaction.commandName}`);
+                    teamBot.log(`${interaction.user.username} used ${interaction.commandName}`, false);
                     (teamBot.commands.get(interaction.commandName) as DiscordCommand).executeInteraction(teamBot.client, interaction, teamBot);
                 }
                 if (interaction.isContextMenuCommand()) {
-                    console.log(`${interaction.user.username} used ${interaction.commandName}`);
+                    teamBot.log(`${interaction.user.username} used ${interaction.commandName}`, false);
                     (teamBot.commands.get(interaction.commandName) as DiscordContextMenu).executeInteraction(teamBot.client, interaction, teamBot);
                 }
             } catch (e) {
-                console.error(e);
+                teamBot.log(e as Error, true);
             }
 
             if (interaction.isButton()) {
-                console.log(`${interaction.user.username} pressed ${interaction.customId}`)
+                teamBot.log(`${interaction.user.username} pressed ${interaction.customId}`, false)
                 /** if it isn't a persistent button, either wait for a
                  * reply or defer an update if it's a non-reply button */
                 if (!teamBot.persistentButtons.has(interaction.customId)) {

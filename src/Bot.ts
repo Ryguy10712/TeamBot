@@ -1,4 +1,4 @@
-import { Client, Partials, REST, Routes, SystemChannelFlagsBitField } from "discord.js";
+import { Client, DataResolver, Partials, REST, Routes, SystemChannelFlagsBitField } from "discord.js";
 import dotenv from "dotenv";
 import { DiscordCommand } from "./discord/DiscordCommand";
 import { DiscordListener } from "./discord/DiscordListener";
@@ -36,8 +36,12 @@ export class TeamBot {
     public readonly commands: Map<String, DiscordCommand | DiscordContextMenu>;
     public readonly persistentButtons: Map<string, DiscordButton>;
     public readonly rest: REST;
+    protected currentLogName: string;
 
     constructor() {
+        this.currentLogName = new Date(Date.now()).toDateString()
+        fs.writeFileSync(`./cache/${this.currentLogName}`,"")
+
         this.rest = new REST({ version: "10" }).setToken(process.env.TOKEN!);
 
         this.client = new Client({
@@ -77,6 +81,11 @@ export class TeamBot {
         await this.client.login(process.env.TOKEN);
         //initialize cron jobs
         AvailabilityReset(this)
+
+        ///create error logger
+        process.on("uncaughtException", (e) => {
+            this.log(e, true);
+        })
     }
 
     registerListener(discordListener: DiscordListener): void {
@@ -111,6 +120,21 @@ export class TeamBot {
             return PCLTeam.captain === discordId;
         });
     }
+
+    log(text: Error | string, isError: boolean) {
+        let logFile = fs.readFileSync(`./cache/${this.currentLogName}`, "utf-8")
+        if(isError){
+            text = text as Error
+            const errorStr = `\nERROR!!!\n${text.name}\n${text.message}\n${text.cause}\n${text.stack}\n################################`
+            fs.writeFileSync(`./cache/${this.currentLogName}`, logFile += errorStr)
+            console.error(Error)
+        } else {
+            text = text as string
+            logFile += "\n"
+            fs.writeFileSync(`./cache/${this.currentLogName}`, logFile += text)
+            console.log(text)
+        }
+    }
 }
 
 (async () => {
@@ -121,3 +145,4 @@ export class TeamBot {
         console.error(e);
     }
 })();
+
