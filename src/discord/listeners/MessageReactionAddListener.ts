@@ -46,9 +46,9 @@ export class MessageReactionAddListender extends DiscordListener {
                 reaction.users.remove(reactionUser as UserResolvable)
                 return;
             }
-
             const fullMsg = await reaction.message.fetch(); //reaction.message is a partial structure, must fetch content
             const fullMsgContent = fullMsg.content.toLowerCase() as dayOfWeek;
+            teamBot.log(`${reactionUser.username} (${messageTeam.name}) reacted to ${fullMsgContent}`, false)
             //fuck you, typescript type-checking 
             const r = reaction.emoji.name as validReaction;
             const rt = reactionToTime[r] as time;

@@ -40,6 +40,7 @@ export class ReactionRemoveListener extends DiscordListener {
             const newAvailability = messageTeam.availability!;
             const fullMsg = await reaction.message.fetch()
             const dayIndex = fullMsg.content.toLowerCase() as dayOfWeek //type-checking is bad
+            teamBot.log(`${reactionUser.username} (${messageTeam.name}) unreacted to ${dayIndex}`, false)
             const r = reaction.emoji.name as timeReaction //type-checking is awful
             const rt = reactionToTime[r] as time //type-checking is terrible
 
