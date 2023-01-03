@@ -123,6 +123,10 @@ export class TeamAvailabilityCommand extends DiscordCommand {
         });
 
         if (!issuerTeam) return interaction.reply({ content: "you are not on a team", ephemeral: true });
+        if(!issuerTeam.availability){
+            interaction.reply({content: "your team does not have a scheduling channel", ephemeral: true})
+            return;
+        }
         if (dayResponse) {
             const embed = new TeamAvailabilityEmbed(teamBot, issuerTeam, dayResponse.value as DayOfWeek);
             await embed.init();
