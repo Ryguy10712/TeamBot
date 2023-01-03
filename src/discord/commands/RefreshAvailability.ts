@@ -10,7 +10,7 @@ export class RefreshAvailabilityCommand extends DiscordCommand{
 
     constructor(){
         super()
-        this.inDev = true;
+        this.inDev = false;
         this.properties.setName("fix_availability")
         this.properties.setDescription("only use this if availability appears incorrect")
     }
