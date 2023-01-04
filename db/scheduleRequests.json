@@ -1,1 +1,12 @@
-[]
+[
+    {
+        "id": 0,
+        "requester": "Divine",
+        "opponent": "slaughterhouse",
+        "captainMsgId": "1059897642848637060",
+        "coCaptainMsgId": "1059897646145359872",
+        "requestChanId": "1052813428122726461",
+        "type": 2,
+        "accepted": false
+    }
+]

@@ -1,5 +1,5 @@
 import { UserResolvable } from "discord.js";
-import fs from "fs";
+import fs from "node:fs/promises";
 import { TeamBot } from "../../Bot";
 import { HourReaction, PCLTeam } from "../../interfaces/PCLTeam";
 import { DiscordListener } from "../DiscordListener";
@@ -30,7 +30,8 @@ export class MessageReactionAddListender extends DiscordListener {
         teamBot.client.on("messageReactionAdd", async (reaction, reactionUser) => {
             if(reactionUser.id === teamBot.client.user?.id) return;
             if (!Object.keys(reactionToTime).includes(reaction.emoji.name as validReaction)) return; //not a tracked reaction
-            const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
+            const teamsDb: PCLTeam[] = JSON.parse(await fs.readFile("./db/teams.json", "utf-8"));
+            
             if (
                 !teamsDb.some((pclTeam) => {
                     return pclTeam.schedulingChannel === reaction.message.channelId;
@@ -48,17 +49,17 @@ export class MessageReactionAddListender extends DiscordListener {
             }
             const fullMsg = await reaction.message.fetch(); //reaction.message is a partial structure, must fetch content
             const fullMsgContent = fullMsg.content.toLowerCase() as dayOfWeek;
-            teamBot.log(`${reactionUser.username} (${messageTeam.name}) reacted to ${fullMsgContent}`, false)
             //fuck you, typescript type-checking 
             const r = reaction.emoji.name as validReaction;
             const rt = reactionToTime[r] as time;
+            teamBot.log(`${reactionUser.username} (${messageTeam.name}) reacted to ${fullMsgContent} on ${rt}`, false)
             if (messageTeam.availability![fullMsgContent][rt].includes(reactionUser.id)) return; //prevents duplicate reaction logging
             messageTeam.availability![fullMsgContent][rt].push(reactionUser.id);
 
             teamsDb.find((pclTeam) => { //write newAvailability to database
                 return pclTeam.name === messageTeam.name;
             })!.availability = messageTeam.availability;
-            fs.writeFileSync("./db/teams.json", JSON.stringify(teamsDb));
+            fs.writeFile("./db/teams.json", JSON.stringify(teamsDb));
         });
     }
 }
