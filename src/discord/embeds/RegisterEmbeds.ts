@@ -1,11 +1,17 @@
-import { EmbedBuilder } from "discord.js";
+import { Embed, EmbedBuilder } from "discord.js";
 
 //SUCCCESS
-export let RegisterSuccess = new EmbedBuilder()
-    .setTitle("Nice to meet ya!")
-    //fields set during runtime
-    .setFooter({ text: "You can always change your username by registering again!" })
-    .setColor("Green");
+export class RegisterSuccess extends EmbedBuilder {
+    constructor(oculusId: string){
+        super()
+        this.setColor("Green")
+        this.setTitle("Nice to meet ya!")
+        this.setFields({
+            name: "Success",
+            value: `Your oculusId is now set to **${oculusId}**`
+        })
+    }
+}
 
 export let UpdateSuccess = new EmbedBuilder()
     .setTitle("Updated!")
@@ -25,6 +31,10 @@ export const IdMatchError = new EmbedBuilder()
     .setTitle("We've met before...")
     //fields set during runtime
     .setColor("Orange")
+    .setFields({
+        name: "Warning:",
+        value: "That is already your username"
+    })
     .setFooter({"text": "Bro fr forgot their own name 💀"})
 
 export const UserNameExistsError = new EmbedBuilder()
