@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Team {
+  id   Int    @id @unique @default(autoincrement())
+  name String @unique
+
+  rank            Int
+  confidential    Boolean
+  captainId       String            @unique
+  coCapId         String            @unique
+  Players         Player[]          @relation(name: "Team")
+
+  @@index([captainId, coCapId, id])
+}
+
+model Player {
+  discordId String  @id @unique
+  oculusId  String  @unique
+  teamId    Int?
+  team      Team?   @relation(name: "Team", fields: [teamId], references: [id])
+  isCaptain Boolean
+  isCoCap   Boolean
+
+  @@index([discordId, oculusId])
+}
+
+model ScheduleRequest {
+  id          Int  @id @unique @default(autoincrement()) 
+  requesterId Int
+  opponentId  Int
+  type Int
+  captainMsgId String @unique
+  coCapMsgId String? @unique
+  accepted Boolean
+
+
+  @@index([id, captainMsgId, coCapMsgId])
+}

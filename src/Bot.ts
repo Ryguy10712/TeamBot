@@ -30,6 +30,7 @@ import { AvailabilityReset } from "./events/AvailabilityReset";
 import { TeamAvailabilityCommand } from "./discord/commands/TeamAvailability";
 import { ResetAvailability } from "./discord/commands/admin/ResetAvailability";
 import { RefreshAvailabilityCommand } from "./discord/commands/RefreshAvailability";
+import { PrismaClient } from "@prisma/client";
 dotenv.config();
 
 export class TeamBot {
@@ -38,10 +39,15 @@ export class TeamBot {
     public readonly persistentButtons: Map<string, DiscordButton>;
     public readonly rest: REST;
     protected currentLogName: string;
+    public readonly prisma: PrismaClient
 
     constructor() {
         this.currentLogName = new Date(Date.now()).toDateString()
         fs.writeFileSync(`./cache/${this.currentLogName}`,"")
+        
+        this.prisma = new PrismaClient({
+            errorFormat: "minimal"
+        })
 
         this.rest = new REST({ version: "10" }).setToken(process.env.TOKEN!);
 
