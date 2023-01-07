@@ -9,12 +9,17 @@ export const GuildConfirmationEmbed = new EmbedBuilder()
     .setColor("Yellow");
 
 //Success EMBEDS
-export let TeamCreateSuccess = new EmbedBuilder()
-    .setTitle("Your team has been created!")
-    .setDescription("Your team will be verified shortly")
-    //fields will be set during runtime
-    .setDescription("If any of this information is incorrect, change it immediateley with /team_config or you risk losing permission to run this command")
-    .setColor("Green");
+export class TeamCreateSuccess extends EmbedBuilder {
+    constructor(teamName: string, coCapId: string | undefined, rank: string | undefined){
+        super()
+        this.setTitle("Your team has been created!")
+        this.setDescription("If any of this information is incorrect, change it immediateley with **/team_menu**")
+        this.setFields({
+            name: "Success:",
+            value: `Team **${teamName}** has been creatd with the following:\n**Co-Captain:** ${coCapId}\n **Rank:** ${rank}`
+        })
+    }
+}
 
 export const AlreadyCaptainError = new EmbedBuilder()
     .setTitle("Heads Up!")
@@ -22,7 +27,7 @@ export const AlreadyCaptainError = new EmbedBuilder()
     .setFields(
         {
             name: "Failed:",
-            value: "You cannot be the captain or co-captain of multiple teams at once"
+            value: "You must not be on a team when registering a new team."
         }
     )
 

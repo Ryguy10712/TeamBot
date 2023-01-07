@@ -1,10 +1,12 @@
-import { Client, CommandInteraction, CacheType, SlashCommandStringOption } from "discord.js";
+import { Client, CommandInteraction, CacheType, SlashCommandStringOption, escapeHeading, embedLength } from "discord.js";
 import { DiscordCommand } from "../DiscordCommand";
 import fs from "fs";
 import PCLPlayer from "../../interfaces/PCLPlayer";
 import * as Embeds from "../embeds/RegisterEmbeds";
 import { isoculusidClean } from "../../utils/StringSanatizers";
 import { TeamBot } from "../../Bot";
+import { Player } from "@prisma/client";
+import { createOptimisticUniqueName } from "typescript";
 
 export default class RegisterCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -23,13 +25,7 @@ export default class RegisterCommand extends DiscordCommand {
             return interaction.reply({ embeds: [Embeds.InvalidIdError], ephemeral: true });
         }
 
-        if (interaction.options.get("oculusid")?.value) {
-            const registeredPlayers: PCLPlayer[] = JSON.parse(fs.readFileSync("./db/registeredPlayers.json", "utf-8"));
-            const PCLPLayer = registeredPlayers.find((PCLPlayer) => {
-                return PCLPlayer.discordID === interaction.user.id;
-            });
-
-            const existingPlayer = await teamBot.prisma.player.findFirst({where: {oculusId: optionResponse}})
+            const existingPlayer = await teamBot.prisma.player.findFirst({where: {oculusId: optionResponse}}).then(() => {teamBot.prisma.$disconnect()}) as Player
 
             if(existingPlayer) {
                 if(existingPlayer.oculusId == optionResponse){
@@ -41,22 +37,24 @@ export default class RegisterCommand extends DiscordCommand {
                 return;
             }
 
-            await teamBot.prisma.player.upsert({
+            teamBot.prisma.player.upsert({
                 where: {discordId: interaction.user.id},
-                create:{
+                update: {oculusId: optionResponse},
+                create: {
                     discordId: interaction.user.id,
-                    oculusId: optionResponse,
-                    isCaptain: false,
-                    isCoCap: false,
-                    teamId: undefined,
-                    team: undefined
+                    oculusId: optionResponse
                 },
-                update : {oculusId: optionResponse}
+            }).then(() => {
+                interaction.reply({embeds: [new Embeds.RegisterSuccess(optionResponse)], ephemeral: true})
+                teamBot.prisma.$disconnect()
+            }).catch(() => {
+                interaction.reply("An unexpected error has occured")
+                teamBot.prisma.$disconnect()
             })
-            teamBot.prisma.$disconnect()
-            interaction.reply({embeds: [new Embeds.RegisterSuccess(optionResponse)], ephemeral: true})
-
+            
+        
+            
             
         }
     }
-}
+

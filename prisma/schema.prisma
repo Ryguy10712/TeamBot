@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,38 +9,43 @@ datasource db {
 }
 
 model Team {
-  id   Int    @id @unique @default(autoincrement())
-  name String @unique
-
-  rank            Int
-  confidential    Boolean
-  captainId       String            @unique
-  coCapId         String            @unique
-  Players         Player[]          @relation(name: "Team")
-
-  @@index([captainId, coCapId, id])
+  id                  Int               @id @unique @default(autoincrement())
+  name                String            @unique
+  rank                Int?
+  confidential        Boolean
+  players             TeamPlayer[]
+  scheduleRequestsOut ScheduleRequest[] @relation("requester")
+  scheduleRequestsIn  ScheduleRequest[] @relation("receiver")
 }
 
 model Player {
-  discordId String  @id @unique
-  oculusId  String  @unique
-  teamId    Int?
-  team      Team?   @relation(name: "Team", fields: [teamId], references: [id])
-  isCaptain Boolean
-  isCoCap   Boolean
+  discordId String      @id @unique
+  oculusId  String      @unique
+  team      TeamPlayer?
 
   @@index([discordId, oculusId])
 }
 
+model TeamPlayer {
+  playerId  String  @id @unique
+  player    Player  @relation(fields: [playerId], references: [discordId], onDelete: Cascade, onUpdate: Cascade)
+  teamId    Int
+  team      Team    @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  isCaptain Boolean @default(false)
+  isCoCap   Boolean @default(false)
+
+  @@index([teamId])
+}
+
 model ScheduleRequest {
-  id          Int  @id @unique @default(autoincrement()) 
-  requesterId Int
-  opponentId  Int
-  type Int
-  captainMsgId String @unique
-  coCapMsgId String? @unique
-  accepted Boolean
+  id             Int    @id @default(autoincrement())
+  requesterId    Int
+  receiverId     Int    @map("opponentId")
+  requesterTeam  Team   @relation(name: "requester", fields: [requesterId], references: [id])
+  receiverTeam   Team   @relation(name: "receiver", fields: [receiverId], references: [id])
+  captainMsgId   String @unique
+  coCaptainMsgId String @unique
 
-
-  @@index([id, captainMsgId, coCapMsgId])
+  @@index([requesterId])
+  @@index([receiverId])
 }
