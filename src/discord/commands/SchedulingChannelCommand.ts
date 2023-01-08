@@ -1,4 +1,13 @@
-import { Client, CommandInteraction, CacheType, SlashCommandChannelOption, GuildTextBasedChannel, GuildChannel, ReactionCollector, ChannelType } from "discord.js";
+import {
+    Client,
+    CommandInteraction,
+    CacheType,
+    SlashCommandChannelOption,
+    GuildTextBasedChannel,
+    GuildChannel,
+    ReactionCollector,
+    ChannelType,
+} from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import fs from "fs";
@@ -19,22 +28,24 @@ export class SchedulingChannelCommand extends DiscordCommand {
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
         await interaction.deferReply();
         const REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "🕚", "🕛"];
-        const channel = interaction.options.get("channel")!.value as string;
-        let teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
-        let issuerTeam = teamsDb.find((pclTeam) => {
-            return pclTeam.captain === interaction.user.id || pclTeam.coCap === interaction.user.id; //evaluate wether the user is a cap or cocap of a team
+        const channelId = interaction.options.get("channel")!.value as string;
+        const teamPlayer = await teamBot.prisma.teamPlayer.findFirst({
+            where: {
+                OR: [{isCaptain: true,},{isCoCap: true,}],
+                AND: [{ playerId: interaction.user.id }],
+            },
         });
 
-        if (!issuerTeam) return interaction.followUp({embeds: [new NoTeamEmbed]});
-        teamsDb.find((pclTeam) => {
-            return pclTeam.name === issuerTeam!.name;
-        })!.schedulingChannel = channel;
+        if(!teamPlayer){
+            interaction.followUp({embeds: [new NoTeamEmbed], ephemeral: true});
+            return;
+        }
 
         //sending out the shizz
-        const guildChan = (await client.channels.fetch(channel))!;
-        if(guildChan.type != ChannelType.GuildText) return interaction.followUp({embeds: [new WrongChannelTypeEmbed()], ephemeral: true})
+        const guildChan = (await client.channels.fetch(channelId))!;
+        if (guildChan.type != ChannelType.GuildText) return interaction.followUp({ embeds: [new WrongChannelTypeEmbed()], ephemeral: true });
         const messages = [];
-        try{
+        try {
             messages.push(
                 await guildChan.send("Tuesday"),
                 await guildChan.send("Wednesday"),
@@ -43,10 +54,9 @@ export class SchedulingChannelCommand extends DiscordCommand {
                 await guildChan.send("Saturday"),
                 await guildChan.send("Sunday"),
                 await guildChan.send("Monday")
-                
             );
-        } catch(e){
-            interaction.followUp({embeds: [new MissingAccessEmbed]});
+        } catch (e) {
+            interaction.followUp({ embeds: [new MissingAccessEmbed()] });
             return;
         }
 
@@ -81,13 +91,21 @@ export class SchedulingChannelCommand extends DiscordCommand {
                 message.react(reaction);
             }
             message.react("❌");
-            message.react("❓")
+            message.react("❓");
         }
 
-        teamsDb.find((pclTeam) => {
-            return pclTeam.name === issuerTeam!.name;
-        })!.availability = teamAvailability;
-        fs.writeFileSync("./db/teams.json", JSON.stringify(teamsDb));
-        interaction.followUp({embeds: [new SchedChanSetEmbed(guildChan.id)]});
+        try {
+            await teamBot.prisma.team.update({
+                where: {id: teamPlayer.teamId},
+                data: {
+                    availability: teamAvailability
+                }
+            })
+            interaction.followUp({embeds: [new SchedChanSetEmbed(guildChan.id)], ephemeral: true})
+            teamBot.prisma.$disconnect()
+        } catch {
+            teamBot.prisma.$disconnect()
+            interaction.reply("An unexpected error occured")
+        }
     }
 }

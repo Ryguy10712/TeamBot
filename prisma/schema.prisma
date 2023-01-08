@@ -14,6 +14,8 @@ model Team {
   rank                Int?
   confidential        Boolean
   players             TeamPlayer[]
+  availability        Json?
+  schedulingChannel   String?
   scheduleRequestsOut ScheduleRequest[] @relation("requester")
   scheduleRequestsIn  ScheduleRequest[] @relation("receiver")
 }
