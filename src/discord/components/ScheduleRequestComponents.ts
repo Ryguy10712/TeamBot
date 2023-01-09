@@ -1,3 +1,4 @@
+import { Team } from "@prisma/client"
 import { SelectMenuBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } from "discord.js"
 import fs from "fs"
 import { PCLTeam } from "../../interfaces/PCLTeam"
@@ -7,7 +8,7 @@ import { DiscordButton } from "../DiscordButton"
 
 //Components
 export class TeamListMenu extends SelectMenuBuilder {
-  constructor(issuerTeam: PCLTeam){
+  constructor(issuerTeam: Team){
     super()
     this.setCustomId("schedreqTeams")
     const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
@@ -62,7 +63,7 @@ export const DenyButton = new ButtonBuilder()
 
 //ActionRows
 export class TeamListRow extends ActionRowBuilder<SelectMenuBuilder> {
-  constructor(issuerTeam: PCLTeam){
+  constructor(issuerTeam: Team){
     super()
     this.setComponents(new TeamListMenu(issuerTeam))
   }

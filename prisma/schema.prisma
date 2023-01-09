@@ -53,7 +53,7 @@ model ScheduleRequest {
   requesterTeam  Team   @relation(name: "requester", fields: [requesterId], references: [id])
   receiverTeam   Team   @relation(name: "receiver", fields: [receiverId], references: [id])
   captainMsgId   String @unique
-  coCaptainMsgId String @unique
+  coCaptainMsgId String? @unique
 
   @@index([requesterId])
   @@index([receiverId])

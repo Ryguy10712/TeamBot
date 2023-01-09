@@ -5,7 +5,9 @@ import fs from "fs";
 import { PCLTeam } from "../../interfaces/PCLTeam";
 import { MatchTypeRow, RequestRow, TeamListRow } from "../components/ScheduleRequestComponents";
 import { ScheduleRequest, MatchType } from "../../interfaces/ScheduleRequest";
-import { RequestSentEmbed, SchedReqPrimaryEmbed } from "../embeds/ScheduleRequestEmbeds";
+import { IncomingRequestEmbed, RequestSentEmbed, SchedReqPrimaryEmbed } from "../embeds/ScheduleRequestEmbeds";
+import { UserNotCaptainEmbed } from "../embeds/CommonEmbeds";
+import { Prisma } from "@prisma/client";
 
 export default class ScheduleRequestCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -16,30 +18,31 @@ export default class ScheduleRequestCommand extends DiscordCommand {
     }
 
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
-        const registeredTeams: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
-        const issuerPlayer = teamBot.findPCLPlayerByDiscord(interaction.user.id);
+        const issuerPlayer = await teamBot.prisma.teamPlayer.findFirst({where: {playerId: interaction.user.id}, include: {team: true}})
         //check to see if this person is cap or co-cap of a team
-        if (!registeredTeams.some((pclPlayer) => {
-                return pclPlayer.captain === interaction.user.id || pclPlayer.coCap === interaction.user.id;
-            })
-          ) {
-            return interaction.reply({content: "poopoo"}); //poopoo pee pee
+        if(!issuerPlayer?.isCaptain && !issuerPlayer?.isCoCap){
+            interaction.reply({embeds: [new UserNotCaptainEmbed()], ephemeral: true})
         }
         //at this point the user IS a cocaptain
-        const issuerTeam = registeredTeams.find((pclTeam) => {
-            return pclTeam.captain === interaction.user.id || pclTeam.coCap === interaction.user.id;
-        })!;
-        if(!issuerTeam.schedulingChannel) return interaction.reply("In order to use this command you must have a scheduling channel")
+        
+        if(!issuerPlayer!.team.schedulingChannel) return interaction.reply("In order to use this command you must have a scheduling channel")
         let TeamListMenuParams: SelectMenuOptionBuilder[] = []
-        for (const team of registeredTeams) {
-            if (team.rank === issuerTeam.rank && team.schedulingChannel && !team.confidential) { //the otherteam must have a scheduling channel in order for it to show up
-                const option = new SelectMenuOptionBuilder()
-                    .setLabel(team.name)
-                    .setValue(`schedreq${team.name}`)
-                TeamListMenuParams.push(option)
-              }
+        const teams = await teamBot.prisma.team.findMany({
+            where: {
+                NOT: [
+                    {
+                        schedulingChannel: null, confidential: true
+                    }
+                ]
+            }
+        })
+        for (const team of teams) {
+            const option = new SelectMenuOptionBuilder()
+            .setLabel(team.name)
+            .setValue(`schedreq${team.name}`)
+            TeamListMenuParams.push(option)
         }
-        const reply = await interaction.reply({components: [new TeamListRow(issuerTeam), new MatchTypeRow], embeds: [new SchedReqPrimaryEmbed]})
+        const reply = await interaction.reply({components: [new TeamListRow(issuerPlayer!.team), new MatchTypeRow], embeds: [new SchedReqPrimaryEmbed]})
         let selectedTeam: string | undefined = undefined
         const menuFilter = (i: SelectMenuInteraction) => {
           if (i.deferred || i.customId != "schedreqTeams") return false;
@@ -62,40 +65,37 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         if(buttonInteraction.customId === "schedreqMatch") matchType = MatchType.MATCH;
         if(buttonInteraction.customId === "schedreqChallenge") matchType = MatchType.CHALLENGE;
         if(buttonInteraction.customId === "schedreqScrim") matchType = MatchType.SCRIM;
-        let registeredMatches: ScheduleRequest[] = JSON.parse(fs.readFileSync("./db/scheduleRequests.json", "utf-8"))
-        const requestId = registeredMatches.length == 0 ? 0 : registeredMatches[registeredMatches.length - 1].id + 1 //set the match ID one above the last match
         //get captain of other team and dm them
-        const opponentCaptainId = registeredTeams.find(pclTeam => {return pclTeam.name === selectedTeam})!.captain
-        const opponentCoCaptainId = registeredTeams.find(pclTeam => {return pclTeam.name === selectedTeam})!.coCap
-        const opponentCaptainUser = await client.users.fetch(opponentCaptainId);
+        const oppTeam = teams.find(team => {return team.name == selectedTeam})!
+        const oppCapAndCoCap = await teamBot.prisma.teamPlayer.findMany({where: { //query gets both captain and cocaptain
+            teamId: oppTeam.id,
+            OR: [{isCaptain: true}, {isCoCap: true}]
+        }})
+        const oppCaptain = oppCapAndCoCap.find(teamPlayer => {return teamPlayer.isCaptain})!
+        const oppCoCaptain = oppCapAndCoCap.find(teamPlayer => {return teamPlayer.isCoCap})!
+        const opponentCaptainUser = await client.users.fetch(oppCaptain.playerId)
         //evaluate wether or not a co-captain exists
-        const opponentCoCaptainUser = opponentCoCaptainId ? await client.users.fetch(opponentCoCaptainId) : null 
-        const capMsg = await opponentCaptainUser.send({content: "this is maybe a scheduling request", components: [new RequestRow()]})
+        const opponentCoCaptainUser = oppCoCaptain ? await client.users.fetch(oppCoCaptain.playerId) : null 
+        const capMsg = await opponentCaptainUser.send({embeds: [new IncomingRequestEmbed(oppTeam.name, matchType!)], components: [new RequestRow()]})
         const coCapMsg = opponentCoCaptainUser ? await opponentCoCaptainUser.send("||RUNRUNRUNRUN||") : null
-        buttonInteraction.followUp({embeds: [new RequestSentEmbed(selectedTeam)], ephemeral: true}) 
-        buttonInteraction.replied = true; //button handler will acknowledge this
+        teamBot.prisma.scheduleRequest.create({
+            data: {
+                requesterId: issuerPlayer!.teamId,
+                receiverId: issuerPlayer!.teamId,
+                captainMsgId: capMsg.id,
+                coCaptainMsgId: coCapMsg?.id,
+
+            },
+            
+        }).then(() => {
+            teamBot.prisma.$disconnect()
+            buttonInteraction.followUp({embeds: [new RequestSentEmbed(selectedTeam!)], ephemeral: true}) 
+            buttonInteraction.replied = true; //button handler will acknowledge this
+        })
+        .catch(() => {interaction.followUp("An unxpected error occured and the schedule request will be terminatd")})
         //co cap msg id is null if co cap doesnt exist
-        const schedRequest: ScheduleRequest = coCapMsg ? {
-            id: requestId,
-            requester: issuerTeam.name,
-            opponent: selectedTeam,
-            captainMsgId: capMsg.id,
-            coCaptainMsgId: coCapMsg.id,
-            requestChanId: capMsg.channelId,
-            type: matchType!,
-            accepted: false
-        } : {
-            id: requestId,
-            requester: issuerTeam.name,
-            opponent: selectedTeam,
-            captainMsgId: capMsg.id,
-            coCaptainMsgId: null,
-            requestChanId: capMsg.channelId,
-            type: matchType!,
-            accepted: false
-        }
-        registeredMatches.push(schedRequest)
-        fs.writeFileSync("./db/scheduleRequests.json", JSON.stringify(registeredMatches))
+        
+       
         
 
 
