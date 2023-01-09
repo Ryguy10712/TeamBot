@@ -1,9 +1,9 @@
-import { ButtonBuilder, ButtonInteraction, CacheType, Client, CommandInteraction, Component, ComponentType, DMChannel, SelectMenuInteraction, SelectMenuOptionBuilder, ThreadMemberFlagsBitField, UserPremiumType } from "discord.js";
+import { ButtonInteraction, CacheType, Client, CommandInteraction, ComponentType, SelectMenuInteraction, SelectMenuOptionBuilder } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import fs from "fs";
 import { PCLTeam } from "../../interfaces/PCLTeam";
-import { AcceptButton, DenyButton, MatchTypeRow, RequestRow, TeamListMenu, TeamListRow } from "../components/ScheduleRequestComponents";
+import { MatchTypeRow, RequestRow, TeamListRow } from "../components/ScheduleRequestComponents";
 import { ScheduleRequest, MatchType } from "../../interfaces/ScheduleRequest";
 import { RequestSentEmbed, SchedReqPrimaryEmbed } from "../embeds/ScheduleRequestEmbeds";
 

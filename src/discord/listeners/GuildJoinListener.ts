@@ -1,4 +1,4 @@
-import { ChannelType, Collection, GuildTextBasedChannel, Message, PermissionResolvable, PermissionsBitField } from "discord.js";
+import { ChannelType, Collection, GuildTextBasedChannel, Message, PermissionResolvable } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordListener } from "../DiscordListener";
 import { MissingPermissionsEmbed } from "../embeds/GuildJoinEmbeds";

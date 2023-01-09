@@ -1,4 +1,4 @@
-import { Embed, EmbedBuilder } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 
 //SUCCCESS
 export class RegisterSuccess extends EmbedBuilder {

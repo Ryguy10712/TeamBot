@@ -1,8 +1,6 @@
-import { Prisma } from "@prisma/client";
 import { UserResolvable } from "discord.js";
-import fs from "node:fs/promises";
 import { TeamBot } from "../../Bot";
-import { availability, HourReaction, PCLTeam } from "../../interfaces/PCLTeam";
+import { availability } from "../../interfaces/PCLTeam";
 import { DiscordListener } from "../DiscordListener";
 
 export class MessageReactionAddListender extends DiscordListener {

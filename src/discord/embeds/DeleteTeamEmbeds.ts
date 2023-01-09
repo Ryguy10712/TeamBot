@@ -1,4 +1,4 @@
-import { Embed, EmbedBuilder } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 
 export const NotCaptainError = new EmbedBuilder().setColor("Red").setTitle("What...").setFields({
   name: "Failed:",

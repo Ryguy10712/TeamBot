@@ -1,7 +1,6 @@
 import { TeamBot } from "../../Bot";
 import { DiscordListener } from "../DiscordListener";
-import fs from "fs";
-import { availability, PCLTeam } from "../../interfaces/PCLTeam";
+import { availability } from "../../interfaces/PCLTeam";
 
 export class ReactionRemoveListener extends DiscordListener {
     startListener(teamBot: TeamBot): void {

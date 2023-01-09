@@ -5,7 +5,6 @@ import * as Embeds from "../embeds/TeamMenuEmbeds";
 import * as Components from "../components/TeamMenuComponents";
 import fs from "fs";
 import { PCLTeam } from "../../interfaces/PCLTeam";
-import { isoculusidClean } from "../../utils/StringSanatizers";
 
 export default class TeamConfigCommand extends DiscordCommand {
     public inDev: boolean = false;

@@ -1,12 +1,9 @@
-import { Client, CommandInteraction, CacheType, SlashCommandStringOption, escapeHeading, embedLength } from "discord.js";
+import { Client, CommandInteraction, CacheType, SlashCommandStringOption } from "discord.js";
 import { DiscordCommand } from "../DiscordCommand";
-import fs from "fs";
-import PCLPlayer from "../../interfaces/PCLPlayer";
 import * as Embeds from "../embeds/RegisterEmbeds";
 import { isoculusidClean } from "../../utils/StringSanatizers";
 import { TeamBot } from "../../Bot";
 import { Player } from "@prisma/client";
-import { createOptimisticUniqueName } from "typescript";
 
 export default class RegisterCommand extends DiscordCommand {
     public inDev: boolean = false;

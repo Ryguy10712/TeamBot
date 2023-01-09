@@ -1,7 +1,7 @@
 import { Client, ContextMenuCommandInteraction, CacheType, ContextMenuCommandBuilder, ApplicationCommandType } from "discord.js";
 import { TeamBot } from "../../../Bot";
 import { DiscordContextMenu } from "../../DiscordContextMenu";
-import fs from "fs"
+import fs from "fs";
 import { PCLTeam } from "../../../interfaces/PCLTeam";
 import { PlayerNotOnUserTeamEmbed, UserNotCaptainEmbed, UserNotOnTeamEmbed } from "../../embeds/CommonEmbeds";
 import { CoCapSetEmbed } from "../../embeds/SetCoCapEmbeds";

@@ -1,4 +1,4 @@
-import { Client, CommandInteraction, CacheType, EmbedBuilder, SlashCommandStringOption, Invite } from "discord.js";
+import { Client, CommandInteraction, CacheType, EmbedBuilder, SlashCommandStringOption } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DayOfWeek, PCLTeam } from "../../interfaces/PCLTeam";
 import { DiscordCommand } from "../DiscordCommand";

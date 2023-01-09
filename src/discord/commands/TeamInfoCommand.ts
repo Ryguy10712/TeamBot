@@ -1,8 +1,8 @@
-import { Client, CommandInteraction, CacheType, EmbedBuilder, BaseGuildTextChannel } from "discord.js";
+import { Client, CommandInteraction, CacheType, EmbedBuilder } from "discord.js";
 import { TeamBot } from "../../Bot";
 import fs from "fs";
 import { DiscordCommand } from "../DiscordCommand";
-import { PCLTeam, Ranks } from "../../interfaces/PCLTeam";
+import { PCLTeam } from "../../interfaces/PCLTeam";
 
 export default class TeamInfoCommand extends DiscordCommand {
     public inDev: boolean = false;

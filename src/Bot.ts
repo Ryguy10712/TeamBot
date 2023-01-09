@@ -1,4 +1,4 @@
-import { Client, DataResolver, Partials, REST, Routes, SystemChannelFlagsBitField } from "discord.js";
+import { Client, Partials, REST } from "discord.js";
 import dotenv from "dotenv";
 import { DiscordCommand } from "./discord/DiscordCommand";
 import { DiscordListener } from "./discord/DiscordListener";

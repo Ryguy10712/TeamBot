@@ -2,16 +2,10 @@ import {
     Client,
     CommandInteraction,
     CacheType,
-    SlashCommandChannelOption,
-    GuildTextBasedChannel,
-    GuildChannel,
-    ReactionCollector,
-    ChannelType,
+    SlashCommandChannelOption, ChannelType
 } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
-import fs from "fs";
-import { PCLTeam, HourReaction, availability } from "../../interfaces/PCLTeam";
 import { MissingAccessEmbed, NoTeamEmbed, SchedChanSetEmbed, WrongChannelTypeEmbed } from "../embeds/SchedChannelEmbeds";
 
 export class SchedulingChannelCommand extends DiscordCommand {

@@ -4,7 +4,7 @@ import { PCLTeam } from "../../interfaces/PCLTeam";
 import { DiscordButton } from "../DiscordButton";
 import { MatchOrganizerEmbed } from "../components/RequestAcceptComponents";
 import { TeamBot } from "../../Bot";
-import fs from "fs"
+import fs from "fs";
 
 export class MatchOrganizerUpdateButton extends DiscordButton {
     public id: string;

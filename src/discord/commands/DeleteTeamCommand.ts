@@ -1,9 +1,7 @@
 import { Client, CommandInteraction, CacheType } from "discord.js";
 import { TeamBot } from "../../Bot";
-import fs from "fs"
 import { DiscordCommand } from "../DiscordCommand";
-import { PCLTeam } from "../../interfaces/PCLTeam";
-import * as Embeds from "../embeds/DeleteTeamEmbeds"
+import * as Embeds from "../embeds/DeleteTeamEmbeds";
 
 export default class DeleteTeamCommand extends DiscordCommand {
     public inDev: boolean = false;

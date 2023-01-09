@@ -1,6 +1,5 @@
 import { DiscordCommand } from "../DiscordCommand";
-import { TeamBot } from "../../Bot";
-import { Client, CommandInteraction, CacheType, SlashCommandBuilder } from "discord.js";
+import { Client, CommandInteraction, CacheType } from "discord.js";
 
 export class PingCommand extends DiscordCommand {
     public inDev: boolean;

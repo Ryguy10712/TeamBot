@@ -1,7 +1,7 @@
-import { Client, CommandInteraction, CacheType, GuildTextBasedChannel, FetchReactionUsersOptions } from "discord.js";
+import { Client, CommandInteraction, CacheType, GuildTextBasedChannel } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
-import fs from "fs"
+import fs from "fs";
 import { DayOfWeek, PCLTeam } from "../../interfaces/PCLTeam";
 import { UserNotOnTeamEmbed } from "../embeds/CommonEmbeds";
 

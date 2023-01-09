@@ -1,7 +1,7 @@
-import { Client, CommandInteraction, CacheType, SlashCommandStringOption, ThreadMemberFlagsBitField, GuildTextBasedChannel } from "discord.js";
+import { Client, CommandInteraction, CacheType, SlashCommandStringOption, GuildTextBasedChannel } from "discord.js";
 import { TeamBot } from "../../../Bot";
 import { DiscordCommand } from "../../DiscordCommand";
-import fs from "fs"
+import fs from "fs";
 import { PCLTeam } from "../../../interfaces/PCLTeam";
 
 class TeamOption extends SlashCommandStringOption {

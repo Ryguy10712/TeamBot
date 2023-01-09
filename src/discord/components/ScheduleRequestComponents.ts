@@ -1,6 +1,5 @@
-import {SelectMenuBuilder, ButtonBuilder, ActionRowBuilder, Team, ButtonStyle, SelectMenuOptionBuilder} from "discord.js"
+import { SelectMenuBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } from "discord.js"
 import fs from "fs"
-import { TeamBot } from "../../Bot"
 import { PCLTeam } from "../../interfaces/PCLTeam"
 import { ScheduleRequestAcceptButton } from "../buttons/ScheduleRequestAccept"
 import { ScheduleRequestDenyButton } from "../buttons/ScheduleRequestDeny"

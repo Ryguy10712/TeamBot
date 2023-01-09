@@ -6,20 +6,12 @@ import {
     SlashCommandStringOption,
     ButtonBuilder,
     ActionRowBuilder,
-    ButtonStyle,
-    ButtonInteraction,
-    ComponentType,
-    ButtonComponent,
-    AnyComponentBuilder,
-    SlashCommandBooleanOption,
+    ButtonStyle, SlashCommandBooleanOption
 } from "discord.js";
-import { PCLTeam, Ranks } from "../../interfaces/PCLTeam";
-import PCLPlayer from "../../interfaces/PCLPlayer";
-import fs from "fs";
+import { Ranks } from "../../interfaces/PCLTeam";
 import { DiscordCommand } from "../DiscordCommand";
 import { TeamBot } from "../../Bot";
 import * as Embeds from "../embeds/RegisterTeamEmbeds";
-import { RequesterChanDeleted } from "../components/RequestAcceptComponents";
 
 export default class RegisterTeamCommand extends DiscordCommand {
     public inDev: boolean = false;

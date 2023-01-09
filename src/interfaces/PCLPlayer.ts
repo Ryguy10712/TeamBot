@@ -1,4 +1,3 @@
-import { PCLTeam } from "./PCLTeam";
 export default interface PCLPlayer {
     team: string | undefined
     oculusId: string;

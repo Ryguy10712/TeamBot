@@ -1,4 +1,4 @@
-import {ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder} from "discord.js"
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js"
 import { TeamBot } from "../../Bot"
 import { PCLTeam } from "../../interfaces/PCLTeam"
 import { MatchType } from "../../interfaces/ScheduleRequest"

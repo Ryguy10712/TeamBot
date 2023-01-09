@@ -1,5 +1,4 @@
 import { Client, CommandInteraction, CacheType } from "discord.js";
-import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 
 export class PongCommand extends DiscordCommand {

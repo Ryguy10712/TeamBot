@@ -1,6 +1,5 @@
-import { Client, CommandInteraction, CacheType, ContextMenuCommandBuilder, ApplicationCommandType, ContextMenuCommandInteraction } from "discord.js";
+import { Client, CacheType, ContextMenuCommandBuilder, ApplicationCommandType, ContextMenuCommandInteraction } from "discord.js";
 import { TeamBot } from "../../../Bot";
-import { DiscordCommand } from "../../DiscordCommand";
 import { DiscordContextMenu } from "../../DiscordContextMenu";
 import fs from "fs";
 import { PCLTeam } from "../../../interfaces/PCLTeam";

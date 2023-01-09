@@ -1,4 +1,3 @@
-import PCLPlayer from "./PCLPlayer";
 export enum Ranks {
     GOLD,
     SILVER,

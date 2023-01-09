@@ -3,7 +3,7 @@ import { PCLTeam } from "../../interfaces/PCLTeam";
 import { ScheduleRequest } from "../../interfaces/ScheduleRequest";
 import { DiscordButton } from "../DiscordButton";
 import fs from "fs";
-import { AccepterChanDeleted, MatchOrganizerEmbed, RequesterChanDeleted, UpdateButtonRow } from "../components/RequestAcceptComponents";
+import { MatchOrganizerEmbed, UpdateButtonRow } from "../components/RequestAcceptComponents";
 import { RequestRow } from "../components/ScheduleRequestComponents";
 import { TeamBot } from "../../Bot";
 

@@ -1,7 +1,7 @@
 import { DiscordListener } from "../DiscordListener";
 import { TeamBot } from "../../Bot";
 import { Routes } from "discord.js";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 dotenv.config()
 
 export class ReadyListener extends DiscordListener {
