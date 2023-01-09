@@ -11,7 +11,7 @@ import {
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import fs from "fs";
-import { PCLTeam, HourReaction } from "../../interfaces/PCLTeam";
+import { PCLTeam, HourReaction, availability } from "../../interfaces/PCLTeam";
 import { MissingAccessEmbed, NoTeamEmbed, SchedChanSetEmbed, WrongChannelTypeEmbed } from "../embeds/SchedChannelEmbeds";
 
 export class SchedulingChannelCommand extends DiscordCommand {
@@ -26,18 +26,18 @@ export class SchedulingChannelCommand extends DiscordCommand {
     }
 
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
-        await interaction.deferReply();
+        await interaction.deferReply({ ephemeral: true });
         const REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "🕚", "🕛"];
         const channelId = interaction.options.get("channel")!.value as string;
         const teamPlayer = await teamBot.prisma.teamPlayer.findFirst({
             where: {
-                OR: [{isCaptain: true,},{isCoCap: true,}],
+                OR: [{ isCaptain: true }, { isCoCap: true }],
                 AND: [{ playerId: interaction.user.id }],
             },
         });
 
-        if(!teamPlayer){
-            interaction.followUp({embeds: [new NoTeamEmbed], ephemeral: true});
+        if (!teamPlayer) {
+            interaction.followUp({ embeds: [new NoTeamEmbed()], ephemeral: true });
             return;
         }
 
@@ -60,33 +60,7 @@ export class SchedulingChannelCommand extends DiscordCommand {
             return;
         }
 
-        const teamAvailability: PCLTeam["availability"] = {
-            messageIds: [],
-            tuesday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
-            wednesday: {
-                "1PM": [],
-                "2PM": [],
-                "3PM": [],
-                "4PM": [],
-                "5PM": [],
-                "6PM": [],
-                "7PM": [],
-                "8PM": [],
-                "9PM": [],
-                "10PM": [],
-                "11PM": [],
-                "12PM": [],
-            },
-            thursday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
-            friday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
-            saturday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
-            sunday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
-            monday: { "1PM": [], "2PM": [], "3PM": [], "4PM": [], "5PM": [], "6PM": [], "7PM": [], "8PM": [], "9PM": [], "10PM": [], "11PM": [], "12PM": [] },
-        };
-
-        //populating the messageIds
         for (const message of messages) {
-            teamAvailability.messageIds.push(message.id);
             for (const reaction of REACTIONS) {
                 message.react(reaction);
             }
@@ -96,16 +70,27 @@ export class SchedulingChannelCommand extends DiscordCommand {
 
         try {
             await teamBot.prisma.team.update({
-                where: {id: teamPlayer.teamId},
+                where: { id: teamPlayer.teamId },
                 data: {
-                    availability: teamAvailability
-                }
-            })
-            interaction.followUp({embeds: [new SchedChanSetEmbed(guildChan.id)], ephemeral: true})
-            teamBot.prisma.$disconnect()
+                    schedulingChannel: channelId,
+                    availability: {
+                        create: {
+                            tuesday: messages[0].id,
+                            wednesday: messages[1].id,
+                            thursday: messages[2].id,
+                            friday: messages[3].id,
+                            saturday: messages[4].id,
+                            sunday: messages[5].id,
+                            monday: messages[6].id,
+                        },
+                    },
+                },
+            });
+            interaction.followUp({ embeds: [new SchedChanSetEmbed(guildChan.id)], ephemeral: true });
+            teamBot.prisma.$disconnect();
         } catch {
-            teamBot.prisma.$disconnect()
-            interaction.reply("An unexpected error occured")
+            teamBot.prisma.$disconnect();
+            interaction.reply("An unexpected error occured");
         }
     }
 }

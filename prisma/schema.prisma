@@ -14,8 +14,8 @@ model Team {
   rank                Int?
   confidential        Boolean
   players             TeamPlayer[]
-  availability        Json?
-  schedulingChannel   String?
+  availability        TeamAvailability?
+  schedulingChannel   String?           @unique
   scheduleRequestsOut ScheduleRequest[] @relation("requester")
   scheduleRequestsIn  ScheduleRequest[] @relation("receiver")
 }
@@ -35,6 +35,13 @@ model TeamPlayer {
   team      Team    @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   isCaptain Boolean @default(false)
   isCoCap   Boolean @default(false)
+  tuesday   Json?
+  wednesday Json?
+  thursday  Json?
+  friday    Json?
+  saturday  Json?
+  sunday    Json?
+  monday    Json?
 
   @@index([teamId])
 }
@@ -50,4 +57,16 @@ model ScheduleRequest {
 
   @@index([requesterId])
   @@index([receiverId])
+}
+
+model TeamAvailability {
+  teamId    Int    @id @unique
+  team      Team   @relation(fields: [teamId], references: [id])
+  tuesday   String
+  wednesday String
+  thursday  String
+  friday    String
+  saturday  String
+  sunday    String
+  monday    String
 }

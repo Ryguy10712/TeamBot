@@ -1,7 +1,8 @@
+import { Prisma } from "@prisma/client";
 import { UserResolvable } from "discord.js";
 import fs from "node:fs/promises";
 import { TeamBot } from "../../Bot";
-import { HourReaction, PCLTeam } from "../../interfaces/PCLTeam";
+import { availability, HourReaction, PCLTeam } from "../../interfaces/PCLTeam";
 import { DiscordListener } from "../DiscordListener";
 
 export class MessageReactionAddListender extends DiscordListener {
@@ -10,56 +11,60 @@ export class MessageReactionAddListender extends DiscordListener {
 
         type validReaction = "1️⃣" | "2️⃣" | "3️⃣" | "4️⃣" | "5️⃣" | "6️⃣" | "7️⃣" | "8️⃣" | "9️⃣" | "🔟" | "🕚" | "🕛";
 
-        type time = "1PM" | "2PM" | "3PM" | "4PM" | "5PM" | "6PM" | "7PM" | "8PM" | "9PM" | "10PM" | "11PM" | "12PM";
+        type time = "one" | "two" | "three" | "four" | "five" | "six" | "seven" | "eight" | "nine" | "ten" | "eleven" | "twelve";
 
         const reactionToTime = {
-            "1️⃣": "1PM",
-            "2️⃣": "2PM",
-            "3️⃣": "3PM",
-            "4️⃣": "4PM",
-            "5️⃣": "5PM",
-            "6️⃣": "6PM",
-            "7️⃣": "7PM",
-            "8️⃣": "8PM",
-            "9️⃣": "9PM",
-            "🔟": "10PM",
-            "🕚": "11PM",
-            "🕛": "12PM",
+            "1️⃣": "one",
+            "2️⃣": "two",
+            "3️⃣": "three",
+            "4️⃣": "four",
+            "5️⃣": "five",
+            "6️⃣": "six",
+            "7️⃣": "seven",
+            "8️⃣": "eight",
+            "9️⃣": "nine",
+            "🔟": "ten",
+            "🕚": "eleven",
+            "🕛": "twelve",
         };
 
         teamBot.client.on("messageReactionAdd", async (reaction, reactionUser) => {
             if(reactionUser.id === teamBot.client.user?.id) return;
             if (!Object.keys(reactionToTime).includes(reaction.emoji.name as validReaction)) return; //not a tracked reaction
-            const teamsDb: PCLTeam[] = JSON.parse(await fs.readFile("./db/teams.json", "utf-8"));
-            
-            if (
-                !teamsDb.some((pclTeam) => {
-                    return pclTeam.schedulingChannel === reaction.message.channelId;
-                })
-            ) {
-                return; //this is not a reaction in a scheduling channel
+            //find the reactor's team
+            const reactor = await teamBot.prisma.teamPlayer.findFirst({
+                where: {playerId: reactionUser.id}
+            })
+            const messageTeam = await teamBot.prisma.teamAvailability.findFirst({
+                where: {
+                    OR: [
+                    {tuesday: reaction.message.id}, {wednesday: reaction.message.id}, 
+                    {thursday: reaction.message.id}, {friday: reaction.message.id},
+                    {saturday: reaction.message.id}, {sunday: reaction.message.id},
+                    {monday: reaction.message.id}
+                    ]
+                }
+            })
+            if(!messageTeam){
+                return;
             }
-            const messageTeam = teamsDb.find((pclTeam) => {
-                return pclTeam.availability!.messageIds.includes(reaction.message.id);
-            });
-            if (!messageTeam) return; //not a scheduling message
-            if (!messageTeam.players.includes(reactionUser.id)) {
+            if(reactor?.teamId != messageTeam.teamId){
                 reaction.users.remove(reactionUser as UserResolvable)
                 return;
             }
+
+            
             const fullMsg = await reaction.message.fetch(); //reaction.message is a partial structure, must fetch content
             const fullMsgContent = fullMsg.content.toLowerCase() as dayOfWeek;
             //fuck you, typescript type-checking 
             const r = reaction.emoji.name as validReaction;
             const rt = reactionToTime[r] as time;
-            teamBot.log(`${reactionUser.username} (${messageTeam.name}) reacted to ${fullMsgContent} on ${rt}`, false)
-            if (messageTeam.availability![fullMsgContent][rt].includes(reactionUser.id)) return; //prevents duplicate reaction logging
-            messageTeam.availability![fullMsgContent][rt].push(reactionUser.id);
+            teamBot.log(`${reactionUser.username} (${messageTeam?.teamId}) reacted to ${fullMsgContent} on ${rt}`, false)
+            const obj = reactor[fullMsgContent]?.valueOf() as availability
+            obj[rt] = true
+            teamBot.prisma.teamPlayer.update({where: {playerId: reactionUser.id}, data: {[fullMsgContent]: obj}})
+            .then(() => {teamBot.prisma.$disconnect()})
 
-            teamsDb.find((pclTeam) => { //write newAvailability to database
-                return pclTeam.name === messageTeam.name;
-            })!.availability = messageTeam.availability;
-            fs.writeFile("./db/teams.json", JSON.stringify(teamsDb));
         });
     }
 }
