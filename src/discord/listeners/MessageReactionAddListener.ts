@@ -60,8 +60,11 @@ export class MessageReactionAddListender extends DiscordListener {
             const r = reaction.emoji.name as validReaction;
             const rt = reactionToTime[r] as time;
             teamBot.log(`${reactionUser.username} (${messageTeam?.teamId}) reacted to ${fullMsgContent} on ${rt}`, false)
-            const obj = reactor[fullMsgContent]?.valueOf() as availability
-            obj[rt] = true
+            let obj = reactor[fullMsgContent]?.valueOf()
+            if(!obj){
+                obj = {}
+            }
+            (obj as availability)[rt] = true;
             teamBot.prisma.teamPlayer.update({where: {playerId: reactionUser.id}, data: {[fullMsgContent]: obj}})
             .then(() => {teamBot.prisma.$disconnect()})
 
