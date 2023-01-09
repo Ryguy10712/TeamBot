@@ -12,6 +12,7 @@ export const GuildConfirmationEmbed = new EmbedBuilder()
 export class TeamCreateSuccess extends EmbedBuilder {
     constructor(teamName: string, coCapId: string | undefined, rank: string | undefined){
         super()
+        this.setColor("Green")
         this.setTitle("Your team has been created!")
         this.setDescription("If any of this information is incorrect, change it immediateley with **/team_menu**")
         this.setFields({
