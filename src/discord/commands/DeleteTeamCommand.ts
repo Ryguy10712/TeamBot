@@ -18,6 +18,7 @@ export default class DeleteTeamCommand extends DiscordCommand {
 				isCaptain: true,
 				playerId: interaction.user.id
 			},
+			
 		})
 		if(!teamToPlayer){
 			interaction.reply({embeds: [Embeds.NotCaptainError], ephemeral: true})
@@ -29,7 +30,8 @@ export default class DeleteTeamCommand extends DiscordCommand {
 		}).then(() => {
 			interaction.reply({embeds: [Embeds.Success], ephemeral: true})
 			teamBot.prisma.$disconnect()
-		}).catch(() => {
+		}).catch((e) => {
+			teamBot.log(e, true)
 			interaction.reply("An unexpected error has occured")
 			teamBot.prisma.$disconnect()
 		})

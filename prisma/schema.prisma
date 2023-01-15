@@ -18,6 +18,8 @@ model Team {
   schedulingChannel   String?           @unique
   scheduleRequestsOut ScheduleRequest[] @relation("requester")
   scheduleRequestsIn  ScheduleRequest[] @relation("receiver")
+
+  @@index([name])
 }
 
 model Player {
@@ -50,8 +52,8 @@ model ScheduleRequest {
   id             Int    @id @default(autoincrement())
   requesterId    Int
   receiverId     Int    @map("opponentId")
-  requesterTeam  Team   @relation(name: "requester", fields: [requesterId], references: [id])
-  receiverTeam   Team   @relation(name: "receiver", fields: [receiverId], references: [id])
+  requesterTeam  Team   @relation(name: "requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiverTeam   Team   @relation(name: "receiver", fields: [receiverId], references: [id], onDelete: Cascade)
   captainMsgId   String @unique
   coCaptainMsgId String? @unique
 
