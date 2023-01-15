@@ -31,6 +31,7 @@ import { TeamAvailabilityCommand } from "./discord/commands/TeamAvailability";
 import { ResetAvailability } from "./discord/commands/admin/ResetAvailability";
 import { RefreshAvailabilityCommand } from "./discord/commands/RefreshAvailability";
 import { PrismaClient } from "@prisma/client";
+import { SlowQuery } from "./utils/ReactionQueue";
 dotenv.config();
 
 export class TeamBot {
@@ -40,6 +41,7 @@ export class TeamBot {
     public readonly rest: REST;
     protected currentLogName: string;
     public readonly prisma: PrismaClient
+    public currentQueue: SlowQuery | null
 
     constructor() {
         this.currentLogName = new Date(Date.now()).toDateString()
@@ -48,6 +50,7 @@ export class TeamBot {
         this.prisma = new PrismaClient({
             errorFormat: "minimal"
         })
+        this.currentQueue = new SlowQuery(this)
 
         this.rest = new REST({ version: "10" }).setToken(process.env.TOKEN!);
 
@@ -143,6 +146,8 @@ export class TeamBot {
             console.log(text)
         }
     }
+
+    
 }
 
 (async () => {

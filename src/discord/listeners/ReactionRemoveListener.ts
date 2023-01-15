@@ -59,11 +59,7 @@ export class ReactionRemoveListener extends DiscordListener {
             (obj as availability)[rt] = false;
             teamBot.log(`${reactionUser.username} (${messageTeam.teamId}) unreacted to ${dayIndex} on ${rt}`, false);
 
-            //write new availability to the db
-            teamBot.prisma.teamPlayer.update({
-                where: {playerId: reactionUser.id},
-                data: {[dayIndex]: obj}
-            }).then(() => {teamBot.prisma.$disconnect()})
+            teamBot.currentQueue?.enqueue(false, dayIndex, rt, reactionUser.id)
         });
     }
 }

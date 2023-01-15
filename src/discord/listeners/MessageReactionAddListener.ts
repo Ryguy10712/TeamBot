@@ -61,10 +61,10 @@ export class MessageReactionAddListender extends DiscordListener {
             let obj = reactor[fullMsgContent]?.valueOf()
             if(!obj){
                 obj = {}
-            }
+            };
             (obj as availability)[rt] = true;
-            teamBot.prisma.teamPlayer.update({where: {playerId: reactionUser.id}, data: {[fullMsgContent]: obj}})
-            .then(() => {teamBot.prisma.$disconnect()})
+            const arg = {where: {playerId: reactionUser.id}, data: {[fullMsgContent]: obj}}
+            teamBot.currentQueue?.enqueue(true, fullMsgContent, rt, reactionUser.id)
 
         });
     }
