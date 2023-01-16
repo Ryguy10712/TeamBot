@@ -1,10 +1,11 @@
-import { Client, CommandInteraction, CacheType, SelectMenuInteraction, ComponentType, ButtonInteraction } from "discord.js";
+import { Client, CommandInteraction, CacheType, SelectMenuInteraction, ComponentType, ButtonInteraction, Embed } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import * as Embeds from "../embeds/TeamMenuEmbeds";
 import * as Components from "../components/TeamMenuComponents";
 import fs from "fs";
 import { PCLTeam } from "../../interfaces/PCLTeam";
+import { PlayerAlreadyOnEmbed, UserNotCaptainEmbed } from "../embeds/CommonEmbeds";
 
 export default class TeamConfigCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -15,13 +16,24 @@ export default class TeamConfigCommand extends DiscordCommand {
     }
 
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
-        let success: Boolean = false
         //terminate if player is not registerd
-        if (!teamBot.findPCLPlayerByDiscord(interaction.user.id)) return interaction.reply({ embeds: [Embeds.NotRegisteredError] });
-        let team = teamBot.findTeamByCaptain(interaction.user.id)
-        if (!team) return interaction.reply({ embeds: [Embeds.NoTeamError] });
+        const issuer = await teamBot.prisma.teamPlayer.findFirst({
+            where: {
+                playerId: interaction.user.id,
+                OR: [{ isCaptain: true }, { isCoCap: true }],
+            },
+            include: { team: { select: { id: true } } },
+        });
+        if (!issuer) {
+            interaction.reply({ embeds: [new UserNotCaptainEmbed()], ephemeral: true });
+            return;
+        }
 
-        const reply = await interaction.reply({ components: [new Components.TeamConfigRow(0), Components.AddPlayerButton], embeds: [Embeds.AddPlayerEmbed], ephemeral: true });
+        const reply = await interaction.reply({
+            components: [new Components.TeamConfigRow(0), Components.AddPlayerButton],
+            embeds: [Embeds.AddPlayerEmbed],
+            ephemeral: true,
+        });
         const menuFilter = (i: SelectMenuInteraction) => {
             if (i.deferred || i.customId != "teamcfgMenu") return false;
             i.deferUpdate();
@@ -42,7 +54,7 @@ export default class TeamConfigCommand extends DiscordCommand {
                     interaction.editReply({ components: [new Components.TeamConfigRow(1), Components.RemovePlayerButton], embeds: [Embeds.RemovePlayerEmbed] });
                     break;
                 case "setCoCap":
-                    interaction.editReply({components: [new Components.TeamConfigRow(2), Components.SetCoCapButton], embeds: [Embeds.SetCoCapEmbed]})
+                    interaction.editReply({ components: [new Components.TeamConfigRow(2), Components.SetCoCapButton], embeds: [Embeds.SetCoCapEmbed] });
                     break;
                 case "editName":
                     interaction.editReply({ components: [new Components.TeamConfigRow(3), Components.EditButton], embeds: [Embeds.EditNameEmbed] });
@@ -56,145 +68,224 @@ export default class TeamConfigCommand extends DiscordCommand {
                 case "rank":
                     interaction.editReply({
                         components: [new Components.TeamConfigRow(5), Components.RankButtons],
-                        embeds: [Embeds.RankEmbed]
-                    })
+                        embeds: [Embeds.RankEmbed],
+                    });
             }
         });
 
         buttonCollector.on("collect", async (buttonInteraction) => {
-            let registeredTeams: PCLTeam[]
+            let registeredTeams: PCLTeam[];
             switch (buttonInteraction.customId) {
                 case "teamcfgAdd":
                     await buttonInteraction.showModal(Components.AddPlayerModal);
-                    await buttonInteraction.awaitModalSubmit({ time: 120_000 })
-                        .then((modalData) => {
+                    await buttonInteraction
+                        .awaitModalSubmit({ time: 120_000 })
+                        .then(async (modalData) => {
                             modalData.deferUpdate();
                             const response = modalData.fields.getTextInputValue("addPlayerText");
-                            const pclPlayer = teamBot.findPCLPlayerByOculus(response);
+                            const candidate = await teamBot.prisma.player.findFirst({
+                                where: { oculusId: response },
+                                include: { team: { select: { teamId: true } } },
+                            });
                             //check to see if the provided player is registered
-                            if (!pclPlayer) return interaction.editReply({ embeds: [Embeds.PlayerNotFoundError] });
-                            registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
+                            if (!candidate) return interaction.editReply({ embeds: [Embeds.PlayerNotFoundError] });
                             //return if the provided player is already on a team
-                            if (
-                                registeredTeams.some((PCLTeam) => {
-                                    return PCLTeam.players.includes(teamBot.findPCLPlayerByOculus(response)?.discordID!);
-                                })
-                            ) return interaction.editReply({ embeds: [Embeds.PlayerAlreadyOnError] });
+                            if (candidate.team) {
+                                interaction.editReply({ embeds: [new PlayerAlreadyOnEmbed(response)] });
+                                return;
+                            }
                             //at this point the username is valid
-                            registeredTeams.find(PCLTeam => {return PCLTeam.captain === buttonInteraction.user.id})?.players.push(pclPlayer.discordID)
-                            fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                            team = teamBot.findTeamByCaptain(interaction.user.id)
-                            interaction.editReply({embeds: [Embeds.AddPlayerSuccess]})
-                            success = true;
+                            teamBot.prisma.team.update({
+                                where: { id: issuer.teamId },
+                                data: {
+                                    players: {
+                                        create: {
+                                            playerId: candidate.discordId,
+                                            isCaptain: false,
+                                            isCoCap: false,
+                                        },
+                                    },
+                                },
+                            })
+                            .then(() => {
+                                interaction.editReply({ embeds: [Embeds.AddPlayerSuccess] });
+                                teamBot.prisma.$disconnect()
+                            })
+                            .catch(() => {
+                                interaction.editReply("An unexpected error has occured");
+                                teamBot.prisma.$disconnect()
+                            });
                         })
-                        .catch(() => { //ignore timeout
+                        .catch(() => {
+                            //ignore timeout
                             return null;
                         });
                     break;
 
                 case "teamcfgRemove":
-                    buttonInteraction.showModal(Components.RemovePlayerModal)
-                    await buttonInteraction.awaitModalSubmit({ time: 120_000 }).then(modalData => {
-                        modalData.deferUpdate()
-                        const resposne = modalData.fields.getTextInputValue("removePlayerText")
-                        const playerForRemoval = teamBot.findPCLPlayerByOculus(resposne)?.discordID
-                        if(!playerForRemoval) return interaction.editReply({embeds: [Embeds.PlayerNotFoundError]});
-                        if(!team!.players.includes(playerForRemoval)) return interaction.editReply({embeds: [Embeds.PlayerNotOnError]})
-                        registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
-                        registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.players = registeredTeams.find(PCLTeam => {return PCLTeam.name === team!.name})!.players.filter(player => {return player != playerForRemoval})
-                        if(team!.coCap === playerForRemoval) team!.coCap = undefined;
-                        fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                        team = teamBot.findTeamByCaptain(interaction.user.id)
-                        interaction.editReply({embeds: [Embeds.RemovePlayerSuccess]})
-                        success = true;
-                    })
+                    buttonInteraction.showModal(Components.RemovePlayerModal);
+                    await buttonInteraction.awaitModalSubmit({ time: 120_000 }).then(async (modalData) => {
+                        modalData.deferUpdate();
+                        const resposne = modalData.fields.getTextInputValue("removePlayerText");
+                        const candidate = await teamBot.prisma.player.findFirst({
+                            where: { oculusId: resposne },
+                            include: { team: { select: { teamId: true } } },
+                        });
+                        if (!candidate) return interaction.editReply({ embeds: [Embeds.PlayerNotFoundError] });
+                        if (candidate.team?.teamId != issuer.teamId) {
+                            interaction.editReply({ embeds: [Embeds.PlayerNotOnError] });
+                            return;
+                        }
+                        teamBot.prisma.teamPlayer
+                            .delete({
+                                where: { playerId: candidate.discordId },
+                            })
+                            .then(() => {
+                                interaction.editReply({ embeds: [Embeds.RemovePlayerSuccess] });
+                            })
+                            .catch(() => {
+                                interaction.editReply("An unexpected error occured");
+                            });
+                    });
                     break;
 
                 case "teamcfgCoCap":
-                    buttonInteraction.showModal(Components.SetCoCapModal)
-                    await buttonInteraction.awaitModalSubmit({time: 120_000}).then(modalData => {
-                        modalData.deferUpdate()
-                        const response = modalData.fields.getTextInputValue("setCoCapText")
-                        const responsePlayer = teamBot.findPCLPlayerByOculus(response)
-                        
-                        if(!responsePlayer) return interaction.editReply({embeds: [Embeds.PlayerNotFoundError]});
-                        if(!team!.players.includes(responsePlayer.discordID)){
-                            interaction.editReply({embeds: [Embeds.PlayerNotOnError]})
+                    buttonInteraction.showModal(Components.SetCoCapModal);
+                    await buttonInteraction.awaitModalSubmit({ time: 120_000 }).then(async (modalData) => {
+                        modalData.deferUpdate();
+                        const response = modalData.fields.getTextInputValue("setCoCapText");
+                        const candidate = await teamBot.prisma.player.findFirst({
+                            where: { oculusId: response },
+                            include: { team: { select: { teamId: true } } },
+                        });
+
+                        if (!candidate) return interaction.editReply({ embeds: [Embeds.PlayerNotFoundError] });
+                        if (candidate.team?.teamId != issuer.teamId) {
+                            interaction.editReply({ embeds: [Embeds.PlayerNotOnError] });
                             return;
                         }
-                        registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
-                        const team1 = registeredTeams.find(pclTeam => {return pclTeam.name == team?.name})
-                        team1!.coCap = responsePlayer.discordID
-                        fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                        success = true;
-                    })
-                break;
+                        teamBot.prisma.teamPlayer.update({
+                                where: { playerId: candidate.discordId },
+                                data: { isCoCap: true },
+                            })
+                            .then(() => {
+                                interaction.editReply({ embeds: [new Embeds.SetCoCapSuccess(response)] });
+                                teamBot.prisma.$disconnect()
+                            })
+                            .catch(() => {
+                                interaction.editReply("An unexpected error occured");
+                                teamBot.prisma.$disconnect()
+                            });
+                    });
+                    break;
 
                 case "teamcfgEdit":
                     buttonInteraction.showModal(Components.EditModal);
-                    await buttonInteraction.awaitModalSubmit({ time: 120_000 })
+                    await buttonInteraction
+                        .awaitModalSubmit({ time: 120_000 })
                         .then((modalData) => {
-                            modalData.deferUpdate()
-                            const response = modalData.fields.getTextInputValue("editText")
-                            registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
-                            registeredTeams.find(PCLTeam => {return PCLTeam.name === team!.name})!.name = response
-                            fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                            team = teamBot.findTeamByCaptain(interaction.user.id)
-                            interaction.editReply({embeds: [Embeds.EditNameSuccess]})
-                            success = true
+                            modalData.deferUpdate();
+                            const response = modalData.fields.getTextInputValue("editText");
+                            teamBot.prisma.team
+                                .update({
+                                    where: { id: issuer.teamId },
+                                    data: { name: response },
+                                })
+                                .then(() => {
+                                    interaction.editReply({ embeds: [Embeds.EditNameSuccess] });
+                                    teamBot.prisma.$disconnect()
+                                })
+                                .catch(() => {
+                                    interaction.editReply("An unexpected error occured");
+                                    teamBot.prisma.$disconnect()
+                                });
                         })
-                        .catch(() => { //ignore timeout
+                        .catch(() => {
+                            //ignore timeout
                             return null;
                         });
                     break;
 
                 case "teamcfgTrue":
-                    registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
-                    registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.confidential = true;
-                    fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                    team = teamBot.findTeamByCaptain(interaction.user.id)
-                    interaction.editReply({embeds: [Embeds.ConfidentialitySuccess]})
-                    success = true;
+                    teamBot.prisma.team
+                        .update({
+                            where: { id: issuer.teamId },
+                            data: { confidential: true },
+                        })
+                        .then(() => {
+                            interaction.editReply({ embeds: [Embeds.ConfidentialitySuccess] });
+                            teamBot.prisma.$disconnect()
+                        })
+                        .catch(() => {
+                            interaction.editReply("An unexpected error occured");
+                            teamBot.prisma.$disconnect()
+                        });
                     break;
 
                 case "teamcfgFalse":
-                    registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
-                    registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.confidential = false;
-                    fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                    team = teamBot.findTeamByCaptain(interaction.user.id)
-                    interaction.editReply({embeds: [Embeds.ConfidentialitySuccess]})
-                    success = true;
+                    teamBot.prisma.team
+                        .update({
+                            where: { id: issuer.teamId },
+                            data: { confidential: false },
+                        })
+                        .then(() => {
+                            interaction.editReply({ embeds: [Embeds.ConfidentialitySuccess] });
+                            teamBot.prisma.$disconnect()
+                        })
+                        .catch(() => {
+                            interaction.editReply("An unexpected error occured");
+                            teamBot.prisma.$disconnect()
+                        });
                     break;
 
                 case "teamcfgGold":
-                    registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
-                    registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.rank = 0
-                    fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                    team = teamBot.findTeamByCaptain(interaction.user.id)
-                    interaction.editReply({embeds: [Embeds.RankSuccessEmbed]})
-                    success = true;
+                    teamBot.prisma.team
+                        .update({
+                            where: { id: issuer.teamId },
+                            data: { rank: 0 },
+                        })
+                        .then(() => {
+                            interaction.editReply({ embeds: [Embeds.RankSuccessEmbed] });
+                            teamBot.prisma.$disconnect()
+                        })
+                        .catch(() => {
+                            interaction.editReply("An unexpected error occured");
+                            teamBot.prisma.$disconnect()
+                        });
                     break;
 
                 case "teamcfgSilver":
-                    registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
-                    registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.rank = 1
-                    fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                    team = teamBot.findTeamByCaptain(interaction.user.id)
-                    interaction.editReply({embeds: [Embeds.RankSuccessEmbed]})
-                    success = true;
+                    teamBot.prisma.team
+                        .update({
+                            where: { id: issuer.teamId },
+                            data: { rank: 1 },
+                        })
+                        .then(() => {
+                            interaction.editReply({ embeds: [Embeds.RankSuccessEmbed] });
+                            teamBot.prisma.$disconnect()
+                        })
+                        .catch(() => {
+                            interaction.editReply("An unexpected error occured");
+                            teamBot.prisma.$disconnect()
+                        });
                     break;
 
                 case "teamcfgBronze":
-                    registeredTeams = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"))
-                    registeredTeams.find(pclTeam => {return pclTeam.name === team!.name})!.rank = 2
-                    fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams))
-                    team = teamBot.findTeamByCaptain(interaction.user.id)
-                    interaction.editReply({embeds: [Embeds.RankSuccessEmbed]})
-                    success = true;
+                    teamBot.prisma.team
+                        .update({
+                            where: { id: issuer.teamId },
+                            data: { rank: 2 },
+                        })
+                        .then(() => {
+                            interaction.editReply({ embeds: [Embeds.RankSuccessEmbed] });
+                            teamBot.prisma.$disconnect()
+                        })
+                        .catch(() => {
+                            interaction.editReply("An unexpected error occured");
+                            teamBot.prisma.$disconnect()
+                        });
                     break;
-
-
-                }
+            }
         });
 
         menuCollector.on("end", async () => {

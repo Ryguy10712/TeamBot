@@ -42,6 +42,18 @@ export const SetCoCapEmbed = new EmbedBuilder()
     .setTitle("Set team co-captain")
     .setDescription("Sets your cocaptain, or replaces the current one")
 
+export class SetCoCapSuccess extends EmbedBuilder {
+    constructor(oculusId: string){
+        super()
+        this.setColor("Green")
+        this.setTitle("Alrighty!")
+        this.setFields({
+            name: "Success:",
+            value: `**${oculusId}** is now your co-captain`
+        })
+    }
+}
+
 //ERROR
 export const NotRegisteredError = new EmbedBuilder().setColor("Red").setTitle("Who even are you?").setFields({
     name: "Failed:",

@@ -66,7 +66,7 @@ export class InteractionCreateListener extends DiscordListener {
             }
 
             if(interaction.isModalSubmit()){
-                console.timeLog(`${interaction.user.username} submit ${interaction.customId}`)
+                teamBot.log(`${interaction.user.username} submit ${interaction.customId}`, false)
             }
         });
     }
