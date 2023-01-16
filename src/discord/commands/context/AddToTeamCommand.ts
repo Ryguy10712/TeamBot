@@ -1,9 +1,7 @@
 import { Client, CacheType, ContextMenuCommandBuilder, ApplicationCommandType, ContextMenuCommandInteraction } from "discord.js";
 import { TeamBot } from "../../../Bot";
 import { DiscordContextMenu } from "../../DiscordContextMenu";
-import fs from "fs";
-import { PCLTeam } from "../../../interfaces/PCLTeam";
-import { PlayerAlreadyOnEmbed, UserNotCaptainEmbed, UserNotOnTeamEmbed } from "../../embeds/CommonEmbeds";
+import { PlayerAlreadyOnEmbed, UserNotCaptainOrEmbed, UserNotOnTeamEmbed } from "../../embeds/CommonEmbeds";
 import { PlayerAddSuccess } from "../../embeds/AddToTeamEmbeds";
 
 export class AddToTeamCommand extends DiscordContextMenu {
@@ -15,23 +13,43 @@ export class AddToTeamCommand extends DiscordContextMenu {
         this.properties = new ContextMenuCommandBuilder().setName("Add to team").setType(ApplicationCommandType.User);
     }
     async executeInteraction(client: Client<boolean>, interaction: ContextMenuCommandInteraction<CacheType>, teamBot: TeamBot) {
-        const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
-        const issuerTeam = teamsDb.find((pclTeam) => {
-            return pclTeam.players.includes(interaction.user.id);
-        });
+        const issuer = await teamBot.prisma.teamPlayer.findFirst({
+            where: {playerId: interaction.user.id}
+        })
+        
 
-        if (!issuerTeam) return interaction.reply({ embeds: [new UserNotOnTeamEmbed()], ephemeral: true }); //not on team
-        if (issuerTeam.captain != interaction.user.id && issuerTeam.coCap != interaction.user.id) {
-            interaction.reply({ embeds: [new UserNotCaptainEmbed()], ephemeral: true });
+        if (!issuer) return interaction.reply({ embeds: [new UserNotOnTeamEmbed()], ephemeral: true }); //not on team
+        if (!issuer.isCaptain && !issuer.isCoCap) {
+            interaction.reply({ embeds: [new UserNotCaptainOrEmbed()], ephemeral: true });
             return;
         }
-        if(teamsDb.find(pclTeam => {return pclTeam.players.includes(interaction.targetId)})){
-            return interaction.reply({embeds: [new PlayerAlreadyOnEmbed], ephemeral: true})
+        const candidate = await teamBot.prisma.teamPlayer.findFirst({
+            where: {playerId: interaction.targetId}
+        })
+        if(candidate){
+            interaction.reply({embeds: [new PlayerAlreadyOnEmbed()], ephemeral: true})
+            return;
         }
+        
+        teamBot.prisma.team.update({
+            where: {id: issuer.teamId},
+            data: {
+                players: {
+                    create: {playerId: interaction.targetId}
+                }
+            }
+        })
+        .then(() => {
+            teamBot.prisma.$disconnect()
+            interaction.reply({embeds: [new PlayerAddSuccess], ephemeral: true})
+        })
+        .catch(() => {
+            teamBot.prisma.$disconnect()
+            interaction.reply("An unexpected error occured")
+        })
 
-        issuerTeam.players.push(interaction.targetId)
-        fs.writeFileSync("./db/teams.json", JSON.stringify(teamsDb))
-        interaction.reply({embeds: [new PlayerAddSuccess], ephemeral: true})
+        
+        
         
     }
 }
