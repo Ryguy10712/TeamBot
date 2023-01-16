@@ -1,11 +1,10 @@
-import { Client, CommandInteraction, CacheType, SelectMenuInteraction, ComponentType, ButtonInteraction, Embed } from "discord.js";
+import { Client, CommandInteraction, CacheType, SelectMenuInteraction, ComponentType, ButtonInteraction } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import * as Embeds from "../embeds/TeamMenuEmbeds";
 import * as Components from "../components/TeamMenuComponents";
-import fs from "fs";
 import { PCLTeam } from "../../interfaces/PCLTeam";
-import { PlayerAlreadyOnEmbed, UserNotCaptainEmbed } from "../embeds/CommonEmbeds";
+import { PlayerAlreadyOnEmbed, UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
 
 export default class TeamConfigCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -24,7 +23,7 @@ export default class TeamConfigCommand extends DiscordCommand {
             }
         });
         if (!issuer) {
-            interaction.reply({ embeds: [new UserNotCaptainEmbed()], ephemeral: true });
+            interaction.reply({ embeds: [new UserNotCaptainOrEmbed()], ephemeral: true });
             return;
         }
 

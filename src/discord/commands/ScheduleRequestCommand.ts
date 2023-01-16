@@ -1,13 +1,10 @@
 import { ButtonInteraction, CacheType, Client, CommandInteraction, ComponentType, SelectMenuInteraction, SelectMenuOptionBuilder } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
-import fs from "fs";
-import { PCLTeam } from "../../interfaces/PCLTeam";
 import { MatchTypeRow, RequestRow, TeamListRow } from "../components/ScheduleRequestComponents";
-import { ScheduleRequest, MatchType } from "../../interfaces/ScheduleRequest";
+import { MatchType } from "../../interfaces/ScheduleRequest";
 import { IncomingRequestEmbed, RequestSentEmbed, SchedReqPrimaryEmbed } from "../embeds/ScheduleRequestEmbeds";
-import { UserNotCaptainEmbed } from "../embeds/CommonEmbeds";
-import { Prisma } from "@prisma/client";
+import { UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
 
 export default class ScheduleRequestCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -21,7 +18,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         const issuerPlayer = await teamBot.prisma.teamPlayer.findFirst({where: {playerId: interaction.user.id}, include: {team: true}})
         //check to see if this person is cap or co-cap of a team
         if(!issuerPlayer?.isCaptain && !issuerPlayer?.isCoCap){
-            interaction.reply({embeds: [new UserNotCaptainEmbed()], ephemeral: true})
+            interaction.reply({embeds: [new UserNotCaptainOrEmbed()], ephemeral: true})
         }
         //at this point the user IS a cocaptain
         

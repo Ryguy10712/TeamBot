@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "discord.js";
 
-export class UserNotCaptainEmbed extends EmbedBuilder{
+export class UserNotCaptainOrEmbed extends EmbedBuilder{
     constructor(){
         super()
         this.setColor("Red")
@@ -8,6 +8,18 @@ export class UserNotCaptainEmbed extends EmbedBuilder{
         this.setFields({
             name: "Failed:",
             value: "Only captains or co-captains can use this"
+        })
+    }
+}
+
+export class UserNotCaptainEmbed extends EmbedBuilder {
+    constructor(){
+        super()
+        this.setColor("Red")
+        this.setTitle("Not so fast...")
+        this.setFields({
+            name: "Failed:",
+            value: "Only captains can use this"
         })
     }
 }
