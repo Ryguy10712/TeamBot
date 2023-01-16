@@ -21,8 +21,7 @@ export default class TeamConfigCommand extends DiscordCommand {
             where: {
                 playerId: interaction.user.id,
                 OR: [{ isCaptain: true }, { isCoCap: true }],
-            },
-            include: { team: { select: { id: true } } },
+            }
         });
         if (!issuer) {
             interaction.reply({ embeds: [new UserNotCaptainEmbed()], ephemeral: true });
