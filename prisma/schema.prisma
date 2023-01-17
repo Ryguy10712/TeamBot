@@ -32,7 +32,7 @@ model Player {
 
 model TeamPlayer {
   playerId  String  @id @unique
-  player    Player  @relation(fields: [playerId], references: [discordId], onDelete: Cascade, onUpdate: Cascade)
+  player    Player?  @relation(fields: [playerId], references: [discordId], onDelete: Cascade, onUpdate: Cascade)
   teamId    Int
   team      Team    @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   isCaptain Boolean @default(false)
@@ -52,8 +52,8 @@ model ScheduleRequest {
   id             Int    @id @default(autoincrement())
   requesterId    Int
   receiverId     Int    @map("opponentId")
-  requesterTeam  Team   @relation(name: "requester", fields: [requesterId], references: [id], onDelete: Cascade)
-  receiverTeam   Team   @relation(name: "receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  requesterTeam  Team   @relation(name: "requester", fields: [requesterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  receiverTeam   Team   @relation(name: "receiver", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   captainMsgId   String @unique
   coCaptainMsgId String? @unique
 
@@ -63,7 +63,7 @@ model ScheduleRequest {
 
 model TeamAvailability {
   teamId    Int    @id @unique
-  team      Team   @relation(fields: [teamId], references: [id])
+  team      Team   @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   tuesday   String
   wednesday String
   thursday  String

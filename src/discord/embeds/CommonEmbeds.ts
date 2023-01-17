@@ -47,7 +47,7 @@ export class UserNotOnTeamEmbed extends EmbedBuilder {
     constructor(){
         super()
         this.setColor("Red")
-        this.setTitle("Wait a second...")
+        this.setTitle("What team?")
         this.setFields({
             name: "Failed:",
             value: "You must be on a team to use this command"
