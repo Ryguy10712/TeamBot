@@ -1,8 +1,6 @@
 import { Client, CommandInteraction, CacheType, EmbedBuilder } from "discord.js";
 import { TeamBot } from "../../Bot";
-import fs from "fs";
 import { DiscordCommand } from "../DiscordCommand";
-import { PCLTeam } from "../../interfaces/PCLTeam";
 import { UserNotOnTeamEmbed } from "../embeds/CommonEmbeds";
 
 export default class TeamInfoCommand extends DiscordCommand {
