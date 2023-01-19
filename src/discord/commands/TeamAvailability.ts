@@ -1,70 +1,115 @@
 import { Client, CommandInteraction, CacheType, EmbedBuilder, SlashCommandStringOption } from "discord.js";
 import { TeamBot } from "../../Bot";
-import { DayOfWeek, PCLTeam } from "../../interfaces/PCLTeam";
+import { availability, DayOfWeek, PCLTeam, time } from "../../interfaces/PCLTeam";
 import { DiscordCommand } from "../DiscordCommand";
 import fs from "fs";
+import { Team, TeamPlayer } from "@prisma/client";
 
 class TeamAvailabilityEmbed extends EmbedBuilder {
     private teamBot: TeamBot;
-    private team: PCLTeam;
+    private team: (Team & {
+        players: (TeamPlayer & {
+            player: {
+                oculusId: string;
+            } | null;
+        })[];
+    }) | null
     private day: DayOfWeek | undefined;
 
-    constructor(teamBot: TeamBot, team: PCLTeam, day?: DayOfWeek) {
+    constructor(teamBot: TeamBot, team: (Team & {
+        players: (TeamPlayer & {
+            player: {
+                oculusId: string;
+            } | null;
+        })[];
+    }) | null, day?: DayOfWeek) {
         super();
         this.setColor("DarkButNotBlack");
         this.teamBot = teamBot;
-        this.team = team;
+        this.team = team
         this.day = day;
     }
 
     async init() {
+        const hourmap = {
+            "one": "1PM",
+            "two": "2PM",
+            "three": "3PM",
+            "four": "4PM",
+            "five": "5PM",
+            "six": "6PM",
+            "seven": "7PM",
+            "eight": "8PM",
+            "nine": "9PM",
+            "ten": "10PM",
+            "eleven": "11PM",
+            "twelve": "12PM"
+        }
         //setting the fields
         if (this.day) {
+            for(const yes of Object.values(hourmap)){
+                this.addFields({
+                    name: yes,
+                    value: "...",
+                    inline: true
+                })
+            }
             this.setTitle(`Availability for ${this.day}`);
-            const entries = Object.entries(this.team.availability![this.day]);
 
-            for (const entry of entries) {
-                const fieldName = entry[1].length >= 5 ? `${entry[0]}✅` : entry[0].toString();
-
-                let fieldValue: string = "";
-
-                for (const discordId of entry[1]) {
-                    const oculusId = this.teamBot.findPCLPlayerByDiscord(discordId)?.oculusId;
-                    if (!oculusId) {
-                        //fetch discord username
-                        const discordUser = await this.teamBot.client.users.fetch(discordId);
-                        fieldValue += `${discordUser.username} (Discord)\n`;
-                    } else {
-                        fieldValue += `${oculusId}\n`;
+            for (const player of this.team?.players!) {
+                const availability = player[this.day]?.valueOf() as availability
+                if(!availability) break;
+                for(const obj of Object.entries(availability)){
+                    const time = obj[0] as time
+                    const bool: boolean = obj[1]
+                    const fields = this.data.fields!
+                    const field = fields.find(field => {
+                        return field.name == hourmap[time]
+                    })
+                    if(bool){
+                        
+                        field!.value = field!.value.replace("...", "")
+                        if(player.player?.oculusId){
+                            field!.value = field!.value.concat(`${player.player.oculusId}\n`)
+                        } else {
+                            field!.value = field!.value.replace("...", "")
+                            const username = (await this.teamBot.client.users.fetch(player.playerId)).username
+                            field!.value = field!.value.concat(`${username}\n`)
+                        }
                     }
                 }
-                if (entry[1].length == 0) {
-                    fieldValue = "...";
-                }
-                this.addFields({
-                    name: fieldName,
-                    value: fieldValue,
-                    inline: true,
-                });
+                
             }
         } else {
             this.setTitle("Availability for this week");
             const daysOfWeek: DayOfWeek[] = ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "monday"];
-
-            for (const day of daysOfWeek) {
-                let fieldValue: string = "";
-                const entries = Object.entries(this.team.availability![day]);
-                for (const entry of entries) {
-                    if (entry[1].length >= 5) {
-                        fieldValue += `${entry[0]} ✅`;
-                        this.addFields({
-                            name: day,
-                            value: fieldValue,
-                            inline: true
-                        })
+            const hours: time[] = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"]
+            for(const day of daysOfWeek) {
+                this.addFields({
+                    name: day,
+                    value: "...",
+                    inline: true
+                })
+                const currentField = this.data.fields?.find(field => {
+                    return field.name === day
+                })
+                for(const player of this.team!.players){
+                    const avail = player[day]?.valueOf() as availability
+                    if(!avail) break;
+                    for(const hour of hours){
+                        let count = 0
+                        if(avail[hour] == true){
+                            count ++
+                            if(count >= 1){
+                                currentField!.value = currentField!.value.replace("...", "")
+                                currentField!.value += `${hourmap[hour]}🟢\n`
+                                break;
+                            }
+                        }
                     }
                 }
             }
+            
         }
     }
 }
@@ -117,13 +162,13 @@ export class TeamAvailabilityCommand extends DiscordCommand {
     }
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
         const dayResponse = interaction.options.get("day");
-        const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
-        const issuerTeam = teamsDb.find((pclTeam) => {
-            return pclTeam.players.includes(interaction.user.id);
-        });
+        const issuerTeam = await teamBot.prisma.team.findFirst({
+            where: {players: {some: {playerId: interaction.user.id}}},
+            include: {players: {include: {player: {select: {oculusId: true}}}}}
+        })
 
         if (!issuerTeam) return interaction.reply({ content: "you are not on a team", ephemeral: true });
-        if(!issuerTeam.availability){
+        if(!issuerTeam.schedulingChannel){
             interaction.reply({content: "your team does not have a scheduling channel", ephemeral: true})
             return;
         }
