@@ -78,6 +78,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         teamBot.prisma.scheduleRequest.create({
             data: {
                 requesterId: issuerPlayer!.teamId,
+                type: matchType!,
                 receiverId: issuerPlayer!.teamId,
                 captainMsgId: capMsg.id,
                 coCaptainMsgId: coCapMsg?.id,
