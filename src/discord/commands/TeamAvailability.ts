@@ -99,7 +99,7 @@ class TeamAvailabilityEmbed extends EmbedBuilder {
                         let count = 0
                         if(avail[hour] == true){
                             count ++
-                            if(count >= 1){
+                            if(count >= 5){
                                 currentField!.value = currentField!.value.replace("...", "")
                                 currentField!.value += `${hourmap[hour]}🟢\n`
                                 break;
