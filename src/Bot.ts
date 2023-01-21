@@ -6,13 +6,11 @@ import { ReadyListener } from "./discord/listeners/ReadyListener";
 import { InteractionCreateListener } from "./discord/listeners/InteractionCreateListener";
 import { PingCommand } from "./discord/commands/PingCommand";
 import { PongCommand } from "./discord/commands/PongCommand";
-import fs from "fs";
+import fs from "node:fs/promises";
 import RegisterCommand from "./discord/commands/RegisterCommand";
 import RegisterTeamCommand from "./discord/commands/RegisterTeamCommand";
-import PCLPlayer from "./interfaces/PCLPlayer";
 import TeamMenuCommand from "./discord/commands/TeamMenuCommand";
 import DeleteTeamCommand from "./discord/commands/DeleteTeamCommand";
-import { PCLTeam } from "./interfaces/PCLTeam";
 import TeamInfoCommand from "./discord/commands/TeamInfoCommand";
 import ScheduleRequestCommand from "./discord/commands/ScheduleRequestCommand";
 import { SchedulingChannelCommand } from "./discord/commands/SchedulingChannelCommand";
@@ -40,17 +38,17 @@ export class TeamBot {
     public readonly persistentButtons: Map<string, DiscordButton>;
     public readonly rest: REST;
     protected currentLogName: string;
-    public readonly prisma: PrismaClient
-    public currentQueue: SlowQuery | null
+    public readonly prisma: PrismaClient;
+    public currentQueue: SlowQuery | null;
 
     constructor() {
-        this.currentLogName = new Date(Date.now()).toDateString()
-        fs.writeFileSync(`./cache/${this.currentLogName}`,"")
-        
+        this.currentLogName = new Date(Date.now()).toDateString();
+        fs.writeFile(`./cache/${this.currentLogName}`, "");
+
         this.prisma = new PrismaClient({
-            errorFormat: "minimal"
-        })
-        this.currentQueue = new SlowQuery(this)
+            errorFormat: "minimal",
+        });
+        this.currentQueue = new SlowQuery(this);
 
         this.rest = new REST({ version: "10" }).setToken(process.env.TOKEN!);
 
@@ -91,12 +89,12 @@ export class TeamBot {
     async start(): Promise<void> {
         await this.client.login(process.env.TOKEN);
         //initialize cron jobs
-        AvailabilityReset(this)
+        AvailabilityReset(this);
 
         ///create error logger
         process.on("uncaughtException", (e) => {
             this.log(e, true);
-        })
+        });
     }
 
     registerListener(discordListener: DiscordListener): void {
@@ -111,43 +109,22 @@ export class TeamBot {
         this.persistentButtons.set(discordButton.id, discordButton);
     }
 
-    findPCLPlayerByDiscord(discordId: string): PCLPlayer | undefined {
-        const registeredPlayers: PCLPlayer[] = JSON.parse(fs.readFileSync("./db/registeredPlayers.json", "utf-8"));
-        return registeredPlayers.find((PCLPlayer) => {
-            return PCLPlayer.discordID === discordId;
-        });
-    }
-
-    findPCLPlayerByOculus(oculusId: string): PCLPlayer | undefined {
-        const registeredPlayers: PCLPlayer[] = JSON.parse(fs.readFileSync("./db/registeredPlayers.json", "utf-8"));
-        return registeredPlayers.find((PCLPlayer) => {
-            return PCLPlayer.oculusId === oculusId;
-        });
-    }
-
-    findTeamByCaptain(discordId: string): PCLTeam | undefined {
-        const registeredTeams: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
-        return registeredTeams.find((PCLTeam) => {
-            return PCLTeam.captain === discordId;
-        });
-    }
-
-    log(text: Error | string, isError: boolean) {
-        let logFile = fs.readFileSync(`./cache/${this.currentLogName}`, "utf-8")
-        if(isError){
-            text = text as Error
-            const errorStr = `\nERROR!!!\n${text.name.toString()}\n${text.message.toString()}\n${text.cause}\n${text.stack?.toString()}\n################################`
-            fs.writeFileSync(`./cache/${this.currentLogName}`, logFile += errorStr)
-            console.error(errorStr)
+    async log(text: Error | string, isError: boolean) {
+        let logFile = await fs.readFile(`./cache/${this.currentLogName}`, "utf-8");
+        if (isError) {
+            text = text as Error;
+            const errorStr = `\nERROR!!!\n${text.name.toString()}\n${text.message.toString()}\n${
+                text.cause
+            }\n${text.stack?.toString()}\n################################`;
+            fs.writeFile(`./cache/${this.currentLogName}`, (logFile += errorStr));
+            console.error(errorStr);
         } else {
-            text = text as string
-            logFile += "\n"
-            fs.writeFileSync(`./cache/${this.currentLogName}`, logFile += text)
-            console.log(text)
+            text = text as string;
+            logFile += "\n";
+            fs.writeFile(`./cache/${this.currentLogName}`, (logFile += text));
+            console.log(text);
         }
     }
-
-    
 }
 
 (async () => {
@@ -158,4 +135,3 @@ export class TeamBot {
         console.error(e);
     }
 })();
-
