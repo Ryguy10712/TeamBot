@@ -50,6 +50,7 @@ model TeamPlayer {
 
 model ScheduleRequest {
   id             Int    @id @default(autoincrement())
+  type           Int    @default(0)
   requesterId    Int
   receiverId     Int    @map("opponentId")
   requesterTeam  Team   @relation(name: "requester", fields: [requesterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -71,4 +72,8 @@ model TeamAvailability {
   saturday  String
   sunday    String
   monday    String
+}
+
+model PersistantButtons {
+  id String @id @unique
 }
