@@ -1,8 +1,6 @@
-import { Client, ButtonInteraction, CacheType, GuildTextBasedChannel, ButtonStyle } from "discord.js";
-import { PCLTeam } from "../../interfaces/PCLTeam";
-import { ScheduleRequest } from "../../interfaces/ScheduleRequest";
+import { Client, ButtonInteraction, CacheType, GuildTextBasedChannel, ButtonStyle, DMChannel } from "discord.js";
+import { MatchType } from "../../interfaces/ScheduleRequest";
 import { DiscordButton } from "../DiscordButton";
-import fs from "fs";
 import { MatchOrganizerEmbed, UpdateButtonRow } from "../components/RequestAcceptComponents";
 import { RequestRow } from "../components/ScheduleRequestComponents";
 import { TeamBot } from "../../Bot";
@@ -20,55 +18,83 @@ export class ScheduleRequestAcceptButton extends DiscordButton {
 
     async execute(teamBot: TeamBot, client: Client<boolean>, interaction: ButtonInteraction<CacheType>) {
         await interaction.deferUpdate(); //prevents failed msg
-        const scheduleRequests: ScheduleRequest[] = JSON.parse(fs.readFileSync("./db/scheduleRequests.json", "utf-8"));
-        const registeredTeams: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
-        const schedReq = scheduleRequests.find((schedreq) => {
-            return interaction.message.id == schedreq.captainMsgId;
-        })!;
+        const schedReq = await teamBot.prisma.scheduleRequest.findFirst({
+            where: { OR: [{ captainMsgId: interaction.message.id }, { coCaptainMsgId: interaction.message.id }] },
+            include: {
+                receiverTeam: {
+                    select: {
+                        players: {
+                            where: { OR: [{ isCaptain: true }, { isCoCap: true }] },
+                        },
+                        schedulingChannel: true,
+                        name: true,
+                    },
+                },
+                requesterTeam: {
+                    select: {
+                        players: {
+                            where: { OR: [{ isCaptain: true }, { isCoCap: true }] },
+                        },
+                        schedulingChannel: true,
+                        name: true,
+                    },
+                },
+            },
+        });
 
         if (!schedReq) return interaction.reply("this schedule request is no longer available");
 
-        const requesterCaptainId = registeredTeams.find((pclTeam) => {
-            return pclTeam.name === schedReq.requester;
-        })!.captain;
-        const requesterCoCaptainId = registeredTeams.find((pclTeam) => {
-            return pclTeam.name === schedReq.requester;
-        })!.coCap;
+        const requesterCaptainId = schedReq.requesterTeam.players.find((player) => {
+            return player.isCaptain;
+        })!.playerId;
+        const requesterCoCapId = schedReq.requesterTeam.players.find((player) => {
+            return player.isCoCap;
+        })?.playerId;
         const requesterCaptainUser = await client.users.fetch(requesterCaptainId);
-        const requesterCoCaptainUser = requesterCoCaptainId ? await client.users.fetch(requesterCoCaptainId) : null;
+        const requesterCoCaptainUser = requesterCoCapId ? await client.users.fetch(requesterCoCapId) : null;
 
         //time for the beef
-        const requesterPclTeam = registeredTeams.find((pclTeam) => {
-            return pclTeam.name === schedReq.requester;
-        })!;
-        const accepterPclTeam = registeredTeams.find((pclTeam) => {
-            return pclTeam.name === schedReq.opponent;
-        })!;
 
         try {
-            const requesterSchedulingChan = (await client.channels.fetch(requesterPclTeam.schedulingChannel!)) as GuildTextBasedChannel;
+            const requesterSchedulingChan = (await client.channels.fetch(schedReq.requesterTeam.schedulingChannel!)) as GuildTextBasedChannel;
 
-            const accepeterSchedulingChan = (await client.channels.fetch(accepterPclTeam.schedulingChannel!)) as GuildTextBasedChannel;
+            const accepeterSchedulingChan = (await client.channels.fetch(schedReq.receiverTeam.schedulingChannel!)) as GuildTextBasedChannel;
 
             //let requester captain know
-            requesterCaptainUser.send("THE REQUEST HAS BEEN ACCEPTED RAHHHHHH");
+            requesterCaptainUser.send(`The ${MatchType[schedReq.type]} against ${schedReq.receiverTeam.name} has been accepted`);
             //disable the buttons
-            interaction.message.edit({ components: [new RequestRow(false)] });
+            interaction.message.edit({ components: [new RequestRow(false)] }).catch(async (e) => {
+                const chan = (await client.channels.fetch(interaction.message.channelId)) as DMChannel;
+                const mess = await chan.messages.fetch(interaction.message.id);
+                mess.edit({ components: [new RequestRow(false)] });
+            });
             //if applicable, let requester coCap know
-            if (requesterCoCaptainUser) requesterCoCaptainUser.send("THE SCHEDULE REQUEST HAS BEEN ACCEPTED RAHHH (you are a stinky co captain)");
+            if (requesterCoCaptainUser) requesterCoCaptainUser.send(`The ${MatchType[schedReq.type]} against ${schedReq.receiverTeam.name} has been accepted`);
 
             requesterSchedulingChan.send({
-                embeds: [new MatchOrganizerEmbed(requesterPclTeam, accepterPclTeam, schedReq.type)],
+                embeds: [new MatchOrganizerEmbed(schedReq.requesterTeam, schedReq.receiverTeam, schedReq.type)],
                 components: [new UpdateButtonRow(schedReq.id, teamBot)],
             });
             accepeterSchedulingChan.send({
-                embeds: [new MatchOrganizerEmbed(accepterPclTeam, requesterPclTeam, schedReq.type)],
+                embeds: [new MatchOrganizerEmbed(schedReq.receiverTeam, schedReq.requesterTeam, schedReq.type)],
                 components: [new UpdateButtonRow(schedReq.id, teamBot)],
             });
-        } catch {
-            interaction.followUp("There was an unexpected error and the schedule request has been terminated")
-            scheduleRequests.splice(scheduleRequests.indexOf(schedReq), 1)
-            fs.writeFileSync("./db/scheduleRequests.json", JSON.stringify(scheduleRequests))
+            teamBot.prisma.persistantButtons
+                .create({
+                    data: { id: `matchOrganizerUpdate${schedReq.id}` },
+                })
+                .then(() => {
+                    teamBot.prisma.$disconnect();
+                });
+        } catch (e: any) {
+            interaction.followUp("There was an unexpected error and the schedule request has been terminated");
+            teamBot.prisma.scheduleRequest
+                .delete({
+                    where: { id: schedReq.id },
+                })
+                .then(() => {
+                    teamBot.prisma.$disconnect();
+                });
         }
     }
 }
