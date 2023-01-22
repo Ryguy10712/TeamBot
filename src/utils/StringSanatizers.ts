@@ -1,4 +1,4 @@
-export function isoculusidClean(oculusid: string): boolean {
+export function isoculusidClean(oculusid: string): boolean { //3JRockproofinator
     const CHAR_LIMIT = 30
     const CHAR_MIN = 3
     if(oculusid.length > CHAR_LIMIT || oculusid.length < CHAR_MIN) return false

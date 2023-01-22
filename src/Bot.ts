@@ -79,8 +79,8 @@ export class TeamBot {
         this.initCommand(new RemoveFromTeamCommand());
         this.initCommand(new SetCoCapCommand());
         this.initCommand(new TeamAvailabilityCommand());
-        this.initCommand(new ResetAvailability());
-        this.initCommand(new RefreshAvailabilityCommand());
+        //this.initCommand(new ResetAvailability()); not needed
+        //this.initCommand(new RefreshAvailabilityCommand()); deprecated
 
         this.initButton(new ScheduleRequestAcceptButton());
         this.initButton(new ScheduleRequestDenyButton());
@@ -135,3 +135,13 @@ export class TeamBot {
         console.error(e);
     }
 })();
+
+
+/**
+ * huge thanks to
+ * Painter
+ * 3JRock
+ * Bruhvy
+ * kade
+ * and all my other helpers :)
+ */
