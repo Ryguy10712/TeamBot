@@ -1,9 +1,4 @@
-import {
-    Client,
-    CommandInteraction,
-    CacheType,
-    SlashCommandChannelOption, ChannelType
-} from "discord.js";
+import { Client, CommandInteraction, CacheType, SlashCommandChannelOption, ChannelType } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import { MissingAccessEmbed, NoTeamEmbed, SchedChanSetEmbed, WrongChannelTypeEmbed } from "../embeds/SchedChannelEmbeds";
@@ -68,23 +63,35 @@ export class SchedulingChannelCommand extends DiscordCommand {
                 data: {
                     schedulingChannel: channelId,
                     availability: {
-                        create: {
-                            tuesday: messages[0].id,
-                            wednesday: messages[1].id,
-                            thursday: messages[2].id,
-                            friday: messages[3].id,
-                            saturday: messages[4].id,
-                            sunday: messages[5].id,
-                            monday: messages[6].id,
+                        upsert: {
+                            create: {
+                                tuesday: messages[0].id,
+                                wednesday: messages[1].id,
+                                thursday: messages[2].id,
+                                friday: messages[3].id,
+                                saturday: messages[4].id,
+                                sunday: messages[5].id,
+                                monday: messages[6].id,
+                            },
+                            update: {
+                                tuesday: messages[0].id,
+                                wednesday: messages[1].id,
+                                thursday: messages[2].id,
+                                friday: messages[3].id,
+                                saturday: messages[4].id,
+                                sunday: messages[5].id,
+                                monday: messages[6].id,
+                            }
                         },
                     },
                 },
             });
+            teamBot.prisma.$disconnect();
             interaction.followUp({ embeds: [new SchedChanSetEmbed(guildChan.id)], ephemeral: true });
+        } catch (e: any) {
+            teamBot.log(e, true);
             teamBot.prisma.$disconnect();
-        } catch {
-            teamBot.prisma.$disconnect();
-            interaction.reply("An unexpected error occured");
+            interaction.followUp("An unexpected error occured");
         }
     }
 }
