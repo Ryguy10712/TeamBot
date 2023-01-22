@@ -19,7 +19,7 @@ export class GuildJoinListener extends DiscordListener {
             }
             if(missingPerms.length === 0) return; //bot has all the right perms
             //look for a channel the bot can send messages in
-            
+            teamBot.log(`Joined guild ${guild.name} with the wrong perms`, false)
             const notifyChans = (await guild.channels.fetch()).filter(channel => {
                 if(!channel) return false;
                 return channel.type == ChannelType.GuildText

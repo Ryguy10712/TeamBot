@@ -1,8 +1,5 @@
 import { Client, ButtonInteraction, CacheType, ButtonStyle } from "discord.js";
 import { DiscordButton } from "../DiscordButton";
-import fs from "fs";
-import { ScheduleRequest } from "../../interfaces/ScheduleRequest";
-import { PCLTeam } from "../../interfaces/PCLTeam";
 import { TeamBot } from "../../Bot";
 
 export class ScheduleRequestDenyButton extends DiscordButton {
@@ -17,9 +14,6 @@ export class ScheduleRequestDenyButton extends DiscordButton {
     }
 
     async execute(teamBot: TeamBot, client: Client<boolean>, interaction: ButtonInteraction<CacheType>) {
-        const schedReqDb: ScheduleRequest[] = JSON.parse(fs.readFileSync("./db/scheduleRequests.json", "utf-8"));
-        const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
-
         const schedReq = await teamBot.prisma.scheduleRequest.findFirst({
             where: { OR: [{ captainMsgId: interaction.message.id }, { coCaptainMsgId: interaction.message.id }] },
             include: {
