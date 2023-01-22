@@ -1,9 +1,7 @@
 import cron from "node-cron";
 import { TeamBot } from "../Bot";
-import fs from "fs";
-import { DayOfWeek, PCLTeam } from "../interfaces/PCLTeam";
-import { DefaultRestOptions, GuildTextBasedChannel } from "discord.js";
-import { Prisma } from "@prisma/client";
+import { DayOfWeek } from "../interfaces/PCLTeam";
+import { GuildTextBasedChannel } from "discord.js";
 
 export async function AvailabilityReset(teamBot: TeamBot) {
     // 0 0 * * 2
