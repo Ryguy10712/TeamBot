@@ -21,13 +21,13 @@ export class TeamListMenu extends SelectMenuBuilder {
                 NOT: [{ schedulingChannel: null }],
             },
         });
-        const teamsInOrder = teams.filter((team) => {
+        let teamsInOrder = teams.filter((team) => {
             return team.rank === this.issuerTeam.rank;
         });
         const remainingTeams = teams.filter((team) => {
             return !teamsInOrder.includes(team);
         });
-        teamsInOrder.concat(remainingTeams)
+        teamsInOrder = teamsInOrder.concat(remainingTeams)
 
         for(const team of teamsInOrder){
             this.addOptions({
