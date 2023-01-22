@@ -1,4 +1,4 @@
-import { ButtonInteraction, CacheType, Client, CommandInteraction, ComponentType, SelectMenuInteraction, SelectMenuOptionBuilder } from "discord.js";
+import { ButtonInteraction, CacheType, Client, CommandInteraction, ComponentType, SelectMenuInteraction } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import { MatchTypeRow, RequestRow, TeamListRow } from "../components/ScheduleRequestComponents";
@@ -23,7 +23,6 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         //at this point the user IS a cocaptain
         
         if(!issuerPlayer!.team.schedulingChannel) return interaction.reply("In order to use this command you must have a scheduling channel")
-        let TeamListMenuParams: SelectMenuOptionBuilder[] = []
         const teams = await teamBot.prisma.team.findMany({
             where: {
                 NOT: [
@@ -33,13 +32,9 @@ export default class ScheduleRequestCommand extends DiscordCommand {
                 ]
             }
         })
-        for (const team of teams) {
-            const option = new SelectMenuOptionBuilder()
-            .setLabel(team.name)
-            .setValue(`schedreq${team.name}`)
-            TeamListMenuParams.push(option)
-        }
-        const reply = await interaction.reply({components: [new TeamListRow(issuerPlayer!.team), new MatchTypeRow], embeds: [new SchedReqPrimaryEmbed]})
+        const row = new TeamListRow(issuerPlayer!.team, teamBot.prisma)
+        await row.init()
+        const reply = await interaction.reply({components: [row, new MatchTypeRow], embeds: [new SchedReqPrimaryEmbed]})
         let selectedTeam: string | undefined = undefined
         const menuFilter = (i: SelectMenuInteraction) => {
           if (i.deferred || i.customId != "schedreqTeams") return false;
