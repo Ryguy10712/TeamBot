@@ -29,13 +29,18 @@ export class GuildJoinListener extends DiscordListener {
             let msg = null
             if(!notifyChans) { //send the guild owner a dm
                 owner.send({embeds: [new MissingPermissionsEmbed(missingPerms)]})
+                guild.leave()
             } else {
                 for(const channel of notifyChans){
                     msg = await channel[1].send({embeds: [new MissingPermissionsEmbed(missingPerms)]}).catch(() => {return}) as Message
-                    if(msg) break;
+                    if(msg) {
+                        guild.leave()
+                        break;
+                    }
                 }
                 if(!msg){
                     owner.send({embeds: [new MissingPermissionsEmbed(missingPerms)]})
+                    guild.leave()
                 }
             }
             
