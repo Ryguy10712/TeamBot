@@ -21,6 +21,9 @@ export class SlowQuery {
             this.ready = false;
             this.prisma.teamPlayer.findFirst({where: {playerId: this.items[0].playerId}}).then((player) => {
                 let currentAvail = player![this.items[0].day]?.valueOf() as availability
+                if(!currentAvail){
+                    currentAvail = {}
+                }
                 currentAvail[this.items[0].time] = this.items[0].status;
                 let args = {where: {playerId: this.items[0].playerId}, data: {[this.items[0].day]: currentAvail}}
                 this.prisma.teamPlayer.update(args).then(() => {
