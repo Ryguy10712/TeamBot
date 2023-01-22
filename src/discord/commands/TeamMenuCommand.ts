@@ -3,7 +3,6 @@ import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import * as Embeds from "../embeds/TeamMenuEmbeds";
 import * as Components from "../components/TeamMenuComponents";
-import { PCLTeam } from "../../interfaces/PCLTeam";
 import { PlayerAlreadyOnEmbed, UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
 
 export default class TeamConfigCommand extends DiscordCommand {
@@ -72,7 +71,6 @@ export default class TeamConfigCommand extends DiscordCommand {
         });
 
         buttonCollector.on("collect", async (buttonInteraction) => {
-            let registeredTeams: PCLTeam[];
             switch (buttonInteraction.customId) {
                 case "teamcfgAdd":
                     await buttonInteraction.showModal(Components.AddPlayerModal);
