@@ -1,4 +1,3 @@
-import { TeamBot } from "../../Bot";
 import { EmbedBuilder } from "discord.js";
 
 //INFO EMBEDS
@@ -9,16 +8,39 @@ export const GuildConfirmationEmbed = new EmbedBuilder()
     .setColor("Yellow");
 
 //Success EMBEDS
-export let TeamCreateSuccess = new EmbedBuilder()
-    .setTitle("Your team has been created!")
-    .setDescription("Your team will be verified shortly")
-    //fields will be set during runtime
-    .setDescription("If any of this information is incorrect, change it immediateley with /team_config or you risk losing permission to run this command")
-    .setColor("Green");
+export class TeamCreateSuccess extends EmbedBuilder {
+    constructor(teamName: string, coCapId: string | undefined, rank: string | undefined){
+        super()
+        this.setColor("Green")
+        this.setTitle("Your team has been created!")
+        this.setDescription("If any of this information is incorrect, change it immediateley with **/team_menu**")
+        this.setFields({
+            name: "Success:",
+            value: `Team **${teamName}** has been creatd with the following:\n**Co-Captain:** ${coCapId}\n **Rank:** ${rank}`
+        })
+    }
+}
 
-export const MultipleTeamsWarning = new EmbedBuilder()
+export const AlreadyCaptainError = new EmbedBuilder()
     .setTitle("Heads Up!")
-    .setColor("Orange")
+    .setColor("Red")
+    .setFields(
+        {
+            name: "Failed:",
+            value: "You must not be on a team when registering a new team."
+        }
+    )
+
+export const CoCapOccuipiedError = new EmbedBuilder()
+    .setTitle("Heads Up!")
+    .setColor("Red")
+    .setFields(
+        {
+            name: "Failed:",
+            value: "Your co-captain is already a captain or co-captain of another team"
+        }
+    )
+    
 
 //ERROR EMBEDS
 export const NotRegisteredError = new EmbedBuilder()
@@ -50,3 +72,11 @@ export const TeamNameMatchError = new EmbedBuilder()
         }
     )
     .setColor("Red")
+
+export const CaptainCoCapMatchError = new EmbedBuilder()
+        .setTitle("That makes no sense")
+        .addFields({
+            name: "Failed",
+            value: "You cannot be the captain, and the cocaptain of the same team"
+        })
+        .setColor("Red")

@@ -6,19 +6,12 @@ import {
     SlashCommandStringOption,
     ButtonBuilder,
     ActionRowBuilder,
-    ButtonStyle,
-    ButtonInteraction,
-    ComponentType,
-    ButtonComponent,
-    AnyComponentBuilder,
-    SlashCommandBooleanOption,
+    ButtonStyle, SlashCommandBooleanOption
 } from "discord.js";
-import { PCLTeam, Ranks } from "../../interfaces/PCLTeam";
-import PCLPlayer from "../../interfaces/PCLPlayer";
-import fs from "fs";
+import { Ranks } from "../../interfaces/PCLTeam";
 import { DiscordCommand } from "../DiscordCommand";
 import { TeamBot } from "../../Bot";
-import * as RegisterTeamEmbeds from "../embeds/RegisterTeamEmbeds";
+import * as Embeds from "../embeds/RegisterTeamEmbeds";
 
 export default class RegisterTeamCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -29,7 +22,7 @@ export default class RegisterTeamCommand extends DiscordCommand {
             .setName("register_team")
             .setDescription("adds your team to the database")
             .addStringOption(new SlashCommandStringOption().setName("team_name").setDescription("the name of your team").setRequired(true))
-            .addBooleanOption(new SlashCommandBooleanOption().setName("confidential").setDescription("is this team visible to others?").setRequired(true))
+            .addBooleanOption(new SlashCommandBooleanOption().setName("confidential").setDescription("set as true if this team is a secret").setRequired(true))
             .addMentionableOption(new SlashCommandMentionableOption().setName("cocap_discord").setDescription("the co-captain of your team"))
             .addStringOption(new SlashCommandStringOption().setName("cocap_oculus").setDescription("use co_cap discord if you can"))
             .addStringOption(
@@ -51,115 +44,74 @@ export default class RegisterTeamCommand extends DiscordCommand {
         const stringResponse = interaction.options.get("cocap_oculus")?.value as string;
         const teamName = interaction.options.get("team_name")?.value as string;
         const confidentiality = interaction.options.get("confidential")?.value as boolean;
-        const player = teamBot.findPCLPlayerByDiscord(interaction.user.id);
-        const registeredTeams: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
-        let captainOnTeamFlag: boolean;
-        let coCaptainOnTeamFlag: boolean;
-        let cocap: PCLPlayer;
-
-        //terminate if user isn't registered
-        if (!player) return interaction.reply({ embeds: [RegisterTeamEmbeds.NotRegisteredError] });
-
-        //terminate if a team shares the same name
-        if (
-            registeredTeams.some((PCLTeam) => {
-                return PCLTeam.name.toLowerCase() == teamName.toLowerCase();
-            })
-        )
-            return interaction.reply({ embeds: [RegisterTeamEmbeds.TeamNameMatchError] });
-
-        if (discordResponse) {
-            cocap = teamBot.findPCLPlayerByDiscord(discordResponse)!;
-        } else if (stringResponse) {
-            cocap = teamBot.findPCLPlayerByOculus(stringResponse)!;
+        const teamRank = interaction.options.get("rank")?.value as string | undefined
+        
+        const player = await teamBot.prisma.player.findFirst({
+            where: {discordId: interaction.user.id},
+            include: {team: true}
+        })
+        if(!player){
+            interaction.reply({embeds: [Embeds.NotRegisteredError], ephemeral: true})
+            return;
         }
-        //terminate if cocap isnt found, and user has provided one
-        if (cocap! === undefined) {
-            if (discordResponse) return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
-            if (stringResponse) return interaction.reply({ embeds: [RegisterTeamEmbeds.CoCapNotRegisteredError] });
+        if(player?.team){
+            interaction.reply({embeds: [Embeds.AlreadyCaptainError], ephemeral: true})
+            return;
         }
-        let team: PCLTeam = {
-            captain: player.discordID,
-            coCap: undefined,
-            players: [player.discordID],
-            rank: undefined,
-            guildID: undefined,
-            isWeeklySchedulingPollsEnabled: undefined,
-            confidential: confidentiality,
-            name: teamName,
-        };
-        if (cocap!) {
-            team.players.push(cocap.discordID);
-            team.coCap = cocap.discordID;
+
+        //determine co cap
+        let coCaptainId: string | undefined = undefined
+        if(discordResponse){
+            coCaptainId = discordResponse;
+        } else if (stringResponse){
+            const potential = await teamBot.prisma.player.findFirst({where: {oculusId: stringResponse}})
+            if(!potential){
+                interaction.reply({embeds: [Embeds.CoCapNotRegisteredError], ephemeral: true})
+                return;
+            }
+            coCaptainId = potential.discordId
         }
-        //determine team rank
-        switch (interaction.options.get("rank")?.value) {
+        
+
+        //determine rank
+        let rank: any = undefined
+        switch(teamRank) {
             case "Gold":
-                team.rank = Ranks.GOLD;
+                rank = Ranks.GOLD
                 break;
             case "Silver":
-                team.rank = Ranks.SILVER;
+                rank = Ranks.SILVER
                 break;
             case "Bronze":
-                team.rank = Ranks.BRONZE;
+                rank = Ranks.BRONZE
+                break;
         }
-        /*determine team guild NOT NEEDED ATM
-        const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("yes").setStyle(ButtonStyle.Success).setLabel("Yes"),
-            new ButtonBuilder().setCustomId("no").setLabel("No").setStyle(ButtonStyle.Danger)
-        );
-        const msg = await interaction.reply({
-            components: [this.actionRows[0] as ActionRowBuilder<ButtonBuilder>],
-            embeds: [RegisterTeamEmbeds.GuildConfirmationEmbed],
-        });
-        const filter: any = (i: ButtonInteraction) => {
-            i.deferUpdate();
-            return i.user.id == interaction.user.id;
-        };
-        let collected = await msg.awaitMessageComponent({ filter: filter, componentType: ComponentType.Button, time: 60000 }).catch();
-
-        //terminate if this is not the teams guild
-        if (collected.customId === "0no") return interaction.followUp({ embeds: [RegisterTeamEmbeds.NotTeamGuildError] });
-        team.guildID = interaction.guild?.id;
-        */
-        //flag if the player is a captain
-        captainOnTeamFlag = registeredTeams.some((PCLTeam) => {
-            return PCLTeam.captain === player.discordID || PCLTeam.coCap === player.discordID;
+        
+        teamBot.prisma.team.create({
+            data: {
+                name: teamName,
+                confidential: confidentiality,
+                rank: rank,
+                players: {
+                    connectOrCreate: {
+                        where: {playerId: interaction.user.id},
+                        create: {
+                            playerId: interaction.user.id,
+                            isCaptain: true,
+                            isCoCap: false
+                        }
+                    }
+                }
+            }
         })
-            ? true
-            : false;
-        coCaptainOnTeamFlag = registeredTeams.some((PCLTeam) => {
-            return PCLTeam.captain === team.coCap || PCLTeam.coCap === team.coCap;
+        .then(async (teamRef) => {
+            await interaction.reply({embeds: [new Embeds.TeamCreateSuccess(teamName, coCaptainId, teamRank)], ephemeral: true})
+            teamBot.prisma.$disconnect()
+        }).catch(() => {
+            interaction.reply({content: "An unexpected error occured", ephemeral: true})
         })
-            ? true
-            : false;
-        //then push the team to registeredTeams
-        registeredTeams.push(team);
-        fs.writeFileSync("./db/teams.json", JSON.stringify(registeredTeams));
-        RegisterTeamEmbeds.TeamCreateSuccess.setFields({
-            name: "Success:",
-            value: `Team **${teamName}** has been created with the following: \n **Co-Captain:** <@${team.coCap}> \n **Rank:** ${
-                interaction.options.get("rank")?.value
-            }`,
-        });
-        await interaction.reply({ embeds: [RegisterTeamEmbeds.TeamCreateSuccess] });
-        if (captainOnTeamFlag)
-            await interaction.channel?.send({
-                embeds: [
-                    RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
-                        name: "Warning",
-                        value: "You are already captain of a team. This isn't breaking anything, just be sure to delete your old team when it's time.",
-                    }),
-                ],
-            });
-        if (coCaptainOnTeamFlag && team.coCap != undefined)
-            await interaction.channel?.send({
-                embeds: [
-                    RegisterTeamEmbeds.MultipleTeamsWarning.setFields({
-                        name: "Warning",
-                        value: "Your Co-Captain is already on a team. This won't break anything, just be sure to have them leave the team when the time comes.",
-                    }),
-                ],
-            });
+        
+        
+        
     }
 }

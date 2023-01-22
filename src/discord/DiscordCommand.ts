@@ -2,8 +2,7 @@ import {
   Client,
   CommandInteraction,
   SlashCommandBuilder,
-  ActionRowBuilder,
-  ButtonBuilder
+  ActionRowBuilder
 } from "discord.js";
 import { TeamBot } from "../Bot";
 

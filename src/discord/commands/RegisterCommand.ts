@@ -1,73 +1,57 @@
 import { Client, CommandInteraction, CacheType, SlashCommandStringOption } from "discord.js";
 import { DiscordCommand } from "../DiscordCommand";
-import fs from "fs";
-import PCLPlayer from "../../interfaces/PCLPlayer";
 import * as Embeds from "../embeds/RegisterEmbeds";
 import { isoculusidClean } from "../../utils/StringSanatizers";
+import { TeamBot } from "../../Bot";
+import { Player } from "@prisma/client";
 
 export default class RegisterCommand extends DiscordCommand {
-    public inDev: boolean = true;
+    public inDev: boolean = false;
     constructor() {
         super();
         this.properties
             .setName("register")
-            .setDescription("registers player and/or team")
+            .setDescription("registers your oculus username")
             .addStringOption(new SlashCommandStringOption().setName("oculusid").setDescription("your oculus username in exact casing").setRequired(true));
     }
 
-    async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>) {
+    async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
         const optionResponse = interaction.options.get("oculusid")?.value as string;
 
         if (!isoculusidClean(optionResponse)) {
-            return interaction.reply({ embeds: [Embeds.InvalidIdError] });
+            return interaction.reply({ embeds: [Embeds.InvalidIdError], ephemeral: true });
         }
 
-        if (interaction.options.get("oculusid")?.value) {
-            const registeredPlayers: PCLPlayer[] = JSON.parse(fs.readFileSync("./db/registeredPlayers.json", "utf-8"));
-            const PCLPLayer = registeredPlayers.find((PCLPlayer) => {
-                return PCLPlayer.discordID === interaction.user.id;
-            });
+            const existingPlayer = await teamBot.prisma.player.findFirst({where: {oculusId: optionResponse}}).then(() => {teamBot.prisma.$disconnect()}) as Player
 
-            //terminate if username already exits
-            if (
-                registeredPlayers.some((PCLPLayer) => {
-                    return PCLPLayer.oculusId.toLowerCase() === optionResponse.toLowerCase();
-                })
-            )
-                return interaction.reply({ embeds: [Embeds.UserNameExistsError] });
-
-            if (PCLPLayer) {
-                //at this point, the user has registered their discord
-                const index = registeredPlayers.indexOf(PCLPLayer);
-
-                if (PCLPLayer.oculusId != optionResponse) {
-                    //user is already registered, but has changed oculus username
-                    registeredPlayers[index].oculusId = optionResponse;
-                    fs.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
-                    await interaction.reply({
-                        embeds: [Embeds.UpdateSuccess.setFields({ name: "Success:", value: `Your username has been updated to **${optionResponse}**` })],
-                    });
-                } else {
-                    //registered user re-registered with the same oculusid
-                    await interaction.reply({
-                        embeds: [Embeds.IdMatchError.setFields({ name: "Failed:", value: "You are already registered with that username!" })],
-                    });
+            if(existingPlayer) {
+                if(existingPlayer.oculusId == optionResponse){
+                    interaction.reply({embeds: [Embeds.IdMatchError], ephemeral: true})
                 }
-            } else {
-                //at this point, the user has not registered their discord
-                registeredPlayers.push({
-                    discordID: interaction.user.id,
-                    oculusId: optionResponse,
-                    isCaptain: undefined,
-                    isCoCap: undefined,
-                    team: undefined,
-                    isBotAdmin: undefined,
-                });
-                fs.writeFileSync("./db/registeredPlayers.json", JSON.stringify(registeredPlayers));
-                await interaction.reply({
-                    embeds: [Embeds.RegisterSuccess.setFields({ name: "Success", value: "Successfully registered as **" + optionResponse + "**" })],
-                });
+                else{
+                    interaction.reply({embeds: [Embeds.UserNameExistsError], ephemeral: true})
+                }
+                return;
             }
+
+            teamBot.prisma.player.upsert({
+                where: {discordId: interaction.user.id},
+                update: {oculusId: optionResponse},
+                create: {
+                    discordId: interaction.user.id,
+                    oculusId: optionResponse
+                },
+            }).then(() => {
+                interaction.reply({embeds: [new Embeds.RegisterSuccess(optionResponse)], ephemeral: true})
+                teamBot.prisma.$disconnect()
+            }).catch(() => {
+                interaction.reply("An unexpected error has occured")
+                teamBot.prisma.$disconnect()
+            })
+            
+        
+            
+            
         }
     }
-}
+

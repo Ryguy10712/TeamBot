@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Team {
+  id                  Int               @id @unique @default(autoincrement())
+  name                String            @unique
+  rank                Int?
+  confidential        Boolean
+  players             TeamPlayer[]
+  availability        TeamAvailability?
+  schedulingChannel   String?           @unique
+  scheduleRequestsOut ScheduleRequest[] @relation("requester")
+  scheduleRequestsIn  ScheduleRequest[] @relation("receiver")
+
+  @@index([name])
+}
+
+model Player {
+  discordId String      @id @unique
+  oculusId  String      @unique
+  team      TeamPlayer?
+
+  @@index([discordId, oculusId])
+}
+
+model TeamPlayer {
+  playerId  String  @id @unique
+  player    Player?  @relation(fields: [playerId], references: [discordId], onDelete: Cascade, onUpdate: Cascade)
+  teamId    Int
+  team      Team    @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  isCaptain Boolean @default(false)
+  isCoCap   Boolean @default(false)
+  tuesday   Json?
+  wednesday Json?
+  thursday  Json?
+  friday    Json?
+  saturday  Json?
+  sunday    Json?
+  monday    Json?
+
+  @@index([teamId])
+}
+
+model ScheduleRequest {
+  id             Int    @id @default(autoincrement())
+  type           Int    @default(0)
+  requesterId    Int
+  receiverId     Int    @map("opponentId")
+  requesterTeam  Team   @relation(name: "requester", fields: [requesterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  receiverTeam   Team   @relation(name: "receiver", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  captainMsgId   String @unique
+  coCaptainMsgId String? @unique
+
+  @@index([requesterId])
+  @@index([receiverId])
+}
+
+model TeamAvailability {
+  teamId    Int    @id @unique
+  team      Team   @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tuesday   String
+  wednesday String
+  thursday  String
+  friday    String
+  saturday  String
+  sunday    String
+  monday    String
+}
+
+model PersistantButtons {
+  id String @id @unique
+}
