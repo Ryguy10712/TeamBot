@@ -1,134 +1,41 @@
 import cron from "node-cron";
 import { TeamBot } from "../Bot";
 import fs from "fs";
-import { PCLTeam } from "../interfaces/PCLTeam";
-import { GuildTextBasedChannel } from "discord.js";
+import { DayOfWeek, PCLTeam } from "../interfaces/PCLTeam";
+import { DefaultRestOptions, GuildTextBasedChannel } from "discord.js";
+import { Prisma } from "@prisma/client";
 
 export async function AvailabilityReset(teamBot: TeamBot) {
-    cron.schedule("0 0 * * 2", async function () { //run every tuesday at 0:00 (12 AM)
-        console.log("cron job is running")
-        const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
-
-        for (const team of teamsDb) {
-            if (!team.availability) return; //team doesn't have availability set up
-
-            const schedChan = (await teamBot.client.channels.fetch(team.schedulingChannel!)) as GuildTextBasedChannel;
-            const REACTIONS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "🕚", "🕛"];
-            //start removing reactions from all the messages
-            for (const messageId of team.availability.messageIds) {
-                schedChan.messages.fetch(messageId).then((message) => {
-                    message.reactions.removeAll().then((message) => {
-                        for (const reaction of REACTIONS) {
-                            message.react(reaction);
+    // 0 0 * * 2
+    cron.schedule("* * * * *", async function () {
+        //run every tuesday at 0:00 (12 AM)
+        teamBot.log("cron job is running", false);
+        const teams = await teamBot.prisma.teamAvailability.findMany({
+            include: { team: { select: { schedulingChannel: true, players: true } } },
+        });
+        const daysOfWeek: DayOfWeek[] = ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "monday"];
+        for (const team of teams) {
+            const schedChan = (await teamBot.client.channels.fetch(team.team.schedulingChannel!)) as GuildTextBasedChannel;
+            if (!schedChan) break;
+            for (const day of daysOfWeek) {
+                teamBot.prisma.teamPlayer.updateMany({
+                    where: { teamId: team.teamId },
+                    data: { tuesday: {}, wednesday: {}, thursday: {}, friday: {}, saturday: {}, sunday: {}, monday: {} },
+                })
+                .then(() => {teamBot.prisma.$disconnect()})
+                const reactions = (await schedChan.messages.fetch(team[day])).reactions.valueOf();
+                for(const i of reactions){
+                    const reaction = i[1]
+                    reaction.users.fetch().then((reactionUsers) => {
+                        for(const reactionUser of reactionUsers){
+                            const user = reactionUser[1]
+                            if(user.id != teamBot.client.user?.id){
+                                reaction.users.remove(user)
+                            }
                         }
-                        message.react("❌");
-                    });
-                });
+                    })
+                }
             }
-            let teamAvailability: PCLTeam["availability"] = {
-                messageIds: [],
-                tuesday: {
-                    "1PM": [],
-                    "2PM": [],
-                    "3PM": [],
-                    "4PM": [],
-                    "5PM": [],
-                    "6PM": [],
-                    "7PM": [],
-                    "8PM": [],
-                    "9PM": [],
-                    "10PM": [],
-                    "11PM": [],
-                    "12PM": [],
-                },
-                wednesday: {
-                    "1PM": [],
-                    "2PM": [],
-                    "3PM": [],
-                    "4PM": [],
-                    "5PM": [],
-                    "6PM": [],
-                    "7PM": [],
-                    "8PM": [],
-                    "9PM": [],
-                    "10PM": [],
-                    "11PM": [],
-                    "12PM": [],
-                },
-                thursday: {
-                    "1PM": [],
-                    "2PM": [],
-                    "3PM": [],
-                    "4PM": [],
-                    "5PM": [],
-                    "6PM": [],
-                    "7PM": [],
-                    "8PM": [],
-                    "9PM": [],
-                    "10PM": [],
-                    "11PM": [],
-                    "12PM": [],
-                },
-                friday: {
-                    "1PM": [],
-                    "2PM": [],
-                    "3PM": [],
-                    "4PM": [],
-                    "5PM": [],
-                    "6PM": [],
-                    "7PM": [],
-                    "8PM": [],
-                    "9PM": [],
-                    "10PM": [],
-                    "11PM": [],
-                    "12PM": [],
-                },
-                saturday: {
-                    "1PM": [],
-                    "2PM": [],
-                    "3PM": [],
-                    "4PM": [],
-                    "5PM": [],
-                    "6PM": [],
-                    "7PM": [],
-                    "8PM": [],
-                    "9PM": [],
-                    "10PM": [],
-                    "11PM": [],
-                    "12PM": [],
-                },
-                sunday: {
-                    "1PM": [],
-                    "2PM": [],
-                    "3PM": [],
-                    "4PM": [],
-                    "5PM": [],
-                    "6PM": [],
-                    "7PM": [],
-                    "8PM": [],
-                    "9PM": [],
-                    "10PM": [],
-                    "11PM": [],
-                    "12PM": [],
-                },
-                monday: {
-                    "1PM": [],
-                    "2PM": [],
-                    "3PM": [],
-                    "4PM": [],
-                    "5PM": [],
-                    "6PM": [],
-                    "7PM": [],
-                    "8PM": [],
-                    "9PM": [],
-                    "10PM": [],
-                    "11PM": [],
-                    "12PM": [],
-                },
-            };
-            teamAvailability.messageIds = team.availability.messageIds
-            team.availability = teamAvailability;
-            fs.writeFileSync("./db/teams.json", JSON.stringify(teamsDb));
         }
     });
 }
