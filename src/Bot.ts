@@ -30,6 +30,7 @@ import { ResetAvailability } from "./discord/commands/admin/ResetAvailability";
 import { RefreshAvailabilityCommand } from "./discord/commands/RefreshAvailability";
 import { PrismaClient } from "@prisma/client";
 import { SlowQuery } from "./utils/ReactionQueue";
+import { HelpCommand } from "./discord/commands/HelpCommand";
 dotenv.config();
 
 export class TeamBot {
@@ -81,7 +82,8 @@ export class TeamBot {
         this.initCommand(new TeamAvailabilityCommand());
         //this.initCommand(new ResetAvailability()); not needed
         //this.initCommand(new RefreshAvailabilityCommand()); deprecated
-
+        this.initCommand(new HelpCommand(this.commands)) //always do this one last
+        
         this.initButton(new ScheduleRequestAcceptButton());
         this.initButton(new ScheduleRequestDenyButton());
     }
