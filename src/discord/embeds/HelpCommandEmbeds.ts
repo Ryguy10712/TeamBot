@@ -107,4 +107,4 @@ class TeamAvailabilityHelpEmbed extends HelpEmbed {
         this.setColor("DarkButNotBlack")
     }
 }
-export const embeds: HelpEmbed[] = [new RegisterTeamHelpEmbed, new ScheduleRequestHelpEmbed, new TeamMenuHelpEmbed]
+export const embeds: HelpEmbed[] = [new RegisterTeamHelpEmbed, new ScheduleRequestHelpEmbed, new TeamMenuHelpEmbed, new TeamAvailabilityHelpEmbed]
