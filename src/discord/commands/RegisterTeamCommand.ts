@@ -6,7 +6,8 @@ import {
     SlashCommandStringOption,
     ButtonBuilder,
     ActionRowBuilder,
-    ButtonStyle, SlashCommandBooleanOption
+    ButtonStyle,
+    SlashCommandBooleanOption,
 } from "discord.js";
 import { Ranks } from "../../interfaces/PCLTeam";
 import { DiscordCommand } from "../DiscordCommand";
@@ -44,74 +45,110 @@ export default class RegisterTeamCommand extends DiscordCommand {
         const stringResponse = interaction.options.get("cocap_oculus")?.value as string;
         const teamName = interaction.options.get("team_name")?.value as string;
         const confidentiality = interaction.options.get("confidential")?.value as boolean;
-        const teamRank = interaction.options.get("rank")?.value as string | undefined
-        
+        const teamRank = interaction.options.get("rank")?.value as string | undefined;
+
         const player = await teamBot.prisma.player.findFirst({
-            where: {discordId: interaction.user.id},
-            include: {team: true}
-        })
-        if(!player){
-            interaction.reply({embeds: [Embeds.NotRegisteredError], ephemeral: true})
+            where: { discordId: interaction.user.id },
+            include: { team: true },
+        });
+        if (!player) {
+            interaction.reply({ embeds: [Embeds.NotRegisteredError], ephemeral: true });
             return;
         }
-        if(player?.team){
-            interaction.reply({embeds: [Embeds.AlreadyCaptainError], ephemeral: true})
+        if (player?.team) {
+            interaction.reply({ embeds: [Embeds.AlreadyCaptainError], ephemeral: true });
             return;
         }
 
         //determine co cap
-        let coCaptainId: string | undefined = undefined
-        if(discordResponse){
+        let coCaptainId: string | undefined = undefined;
+        if (discordResponse) {
             coCaptainId = discordResponse;
-        } else if (stringResponse){
-            const potential = await teamBot.prisma.player.findFirst({where: {oculusId: stringResponse}})
-            if(!potential){
-                interaction.reply({embeds: [Embeds.CoCapNotRegisteredError], ephemeral: true})
+        } else if (stringResponse) {
+            const potential = await teamBot.prisma.player.findFirst({ where: { oculusId: stringResponse } });
+            if (!potential) {
+                interaction.reply({ embeds: [Embeds.CoCapNotRegisteredError], ephemeral: true });
                 return;
             }
-            coCaptainId = potential.discordId
+            coCaptainId = potential.discordId;
         }
-        
 
         //determine rank
-        let rank: any = undefined
-        switch(teamRank) {
+        let rank: any = undefined;
+        switch (teamRank) {
             case "Gold":
-                rank = Ranks.GOLD
+                rank = Ranks.GOLD;
                 break;
             case "Silver":
-                rank = Ranks.SILVER
+                rank = Ranks.SILVER;
                 break;
             case "Bronze":
-                rank = Ranks.BRONZE
+                rank = Ranks.BRONZE;
                 break;
         }
-        
-        teamBot.prisma.team.create({
-            data: {
-                name: teamName,
-                confidential: confidentiality,
-                rank: rank,
-                players: {
-                    connectOrCreate: {
-                        where: {playerId: interaction.user.id},
-                        create: {
-                            playerId: interaction.user.id,
-                            isCaptain: true,
-                            isCoCap: false
-                        }
-                    }
-                }
-            }
-        })
-        .then(async (teamRef) => {
-            await interaction.reply({embeds: [new Embeds.TeamCreateSuccess(teamName, coCaptainId, teamRank)], ephemeral: true})
-            teamBot.prisma.$disconnect()
-        }).catch(() => {
-            interaction.reply({content: "An unexpected error occured", ephemeral: true})
-        })
-        
-        
-        
+
+        if (coCaptainId) {
+            teamBot.prisma.team
+                .create({
+                    data: {
+                        name: teamName,
+                        confidential: confidentiality,
+                        rank: rank,
+                        players: {
+                            connectOrCreate: [
+                                {
+                                    where: { playerId: interaction.user.id },
+                                    create: {
+                                        playerId: interaction.user.id,
+                                        isCaptain: true,
+                                        isCoCap: false,
+                                    },
+                                },
+                                {
+                                    where: { playerId: coCaptainId },
+                                    create: {
+                                        playerId: coCaptainId,
+                                        isCaptain: false,
+                                        isCoCap: true,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                })
+                .then(async (teamRef) => {
+                    await interaction.reply({ embeds: [new Embeds.TeamCreateSuccess(teamName, coCaptainId, teamRank)], ephemeral: true });
+                    await teamBot.prisma.$disconnect();
+                })
+                .catch(() => {
+                    interaction.reply({ content: "An unexpected error occured", ephemeral: true });
+                });
+        } else {
+            teamBot.prisma.team
+                .create({
+                    data: {
+                        name: teamName,
+                        confidential: confidentiality,
+                        rank: rank,
+                        players: {
+                            connectOrCreate: {
+                                where: { playerId: interaction.user.id },
+                                create: {
+                                    playerId: interaction.user.id,
+                                    isCaptain: true,
+                                    isCoCap: false,
+                                },
+                            },
+                        },
+                    },
+                })
+                .then(async (teamRef) => {
+                    await interaction.reply({ embeds: [new Embeds.TeamCreateSuccess(teamName, coCaptainId, teamRank)], ephemeral: true });
+                    await teamBot.prisma.$disconnect();
+                })
+                .catch(() => {
+                    interaction.reply({ content: "An unexpected error occured", ephemeral: true });
+                });
+        }
     }
 }
