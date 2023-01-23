@@ -9,7 +9,7 @@ export class HelpCommand extends DiscordCommand{
 
     constructor(commands: Map<String, DiscordCommand | DiscordContextMenu>){
         super()
-        this.inDev = true
+        this.inDev = false
         this.properties
         .setName("help")
         .setDescription("get more info on the more complicated commands because you dickheads cant figure it out yourselves")
