@@ -30,6 +30,7 @@ class RegisterTeamHelpEmbed extends HelpEmbed {
                 value: "Setting your rank is inessential, but will sort teams in the schedule_request command based on your rank."
             }
         );
+        this.setFooter({text: "**Note:** in order to make schedule reqeusts you must set your scheduling channel using /scheduling_channel"})
     }
 }
 
@@ -43,6 +44,7 @@ class ScheduleRequestHelpEmbed extends HelpEmbed {
             `This is the main feature of teambot. Once you pick a team and select a match type, your opponent will recieve a dm asking for a match. If they accept,
             an informational embed will appear in your scheduling channel containing dates where both you and your opponent have 5 players available. It can be updated on demand.`
         )
+        this.setFooter({text: "**Note:** in order to make schedule reqeusts you must set your scheduling channel using /scheduling_channel"})
     }
 }
 
