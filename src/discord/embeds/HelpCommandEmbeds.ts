@@ -31,6 +31,7 @@ class RegisterTeamHelpEmbed extends HelpEmbed {
             }
         );
         this.setFooter({text: "**Note:** in order to make schedule reqeusts you must set your scheduling channel using /scheduling_channel"})
+        this.setColor("DarkButNotBlack")
     }
 }
 
@@ -45,6 +46,7 @@ class ScheduleRequestHelpEmbed extends HelpEmbed {
             an informational embed will appear in your scheduling channel containing dates where both you and your opponent have 5 players available. It can be updated on demand.`
         )
         this.setFooter({text: "**Note:** in order to make schedule reqeusts you must set your scheduling channel using /scheduling_channel"})
+        this.setColor("DarkButNotBlack")
     }
 }
 
@@ -87,7 +89,22 @@ class TeamMenuHelpEmbed extends HelpEmbed {
                 inline: true
             }
         )
+        this.setColor("DarkButNotBlack")
     }
 }
 
+class TeamAvailabilityHelpEmbed extends HelpEmbed {
+    public id: string;
+    constructor(){
+        super()
+        this.id = "team_availability"
+        this.setTitle("/team_availability")
+        this.setDescription("Gives a detailed description of what your team's availability looks like for the week")
+        this.setFields({
+            name: "Day:",
+            value:"Setting this field will give you a more detailed explanation of who's available __for the given day__"
+        })
+        this.setColor("DarkButNotBlack")
+    }
+}
 export const embeds: HelpEmbed[] = [new RegisterTeamHelpEmbed, new ScheduleRequestHelpEmbed, new TeamMenuHelpEmbed]
