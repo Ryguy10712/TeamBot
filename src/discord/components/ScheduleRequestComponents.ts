@@ -28,7 +28,11 @@ export class TeamListMenu extends SelectMenuBuilder {
             return !teamsInOrder.includes(team);
         });
         teamsInOrder = teamsInOrder.concat(remainingTeams)
-
+        //remove the issuer's team
+        const selfTeamIndex = teamsInOrder.findIndex(team => {
+            return team.id == this.issuerTeam.id
+        })
+        teamsInOrder.splice(selfTeamIndex, 1)
         for(const team of teamsInOrder){
             this.addOptions({
                 label: team.name,

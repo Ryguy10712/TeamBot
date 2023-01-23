@@ -74,7 +74,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
             data: {
                 requesterId: issuerPlayer!.teamId,
                 type: matchType!,
-                receiverId: issuerPlayer!.teamId,
+                receiverId: oppTeam.id,
                 captainMsgId: capMsg.id,
                 coCaptainMsgId: coCapMsg?.id,
 
