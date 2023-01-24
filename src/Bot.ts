@@ -41,8 +41,10 @@ export class TeamBot {
     protected currentLogName: string;
     public readonly prisma: PrismaClient;
     public currentQueue: SlowQuery | null;
+    public maintenanceMode: boolean
 
-    constructor() {
+    constructor(maintenanceMode: boolean) {
+        this.maintenanceMode = maintenanceMode
         this.currentLogName = new Date(Date.now()).toDateString();
         fs.writeFile(`./cache/${this.currentLogName}`, "");
 
@@ -131,7 +133,7 @@ export class TeamBot {
 
 (async () => {
     try {
-        const teamBot = new TeamBot();
+        const teamBot = new TeamBot(true);
         teamBot.start();
     } catch (e) {
         console.error(e);

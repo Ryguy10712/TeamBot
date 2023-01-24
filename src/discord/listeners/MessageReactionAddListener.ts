@@ -1,4 +1,3 @@
-import { UserResolvable } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { availability } from "../../interfaces/PCLTeam";
 import { DiscordListener } from "../DiscordListener";
@@ -46,8 +45,14 @@ export class MessageReactionAddListender extends DiscordListener {
             if(!messageTeam){
                 return;
             }
+            //check to see if bot is in maintenance mode
+            if(teamBot.maintenanceMode){
+                reaction.users.remove(reactionUser.id)
+                reactionUser.send("Your reaction was removed because TeamBot is undergoing maintenance")
+                return;
+            }
             if(reactor?.teamId != messageTeam.teamId){
-                reaction.users.remove(reactionUser as UserResolvable)
+                reaction.users.remove(reactionUser.id)
                 return;
             }
 

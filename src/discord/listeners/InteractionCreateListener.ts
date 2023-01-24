@@ -21,6 +21,12 @@ export class InteractionCreateListener extends DiscordListener {
         }
         //start the listener
         teamBot.client.on("interactionCreate", async (interaction) => {
+            if(interaction.user.id != "758816397399949343" && teamBot.maintenanceMode){
+                if(interaction.isRepliable()){
+                    interaction.reply({content: "TeamBot is currently undergoing maintenance", ephemeral: true})
+                    return;
+                }
+            }
             try {
                 if (interaction.isChatInputCommand()) {
                     teamBot.log(`${interaction.user.username} used ${interaction.commandName}`, false);
