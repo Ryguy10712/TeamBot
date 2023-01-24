@@ -32,7 +32,7 @@ model Player {
 
 model TeamPlayer {
   playerId  String  @id @unique
-  player    Player?  @relation(fields: [playerId], references: [discordId], onDelete: Cascade, onUpdate: Cascade)
+  player    Player? @relation(fields: [playerId], references: [discordId], onDelete: Cascade, onUpdate: Cascade)
   teamId    Int
   team      Team    @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   isCaptain Boolean @default(false)
@@ -49,13 +49,14 @@ model TeamPlayer {
 }
 
 model ScheduleRequest {
-  id             Int    @id @default(autoincrement())
-  type           Int    @default(0)
+  id             Int     @id @default(autoincrement())
+  type           Int     @default(0)
   requesterId    Int
-  receiverId     Int    @map("opponentId")
-  requesterTeam  Team   @relation(name: "requester", fields: [requesterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  receiverTeam   Team   @relation(name: "receiver", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  captainMsgId   String @unique
+  receiverId     Int     @map("opponentId")
+  requesterTeam  Team    @relation(name: "requester", fields: [requesterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  receiverTeam   Team    @relation(name: "receiver", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  accepted       Boolean @default(false)
+  captainMsgId   String  @unique
   coCaptainMsgId String? @unique
 
   @@index([requesterId])

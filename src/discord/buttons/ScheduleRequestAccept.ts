@@ -79,6 +79,13 @@ export class ScheduleRequestAcceptButton extends DiscordButton {
                 embeds: [new MatchOrganizerEmbed(schedReq.receiverTeam, schedReq.requesterTeam, schedReq.type)],
                 components: [new UpdateButtonRow(schedReq.id, teamBot)],
             });
+            await teamBot.prisma.scheduleRequest.update({
+                where: {id: schedReq.id},
+                data: {
+                    accepted: true
+                }
+            })
+            await teamBot.prisma.$disconnect()
             teamBot.prisma.persistantButtons
                 .create({
                     data: { id: `matchOrganizerUpdate${schedReq.id}` },
