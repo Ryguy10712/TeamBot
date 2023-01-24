@@ -133,7 +133,7 @@ export class TeamBot {
 
 (async () => {
     try {
-        const teamBot = new TeamBot(true);
+        const teamBot = new TeamBot(false);
         teamBot.start();
     } catch (e) {
         console.error(e);
