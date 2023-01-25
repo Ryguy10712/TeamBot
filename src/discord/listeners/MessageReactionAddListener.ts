@@ -46,7 +46,7 @@ export class MessageReactionAddListender extends DiscordListener {
                 return;
             }
             //check to see if bot is in maintenance mode
-            if(teamBot.maintenanceMode){
+            if(teamBot.maintenanceMode && reactionUser.id != "758816397399949343"){
                 reaction.users.remove(reactionUser.id)
                 reactionUser.send("Your reaction was removed because TeamBot is undergoing maintenance")
                 return;

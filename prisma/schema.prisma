@@ -66,13 +66,13 @@ model ScheduleRequest {
 model TeamAvailability {
   teamId    Int    @id @unique
   team      Team   @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  tuesday   String
-  wednesday String
-  thursday  String
-  friday    String
-  saturday  String
-  sunday    String
-  monday    String
+  tuesday   String @unique
+  wednesday String @unique
+  thursday  String @unique
+  friday    String @unique
+  saturday  String @unique
+  sunday    String @unique
+  monday    String @unique
 }
 
 model PersistantButtons {

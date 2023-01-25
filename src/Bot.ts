@@ -31,6 +31,7 @@ import { RefreshAvailabilityCommand } from "./discord/commands/RefreshAvailabili
 import { PrismaClient } from "@prisma/client";
 import { SlowQuery } from "./utils/ReactionQueue";
 import { HelpCommand } from "./discord/commands/HelpCommand";
+import { ChannelDeleteListener } from "./discord/listeners/ChannelDeleteListener";
 dotenv.config();
 
 export class TeamBot {
@@ -67,6 +68,7 @@ export class TeamBot {
         this.registerListener(new MessageReactionAddListender());
         this.registerListener(new ReactionRemoveListener());
         this.registerListener(new GuildJoinListener());
+        this.registerListener(new ChannelDeleteListener())
 
         //initializing all commands
         this.initCommand(new RegisterCommand());

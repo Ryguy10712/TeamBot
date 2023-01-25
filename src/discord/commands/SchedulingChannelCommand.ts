@@ -51,10 +51,12 @@ export class SchedulingChannelCommand extends DiscordCommand {
 
         for (const message of messages) {
             for (const reaction of REACTIONS) {
-                message.react(reaction);
+                message.react(reaction).catch(() => {
+                    return;
+                })
             }
-            message.react("❌");
-            message.react("❓");
+            message.react("❌").catch(() => {return});
+            message.react("❓").catch(() => {return;});
         }
 
         try {
@@ -81,7 +83,7 @@ export class SchedulingChannelCommand extends DiscordCommand {
                                 saturday: messages[4].id,
                                 sunday: messages[5].id,
                                 monday: messages[6].id,
-                            }
+                            },
                         },
                     },
                 },
