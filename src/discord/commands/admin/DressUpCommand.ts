@@ -43,7 +43,7 @@ export class DressUpCommand extends DiscordCommand {
             case "status":
                 if(!response){
                     client.user?.setActivity()
-                   
+                    break;
                 } else {
                     client.user?.setActivity({name: response})
                     break;
