@@ -5,7 +5,7 @@ import { GuildTextBasedChannel, Message } from "discord.js";
 
 export async function AvailabilityReset(teamBot: TeamBot) {
     // 0 0 * * 2
-    cron.schedule("4 * * * *", async function () {
+    cron.schedule("0 0 * * 2", async function () {
         //run every tuesday at 0:00 (12 AM)
         teamBot.log("cron job is running", false);
         const teams = await teamBot.prisma.teamAvailability.findMany({
