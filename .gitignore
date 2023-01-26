@@ -3,3 +3,4 @@ dist/
 cache/
 prisma/old.prisma
 db/
+.env
