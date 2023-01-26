@@ -8,6 +8,9 @@ export class ReadyListener extends DiscordListener {
     startListener(teamBot: TeamBot): void {
         teamBot.client.on("ready", async () => {
             console.log("Team Bot is ready")
+            if(teamBot.maintenanceMode){
+                teamBot.client.user?.setActivity({name: "Maintenance..."})
+            }
             //registers commands under the DiscordAPI application
             try{
                 const auth = {"Authorization": `Bot ${process.env.TOKEN}`}
