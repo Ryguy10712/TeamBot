@@ -26,8 +26,8 @@ import { RemoveFromTeamCommand } from "./discord/commands/context/RemoveFromTeam
 import { SetCoCapCommand } from "./discord/commands/context/SetCoCapCommand";
 import { AvailabilityReset } from "./events/AvailabilityReset";
 import { TeamAvailabilityCommand } from "./discord/commands/TeamAvailability";
-import { ResetAvailability } from "./discord/commands/admin/ResetAvailability";
-import { RefreshAvailabilityCommand } from "./discord/commands/RefreshAvailability";
+import { ResetAvailability } from "./discord/commands/admin/ResetAvailability"; //ignore this
+import { RefreshAvailabilityCommand } from "./discord/commands/RefreshAvailability"; //ignore this
 import { PrismaClient } from "@prisma/client";
 import { SlowQuery } from "./utils/ReactionQueue";
 import { HelpCommand } from "./discord/commands/HelpCommand";
