@@ -9,7 +9,6 @@ import {
     ButtonStyle,
     SlashCommandBooleanOption,
 } from "discord.js";
-import { Ranks } from "../../interfaces/PCLTeam";
 import { DiscordCommand } from "../DiscordCommand";
 import { TeamBot } from "../../Bot";
 import * as Embeds from "../embeds/RegisterTeamEmbeds";

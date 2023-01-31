@@ -1,5 +1,4 @@
 import { Client, ButtonInteraction, CacheType, GuildTextBasedChannel, ButtonStyle, DMChannel } from "discord.js";
-import { MatchType } from "../../interfaces/ScheduleRequest";
 import { DiscordButton } from "../DiscordButton";
 import { MatchOrganizerEmbed, UpdateButtonRow } from "../components/RequestAcceptComponents";
 import { RequestRow } from "../components/ScheduleRequestComponents";

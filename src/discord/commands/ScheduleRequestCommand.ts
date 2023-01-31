@@ -2,7 +2,6 @@ import { ButtonInteraction, CacheType, Client, CommandInteraction, ComponentType
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import { MatchTypeRow, RequestRow, TeamListRow } from "../components/ScheduleRequestComponents";
-import { MatchType } from "../../interfaces/ScheduleRequest";
 import { IncomingRequestEmbed, RequestSentEmbed, SchedReqPrimaryEmbed } from "../embeds/ScheduleRequestEmbeds";
 import { UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
 

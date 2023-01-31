@@ -7,7 +7,7 @@ import { PlayerAlreadyOnEmbed, UserNotCaptainOrEmbed } from "../embeds/CommonEmb
 
 export default class TeamConfigCommand extends DiscordCommand {
     public inDev: boolean = false;
-
+    
     constructor() {
         super();
         this.properties.setName("team_menu").setDescription("Edit various aspects of your team");

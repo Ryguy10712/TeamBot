@@ -1,6 +1,5 @@
 import { Client, CommandInteraction, CacheType, EmbedBuilder, SlashCommandStringOption } from "discord.js";
 import { TeamBot } from "../../Bot";
-import { availability, DayOfWeek, time } from "../../interfaces/PCLTeam";
 import { DiscordCommand } from "../DiscordCommand";
 import { Team, TeamPlayer, Prisma } from "@prisma/client";
 

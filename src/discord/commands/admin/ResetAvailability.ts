@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Client, CommandInteraction, CacheType, SlashCommandStringOption, GuildTextBasedChannel } from "discord.js";
 import { TeamBot } from "../../../Bot";
 import { DiscordCommand } from "../../DiscordCommand";

@@ -1,6 +1,5 @@
 import cron from "node-cron";
 import { TeamBot } from "../Bot";
-import { DayOfWeek } from "../interfaces/PCLTeam";
 import { GuildTextBasedChannel, Message } from "discord.js";
 
 export async function AvailabilityReset(teamBot: TeamBot) {

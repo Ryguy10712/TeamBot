@@ -1,5 +1,4 @@
 import { EmbedBuilder } from "discord.js";
-import { MatchType } from "../../interfaces/ScheduleRequest";
 
 export class RequestSentEmbed extends EmbedBuilder {
     constructor(teamName: string){
