@@ -7,7 +7,7 @@ export class DressUpCommand extends DiscordCommand {
     public inDev: boolean;
     constructor() {
         super()
-        this.inDev = true,
+        this.inDev = false,
         this.properties
         .setName("dressup")
         .setDescription("ADMINS ONLY!!!!")
