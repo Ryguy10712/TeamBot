@@ -24,6 +24,10 @@ export class DressUpCommand extends DiscordCommand {
                 name: "Username",
                 value: "username"
             },
+            {
+                name: "Nickname",
+                value: "nickname"
+            }
         )
         const value = new SlashCommandStringOption()
         .setName("value")
@@ -51,6 +55,13 @@ export class DressUpCommand extends DiscordCommand {
                
             case "username":
                 client.user?.setUsername(response)
+                break;
+            case "nickname":
+                if(!interaction.guild){
+                    interaction.reply("This can only be ran inside guilds")
+                } else {
+                    interaction.guild.members.me?.setNickname(response)
+                }
                 break;
         }
         interaction.reply({content: "Success", ephemeral: true})
