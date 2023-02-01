@@ -18,6 +18,8 @@ model Team {
   schedulingChannel   String?           @unique
   scheduleRequestsOut ScheduleRequest[] @relation("requester")
   scheduleRequestsIn  ScheduleRequest[] @relation("receiver")
+  hidesAvailability   Boolean           @default(false)
+  teamRoleId          String?
 
   @@index([name])
 }
