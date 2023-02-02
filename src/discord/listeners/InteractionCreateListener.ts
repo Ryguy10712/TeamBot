@@ -21,7 +21,8 @@ export class InteractionCreateListener extends DiscordListener {
         }
         //start the listener
         teamBot.client.on("interactionCreate", async (interaction) => {
-            if(interaction.user.id != "758816397399949343" && teamBot.maintenanceMode){
+            const isNotRyguy = interaction.user.id != "1070512146347196507" && interaction.user.id != "758816397399949343"
+            if(isNotRyguy && teamBot.maintenanceMode){
                 if(interaction.isRepliable()){
                     interaction.reply({content: "TeamBot is currently undergoing maintenance", ephemeral: true})
                     return;

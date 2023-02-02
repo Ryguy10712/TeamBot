@@ -3,6 +3,7 @@ import { DiscordButton } from "../DiscordButton";
 import { MatchOrganizerEmbed, UpdateButtonRow } from "../components/RequestAcceptComponents";
 import { RequestRow } from "../components/ScheduleRequestComponents";
 import { TeamBot } from "../../Bot";
+import { MatchType } from "../../typings";
 
 export class ScheduleRequestAcceptButton extends DiscordButton {
     public id: string;

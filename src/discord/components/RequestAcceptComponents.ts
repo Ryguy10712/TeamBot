@@ -1,6 +1,7 @@
 import { TeamPlayer } from "@prisma/client";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from "discord.js";
 import { TeamBot } from "../../Bot";
+import { MatchType, DayOfWeek, time, availability } from "../../typings";
 import { MatchOrganizerUpdateButton } from "../buttons/OrganizerUpdate";
 
 type team = {

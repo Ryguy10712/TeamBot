@@ -7,7 +7,8 @@ enum MenuState {
     setCoCap,
     editName,
     confidential,
-    rank
+    rank,
+    availabilityVisibility
 }
 
 //COMPONENTS
@@ -26,27 +27,38 @@ export class TeamConfigMenu extends SelectMenuBuilder {
         this.setOptions([
             {
                 label: "Add player",
-                value: "addPlayer"
+                value: "addPlayer",
+                default: state === MenuState.addPlayer
             },
             {
                 label: "Remove player",
                 value: "removePlayer",
+                default: state === MenuState.removePlayer
             },
             {
                 label: "Set co-captain",
                 value: "setCoCap",
+                default: state === MenuState.setCoCap
             },
             {
                 label: "Edit team name",
                 value: "editName",
+                default: state === MenuState.editName
             },
             {
                 label: "Set team confidentiality",
-                value: "confidential"
+                value: "confidential",
+                default: state === MenuState.confidential
             },
             {
                 label: "Set team rank",
-                value: "rank"
+                value: "rank",
+                default: state === MenuState.rank
+            },
+            {
+                label: "Set team availability visibility",
+                value: "availabilityVisibility",
+                default: state === MenuState.availabilityVisibility
             }
         ])
         //set proper field as the default field

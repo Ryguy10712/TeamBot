@@ -1,5 +1,6 @@
 import { ChannelType } from "discord.js";
 import { TeamBot } from "../../Bot";
+import { DayOfWeek } from "../../typings";
 import { DiscordListener } from "../DiscordListener";
 
 export class ChannelDeleteListener extends DiscordListener {

@@ -54,6 +54,14 @@ export class SetCoCapSuccess extends EmbedBuilder {
     }
 }
 
+export class SetAvailabilityVisibilityEmbed extends EmbedBuilder {
+    constructor(){
+        super()
+        this.setColor("DarkButNotBlack")
+        .setTitle("Set team availability visibility")
+        .setDescription("Disabling this will make it so other teams cannot see what times you guys are available for, but you can still see what they have. This is great if you are an unpleasant person.\n Enabled by default.")
+    }
+}
 //ERROR
 export const NotRegisteredError = new EmbedBuilder().setColor("Red").setTitle("Who even are you?").setFields({
     name: "Failed:",

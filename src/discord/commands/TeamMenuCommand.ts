@@ -7,7 +7,7 @@ import { PlayerAlreadyOnEmbed, UserNotCaptainOrEmbed } from "../embeds/CommonEmb
 
 export default class TeamConfigCommand extends DiscordCommand {
     public inDev: boolean = false;
-    
+
     constructor() {
         super();
         this.properties.setName("team_menu").setDescription("Edit various aspects of your team");
@@ -19,7 +19,7 @@ export default class TeamConfigCommand extends DiscordCommand {
             where: {
                 playerId: interaction.user.id,
                 OR: [{ isCaptain: true }, { isCoCap: true }],
-            }
+            },
         });
         if (!issuer) {
             interaction.reply({ embeds: [new UserNotCaptainOrEmbed()], ephemeral: true });
@@ -41,8 +41,10 @@ export default class TeamConfigCommand extends DiscordCommand {
             return i.user === interaction.user;
         };
         const menuCollector = reply.createMessageComponentCollector({ filter: menuFilter, componentType: ComponentType.StringSelect, time: 120_000 });
+        let selected: string;
         const buttonCollector = reply.createMessageComponentCollector({ filter: buttonFilter, componentType: ComponentType.Button, time: 120_000 });
         menuCollector.on("collect", (menuInteraction) => {
+            selected = menuInteraction.values[0];
             switch (menuInteraction.values[0]) {
                 case "addPlayer":
                     interaction.editReply({ components: [new Components.TeamConfigRow(0), Components.AddPlayerButton], embeds: [Embeds.AddPlayerEmbed] });
@@ -66,6 +68,12 @@ export default class TeamConfigCommand extends DiscordCommand {
                     interaction.editReply({
                         components: [new Components.TeamConfigRow(5), Components.RankButtons],
                         embeds: [Embeds.RankEmbed],
+                    });
+                    break;
+                case "availabilityVisibility":
+                    interaction.editReply({
+                        components: [new Components.TeamConfigRow(6), Components.ConfidentialityButtons],
+                        embeds: [new Embeds.SetAvailabilityVisibilityEmbed()],
                     });
             }
         });
@@ -91,26 +99,27 @@ export default class TeamConfigCommand extends DiscordCommand {
                                 return;
                             }
                             //at this point the username is valid
-                            teamBot.prisma.team.update({
-                                where: { id: issuer.teamId },
-                                data: {
-                                    players: {
-                                        create: {
-                                            playerId: candidate.discordId,
-                                            isCaptain: false,
-                                            isCoCap: false,
+                            teamBot.prisma.team
+                                .update({
+                                    where: { id: issuer.teamId },
+                                    data: {
+                                        players: {
+                                            create: {
+                                                playerId: candidate.discordId,
+                                                isCaptain: false,
+                                                isCoCap: false,
+                                            },
                                         },
                                     },
-                                },
-                            })
-                            .then(() => {
-                                interaction.editReply({ embeds: [Embeds.AddPlayerSuccess] });
-                                teamBot.prisma.$disconnect()
-                            })
-                            .catch(() => {
-                                interaction.editReply("An unexpected error has occured");
-                                teamBot.prisma.$disconnect()
-                            });
+                                })
+                                .then(() => {
+                                    interaction.editReply({ embeds: [Embeds.AddPlayerSuccess] });
+                                    teamBot.prisma.$disconnect();
+                                })
+                                .catch(() => {
+                                    interaction.editReply("An unexpected error has occured");
+                                    teamBot.prisma.$disconnect();
+                                });
                         })
                         .catch(() => {
                             //ignore timeout
@@ -160,17 +169,18 @@ export default class TeamConfigCommand extends DiscordCommand {
                             interaction.editReply({ embeds: [Embeds.PlayerNotOnError] });
                             return;
                         }
-                        teamBot.prisma.teamPlayer.update({
+                        teamBot.prisma.teamPlayer
+                            .update({
                                 where: { playerId: candidate.discordId },
                                 data: { isCoCap: true },
                             })
                             .then(() => {
                                 interaction.editReply({ embeds: [new Embeds.SetCoCapSuccess(response)] });
-                                teamBot.prisma.$disconnect()
+                                teamBot.prisma.$disconnect();
                             })
                             .catch(() => {
                                 interaction.editReply("An unexpected error occured");
-                                teamBot.prisma.$disconnect()
+                                teamBot.prisma.$disconnect();
                             });
                     });
                     break;
@@ -189,11 +199,11 @@ export default class TeamConfigCommand extends DiscordCommand {
                                 })
                                 .then(() => {
                                     interaction.editReply({ embeds: [Embeds.EditNameSuccess] });
-                                    teamBot.prisma.$disconnect()
+                                    teamBot.prisma.$disconnect();
                                 })
                                 .catch(() => {
                                     interaction.editReply("An unexpected error occured");
-                                    teamBot.prisma.$disconnect()
+                                    teamBot.prisma.$disconnect();
                                 });
                         })
                         .catch(() => {
@@ -203,36 +213,54 @@ export default class TeamConfigCommand extends DiscordCommand {
                     break;
 
                 case "teamcfgTrue":
-                    teamBot.prisma.team
-                        .update({
+                    if (selected == "rank") {
+                        teamBot.prisma.team
+                            .update({
+                                where: { id: issuer.teamId },
+                                data: { confidential: true },
+                            })
+                            .then(() => {
+                                interaction.editReply({ embeds: [Embeds.ConfidentialitySuccess] });
+                                teamBot.prisma.$disconnect();
+                            })
+                            .catch(() => {
+                                interaction.editReply("An unexpected error occured");
+                                teamBot.prisma.$disconnect();
+                            });
+                    } else if (selected == "availabilityVisibility") {
+                        teamBot.prisma.team.update({
                             where: { id: issuer.teamId },
-                            data: { confidential: true },
+                            data: { hidesAvailability: false },
                         })
-                        .then(() => {
-                            interaction.editReply({ embeds: [Embeds.ConfidentialitySuccess] });
-                            teamBot.prisma.$disconnect()
-                        })
+                        .then(() => {teamBot.prisma.$disconnect()})
                         .catch(() => {
-                            interaction.editReply("An unexpected error occured");
+                            interaction.editReply("An unexpected error occured")
                             teamBot.prisma.$disconnect()
-                        });
+                        })
+                    }
                     break;
 
                 case "teamcfgFalse":
-                    teamBot.prisma.team
-                        .update({
-                            where: { id: issuer.teamId },
-                            data: { confidential: false },
+                    if (selected == "rank") {
+                        teamBot.prisma.team
+                            .update({
+                                where: { id: issuer.teamId },
+                                data: { confidential: false },
+                            })
+                            .then(() => {
+                                interaction.editReply({ embeds: [Embeds.ConfidentialitySuccess] });
+                                teamBot.prisma.$disconnect();
+                            })
+                            .catch(() => {
+                                interaction.editReply("An unexpected error occured");
+                                teamBot.prisma.$disconnect();
+                            });
+                    } else if (selected == "availabilityVisibility"){
+                        teamBot.prisma.team.update({
+                            where: {id: issuer.teamId},
+                            data: {hidesAvailability: true}
                         })
-                        .then(() => {
-                            interaction.editReply({ embeds: [Embeds.ConfidentialitySuccess] });
-                            teamBot.prisma.$disconnect()
-                        })
-                        .catch(() => {
-                            interaction.editReply("An unexpected error occured");
-                            teamBot.prisma.$disconnect()
-                        });
-                    break;
+                    }
 
                 case "teamcfgGold":
                     teamBot.prisma.team
@@ -242,11 +270,11 @@ export default class TeamConfigCommand extends DiscordCommand {
                         })
                         .then(() => {
                             interaction.editReply({ embeds: [Embeds.RankSuccessEmbed] });
-                            teamBot.prisma.$disconnect()
+                            teamBot.prisma.$disconnect();
                         })
                         .catch(() => {
                             interaction.editReply("An unexpected error occured");
-                            teamBot.prisma.$disconnect()
+                            teamBot.prisma.$disconnect();
                         });
                     break;
 
@@ -258,11 +286,11 @@ export default class TeamConfigCommand extends DiscordCommand {
                         })
                         .then(() => {
                             interaction.editReply({ embeds: [Embeds.RankSuccessEmbed] });
-                            teamBot.prisma.$disconnect()
+                            teamBot.prisma.$disconnect();
                         })
                         .catch(() => {
                             interaction.editReply("An unexpected error occured");
-                            teamBot.prisma.$disconnect()
+                            teamBot.prisma.$disconnect();
                         });
                     break;
 
@@ -274,11 +302,11 @@ export default class TeamConfigCommand extends DiscordCommand {
                         })
                         .then(() => {
                             interaction.editReply({ embeds: [Embeds.RankSuccessEmbed] });
-                            teamBot.prisma.$disconnect()
+                            teamBot.prisma.$disconnect();
                         })
                         .catch(() => {
                             interaction.editReply("An unexpected error occured");
-                            teamBot.prisma.$disconnect()
+                            teamBot.prisma.$disconnect();
                         });
                     break;
             }

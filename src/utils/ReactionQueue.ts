@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { TeamBot } from "../Bot";
+import { availability, DayOfWeek, time } from "../typings";
 
 export class SlowQuery {
     protected prisma: PrismaClient;

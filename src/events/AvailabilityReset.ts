@@ -2,6 +2,7 @@ import cron from "node-cron";
 import { TeamBot } from "../Bot";
 import { DiscordAPIError, GuildTextBasedChannel } from "discord.js";
 import { PrismaClient } from "@prisma/client";
+import { DayOfWeek } from "../typings";
 
 export async function AvailabilityReset(teamBot: TeamBot) {
     // 0 0 * * 2

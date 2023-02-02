@@ -2,6 +2,7 @@ import { Client, CommandInteraction, CacheType, EmbedBuilder, SlashCommandString
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import { Team, TeamPlayer, Prisma } from "@prisma/client";
+import { DayOfWeek, availability, time } from "../../typings";
 
 type team =
     | (Team & {

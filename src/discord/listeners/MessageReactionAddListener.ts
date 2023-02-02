@@ -1,4 +1,5 @@
 import { TeamBot } from "../../Bot";
+import { availability } from "../../typings";
 import { DiscordListener } from "../DiscordListener";
 
 export class MessageReactionAddListender extends DiscordListener {
