@@ -4,7 +4,7 @@ import { DiscordCommand } from "../DiscordCommand";
 import { MatchTypeRow, RequestRow, TeamListRow } from "../components/ScheduleRequestComponents";
 import { IncomingRequestEmbed, RequestSentEmbed, SchedReqPrimaryEmbed } from "../embeds/ScheduleRequestEmbeds";
 import { UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
-import { MatchType } from "../../typings";
+import { MatchType } from "../../types";
 
 export default class ScheduleRequestCommand extends DiscordCommand {
     public inDev: boolean = false;

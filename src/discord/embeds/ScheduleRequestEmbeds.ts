@@ -1,5 +1,5 @@
 import { EmbedBuilder } from "discord.js";
-import { MatchType } from "../../typings";
+import { MatchType } from "../../types";
 
 export class RequestSentEmbed extends EmbedBuilder {
     constructor(teamName: string){

@@ -12,7 +12,7 @@ import {
 import { DiscordCommand } from "../DiscordCommand";
 import { TeamBot } from "../../Bot";
 import * as Embeds from "../embeds/RegisterTeamEmbeds";
-import { Ranks } from "../../typings";
+import { Ranks } from "../../types";
 
 export default class RegisterTeamCommand extends DiscordCommand {
     public inDev: boolean = false;
