@@ -11,6 +11,7 @@
   "scripts": {
     "start": "node ./dist/Bot.js",
     "build": "tsc -p ./tsconfig.json",
+    "watch": "tsc -p ./tsconfig.json --watch",
     "build_and_start": "tsc -p ./tsconfig.json && node ./dist/Bot.js"
   },
   "engines": {
