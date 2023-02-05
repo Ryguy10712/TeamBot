@@ -1,92 +1,15 @@
-import cron from "node-cron";
+import cron, { ScheduledTask } from "node-cron";
 import { TeamBot } from "../Bot";
-import { DiscordAPIError, GuildTextBasedChannel } from "discord.js";
-import { PrismaClient } from "@prisma/client";
+import { DiscordAPIError, GuildTextBasedChannel, userMention } from "discord.js";
+import { PrismaClient, Team, TeamAvailability } from "@prisma/client";
 import { DayOfWeek } from "../types";
 
-export async function AvailabilityReset(teamBot: TeamBot) {
-    const days: DayOfWeek[] = ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "monday"];
-    const teams = await teamBot.prisma.team.findMany({
-        where: { NOT: { schedulingChannel: null }, name: { startsWith: "Divine" } },
-        include: { availability: true },
-    });
-
-    // 0 0 * * 2
-    cron.schedule("0 0 * * 2", async function () {
-        for (const team of teams) {
-            let teamFailed = false;
-            let schedulingChannel: GuildTextBasedChannel;
-            try {
-                schedulingChannel = (await teamBot.client.channels.fetch(team.schedulingChannel!)) as GuildTextBasedChannel;
-                if (!schedulingChannel.viewable) {
-                    throw null;
-                }
-            } catch (err) {
-                teamFailed = true;
-                teamBot.log(`Could not find scheduling channel for (${team.name})`, false);
-                const captain = await teamBot.prisma.teamPlayer.findFirst({
-                    where: { teamId: team.id, isCaptain: true },
-                });
-                const captainDiscord = await teamBot.client.users.fetch(captain!.playerId);
-                captainDiscord.send("When resetting reactions, I could not find your scheduling channel. It is no longer tracked and you must set a new one.");
-                deleteAvailabilityInfo(teamBot.prisma, team.id);
-            } finally {
-                let dayFailed = false; //this will be marked true the bot fails to fetch a single message
-                for (const day of days) {
-                    try {
-                        if (!dayFailed && !teamFailed) {
-                            const msg = await schedulingChannel!.messages.fetch(team.availability![day]);
-                            const reactions = msg.reactions.valueOf().values();
-                            for (const reaction of reactions) {
-                                reaction.users.fetch().then((reactionUsers) => {
-                                    for (const user of reactionUsers.values()) {
-                                        if (user.id != teamBot.client.user!.id) {
-                                            reaction.users.remove(user.id);
-                                        }
-                                    }
-                                });
-                            }
-                            teamBot.prisma.teamPlayer
-                                .updateMany({
-                                    where: { teamId: team.id },
-                                    data: {
-                                        tuesday: {},
-                                        wednesday: {},
-                                        thursday: {},
-                                        friday: {},
-                                        saturday: {},
-                                        sunday: {},
-                                        monday: {},
-                                    },
-                                })
-                                .then(() => {
-                                    teamBot.prisma.$disconnect();
-                                });
-                        }
-                    } catch (err: any) {
-                        dayFailed = true;
-                        if (err instanceof DiscordAPIError) {
-                            console.log(err.message);
-                            if (err.message == "Missing Access") {
-                                console.log(err.cause);
-                                const captain = await teamBot.prisma.teamPlayer.findFirst({
-                                    where: { isCaptain: true, teamId: team.id },
-                                });
-                                const user = await teamBot.client.users.fetch(captain?.playerId!);
-                                user.send(
-                                    "TeamBot had trouble accessing one or more messages in your scheduling channel. The channel is no longer tracked and you will have to set a new one."
-                                );
-                                deleteAvailabilityInfo(teamBot.prisma, team.id);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
+type TeamAndAvailability = Team & {
+    availability: TeamAvailability | null;
+};
 
 async function deleteAvailabilityInfo(prisma: PrismaClient, teamId: number): Promise<boolean> {
+    //this removes info for the entire team
     try {
         await prisma.teamPlayer.updateMany({
             where: { teamId: teamId },
@@ -113,4 +36,85 @@ async function deleteAvailabilityInfo(prisma: PrismaClient, teamId: number): Pro
     } catch {
         return false;
     }
+}
+
+async function checkSchedulingChannel(team: TeamAndAvailability, teamBot: TeamBot): Promise<GuildTextBasedChannel | null> {
+    try {
+        const schedulingChannel = (await teamBot.client.channels.fetch(team.schedulingChannel!)) as GuildTextBasedChannel;
+        if (!schedulingChannel.viewable) {
+            throw null;
+        }
+        return schedulingChannel;
+    } catch {
+        return null;
+    }
+}
+
+async function attemptRemoveReactions(team: TeamAndAvailability, channel: GuildTextBasedChannel, day: DayOfWeek, teamBot: TeamBot): Promise<boolean | DiscordAPIError> {
+    try {
+        const msg = await channel!.messages.fetch(team.availability![day]);
+        const reactions = msg.reactions.valueOf().values();
+        for (const reaction of reactions) {
+            const users = await reaction.users.fetch();
+            for (const user of users.values()) {
+                if (user.id != teamBot.client.user!.id) {
+                    reaction.users.remove(user.id);
+                }
+            }
+        }
+        return true;
+    } catch (err) {
+        return err as DiscordAPIError;
+    }
+}
+
+export function initReactionResetHandle(teamBot: TeamBot): ScheduledTask {
+    // 0 0 * * 2
+    return cron.schedule("* * * * *", async function () {
+        const days: DayOfWeek[] = ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "monday"];
+        const teams = await teamBot.prisma.team.findMany({
+            where: { NOT: { schedulingChannel: null } },
+            include: { availability: true },
+        });
+        console.log("Resetting reactions");
+
+        for (const team of teams) {
+            const channel = await checkSchedulingChannel(team, teamBot);
+            if (!channel) {
+                teamBot.log(`Could not find scheduling channel for (${team.name})`, false);
+                const captain = await teamBot.prisma.teamPlayer.findFirst({
+                    where: { teamId: team.id, isCaptain: true },
+                });
+                const captainDiscord = await teamBot.client.users.fetch(captain!.playerId);
+                captainDiscord.send("When resetting reactions, I could not find your scheduling channel. It is no longer tracked and you must set a new one.");
+                deleteAvailabilityInfo(teamBot.prisma, team.id);
+                return;
+            }
+
+            let reactionRemoveStatus: boolean | DiscordAPIError = true; //this will be marked false the bot fails to fetch a single message
+            for (const day of days) {
+                if (reactionRemoveStatus == false) {
+                    return;
+                }
+
+                if (reactionRemoveStatus instanceof DiscordAPIError) {
+                    if (reactionRemoveStatus.message == "Missing Access") {
+                        teamBot.log(`Could not access messages for ${team.name}`, false);
+                        const captain = await teamBot.prisma.teamPlayer.findFirst({
+                            where: { isCaptain: true, teamId: team.id },
+                        });
+                        const user = await teamBot.client.users.fetch(captain?.playerId!);
+                        user.send(
+                            "TeamBot had trouble accessing one or more messages in your scheduling channel. The channel is no longer tracked and you will have to set a new one."
+                        );
+                        deleteAvailabilityInfo(teamBot.prisma, team.id);
+                        reactionRemoveStatus = false;
+                        return;
+                    }
+                }
+                reactionRemoveStatus = await attemptRemoveReactions(team, channel, day, teamBot);
+                console.log("done");
+            }
+        }
+    });
 }
