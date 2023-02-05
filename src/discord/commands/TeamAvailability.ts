@@ -95,17 +95,16 @@ class TeamAvailabilityEmbed extends EmbedBuilder {
                     inline: true,
                 });
                 const currentField = this.data.fields![i];
-                hourLoop: for (const hour of hours) {
+                for (const hour of hours) {
                     let count = 0;
-                    for (const player of this.issuerTeam!.players) {
+                    playerLoop: for (const player of this.issuerTeam!.players) {
                         const avail = player[day]?.valueOf() as availability;
                         if (avail) {
                             if (avail[hour]) {
                                 count++;
                                 if (count >= 5) {
                                     currentField.value = currentField.value.replace("...", "");
-                                    currentField.value += `${hourmap[hour]}🟢`;
-                                    break hourLoop;
+                                    currentField.value += `${hourmap[hour]}🟢\n`;
                                 }
                             }
                         }
