@@ -105,6 +105,7 @@ class TeamAvailabilityEmbed extends EmbedBuilder {
                                 if (count >= 5) {
                                     currentField.value = currentField.value.replace("...", "");
                                     currentField.value += `${hourmap[hour]}🟢\n`;
+                                    break playerLoop;
                                 }
                             }
                         }
