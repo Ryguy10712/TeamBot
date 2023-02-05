@@ -24,7 +24,7 @@ import { AddToTeamCommand } from "./discord/commands/context/AddToTeamCommand";
 import { GuildJoinListener } from "./discord/listeners/GuildJoinListener";
 import { RemoveFromTeamCommand } from "./discord/commands/context/RemoveFromTeamCommand";
 import { SetCoCapCommand } from "./discord/commands/context/SetCoCapCommand";
-import { AvailabilityReset } from "./events/AvailabilityReset";
+import { initReactionResetHandle } from "./events/AvailabilityReset";
 import { TeamAvailabilityCommand } from "./discord/commands/TeamAvailability";
 import { ResetAvailability } from "./discord/commands/admin/ResetAvailability"; //ignore this
 import { RefreshAvailabilityCommand } from "./discord/commands/RefreshAvailability"; //ignore this
@@ -99,7 +99,7 @@ export class TeamBot {
     async start(): Promise<void> {
         await this.client.login(process.env.TOKEN);
         //initialize cron jobs
-        AvailabilityReset(this);
+        initReactionResetHandle(this);
 
         ///create error logger
         process.on("uncaughtException", (e) => {
