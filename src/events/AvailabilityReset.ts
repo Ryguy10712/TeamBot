@@ -126,6 +126,8 @@ export function initReactionResetHandle(teamBot: TeamBot): ScheduledTask {
                     sunday: {},
                     monday: {}
                 }
+            }).then(() => {
+                teamBot.prisma.$disconnect()
             })
             teamBot.log(`done with ${team.name}`, false)
         }
