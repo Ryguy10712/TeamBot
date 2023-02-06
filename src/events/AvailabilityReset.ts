@@ -8,7 +8,7 @@ type TeamAndAvailability = Team & {
     availability: TeamAvailability | null;
 };
 
-async function deleteAvailabilityInfo(prisma: PrismaClient, teamId: number): Promise<boolean> {
+async function deleteTeamAvailabilityInfo(prisma: PrismaClient, teamId: number): Promise<boolean> {
     //this removes info for the entire team
     try {
         await prisma.teamPlayer.updateMany({
@@ -87,7 +87,7 @@ export function initReactionResetHandle(teamBot: TeamBot): ScheduledTask {
                 });
                 const captainDiscord = await teamBot.client.users.fetch(captain!.playerId);
                 captainDiscord.send("When resetting reactions, I could not find your scheduling channel. It is no longer tracked and you must set a new one.");
-                deleteAvailabilityInfo(teamBot.prisma, team.id);
+                deleteTeamAvailabilityInfo(teamBot.prisma, team.id);
                 return;
             }
 
@@ -107,7 +107,7 @@ export function initReactionResetHandle(teamBot: TeamBot): ScheduledTask {
                         user.send(
                             "TeamBot had trouble accessing one or more messages in your scheduling channel. The channel is no longer tracked and you will have to set a new one."
                         );
-                        deleteAvailabilityInfo(teamBot.prisma, team.id);
+                        deleteTeamAvailabilityInfo(teamBot.prisma, team.id);
                         reactionRemoveStatus = false;
                         return;
                     }
@@ -115,6 +115,19 @@ export function initReactionResetHandle(teamBot: TeamBot): ScheduledTask {
                 reactionRemoveStatus = await attemptRemoveReactions(team, channel, day, teamBot);
                 console.log("done");
             }
+            teamBot.prisma.teamPlayer.updateMany({
+                where: {teamId: team.id},
+                data: {
+                    tuesday: {},
+                    wednesday: {},
+                    thursday: {},
+                    friday: {},
+                    saturday: {},
+                    sunday: {},
+                    monday: {}
+                }
+            })
+            teamBot.log(`done with ${team.name}`, false)
         }
     });
 }
