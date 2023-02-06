@@ -28,6 +28,7 @@ export class SetCoCapCommand extends DiscordContextMenu {
         })
         if(candidate?.playerId == issuer.playerId){
             interaction.reply({content: "You cannot be captain and co captain at the same time", ephemeral: true})
+            return;
         }
         if (candidate?.teamId != issuer.teamId) {
             interaction.reply({ embeds: [new PlayerNotOnUserTeamEmbed()], ephemeral: true });
