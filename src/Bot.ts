@@ -34,6 +34,7 @@ import { HelpCommand } from "./discord/commands/HelpCommand";
 import { ChannelDeleteListener } from "./discord/listeners/ChannelDeleteListener";
 import { MessageDeleteListener } from "./discord/listeners/MessageDeleteListener";
 import { DressUpCommand } from "./discord/commands/admin/DressUpCommand";
+import { SpamBruhvyCommand } from "./discord/commands/SpamBruhvyCommand";
 dotenv.config();
 
 export class TeamBot {
@@ -88,6 +89,7 @@ export class TeamBot {
         this.initCommand(new SetCoCapCommand());
         this.initCommand(new TeamAvailabilityCommand());
         this.initCommand(new DressUpCommand())
+        this.initCommand(new SpamBruhvyCommand())
         //this.initCommand(new ResetAvailability()); not needed
         //this.initCommand(new RefreshAvailabilityCommand()); deprecated
         this.initCommand(new HelpCommand(this.commands)) //always do this one last
