@@ -3,7 +3,7 @@ import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import { MatchTypeRow, RequestRow, TeamListRow } from "../components/ScheduleRequestComponents";
 import { IncomingRequestEmbed, RequestSentEmbed, SchedReqPrimaryEmbed } from "../embeds/ScheduleRequestEmbeds";
-import { UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
+import { DisposedInteraction, UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
 import { MatchType } from "../../types";
 
 export default class ScheduleRequestCommand extends DiscordCommand {
@@ -34,7 +34,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         })
         const row = new TeamListRow(issuerPlayer!.team, teamBot.prisma)
         await row.init()
-        const reply = await interaction.reply({components: [row, new MatchTypeRow], embeds: [new SchedReqPrimaryEmbed]})
+        const reply = await interaction.reply({components: [row, new MatchTypeRow], embeds: [new SchedReqPrimaryEmbed], ephemeral: true})
         let selectedTeam: string | undefined = undefined
         const menuFilter = (i: SelectMenuInteraction) => {
           if (i.deferred || i.customId != "schedreqTeams") return false;
@@ -45,13 +45,19 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         menuCollector.on("collect", menuInteraction => {
           selectedTeam = menuInteraction.values[0].replace("schedreq", "")
         })
+        menuCollector.on("end", () => {
+            if(menuCollector.endReason != "time"){
+                return
+            }
+            interaction.editReply({embeds: [new DisposedInteraction]})
+        })
         //handle button press
         const buttonFilter = (i: ButtonInteraction) => {
             return i.user.id === interaction.user.id
         }
         const buttonInteraction = await reply.awaitMessageComponent({filter: buttonFilter, componentType: ComponentType.Button, time: 120_000}).catch(() => {return}) as ButtonInteraction<CacheType>
-        if(!buttonInteraction) return interaction.followUp("Interaction Disposed") //user did not pick a button
-        if(!selectedTeam) return interaction.followUp("Select a team first")
+        if(!buttonInteraction) return interaction.editReply({embeds: [new DisposedInteraction]}) //user did not pick a button
+        if(!selectedTeam) return interaction.editReply("Select a team first")
         //determine matchType
         let matchType: MatchType;
         if(buttonInteraction.customId === "schedreqMatch") matchType = MatchType.MATCH;
@@ -82,10 +88,10 @@ export default class ScheduleRequestCommand extends DiscordCommand {
             
         }).then(() => {
             teamBot.prisma.$disconnect()
-            buttonInteraction.followUp({embeds: [new RequestSentEmbed(selectedTeam!)], ephemeral: true}) 
+            buttonInteraction.editReply({embeds: [new RequestSentEmbed(selectedTeam!)]}) 
             buttonInteraction.replied = true; //button handler will acknowledge this
         })
-        .catch(() => {interaction.followUp("An unxpected error occured and the schedule request will be terminatd")})
+        .catch(() => {interaction.editReply("An unxpected error occured and the schedule request will be terminatd")})
         //co cap msg id is null if co cap doesnt exist
         
        

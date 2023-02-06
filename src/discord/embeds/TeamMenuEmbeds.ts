@@ -11,16 +11,6 @@ export const AddPlayerEmbed = new EmbedBuilder()
     .setTitle("Add a player")
     .setDescription("Allows you to add a player by their Oculus username")
     .setFooter({text: "You have 2 minutes before this interaction is disposed"});
-
-export const DisposedInteraction = new EmbedBuilder()
-    .setColor("DarkButNotBlack")
-    .setTitle("Moving on...")
-    .addFields(
-        {
-            name: "Warning:",
-            value: "This interaction is no longer available. Make a new one to start fresh."
-        }
-    )
     
 export const RemovePlayerEmbed = new EmbedBuilder()
     .setColor("DarkButNotBlack")

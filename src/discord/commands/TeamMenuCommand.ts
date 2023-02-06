@@ -3,7 +3,7 @@ import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import * as Embeds from "../embeds/TeamMenuEmbeds";
 import * as Components from "../components/TeamMenuComponents";
-import { PlayerAlreadyOnEmbed, UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
+import { DisposedInteraction, PlayerAlreadyOnEmbed, UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
 
 export default class TeamConfigCommand extends DiscordCommand {
     public inDev: boolean = false;
@@ -314,7 +314,7 @@ export default class TeamConfigCommand extends DiscordCommand {
 
         menuCollector.on("end", async () => {
             if (menuCollector.endReason != "time") return;
-            interaction.editReply({ embeds: [Embeds.DisposedInteraction], components: [] });
+            interaction.editReply({ embeds: [new DisposedInteraction], components: [] });
         });
     }
 }

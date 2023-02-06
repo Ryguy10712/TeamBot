@@ -1,5 +1,17 @@
 import { EmbedBuilder } from "discord.js";
 
+export class DisposedInteraction extends EmbedBuilder {
+    constructor(){
+        super()
+        this.setColor("DarkButNotBlack")
+        this.setTitle("Moving on...")
+        this.addFields({
+            name: "Warning",
+            value: "This interaction is no longer available. Make a new one to start fresh."
+        })
+    }
+}
+
 export class UserNotCaptainOrEmbed extends EmbedBuilder{
     constructor(){
         super()
