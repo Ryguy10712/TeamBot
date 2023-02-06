@@ -86,7 +86,7 @@ class TeamAvailabilityEmbed extends EmbedBuilder {
             }
         } else {
             this.setTitle("Availability for this week");
-            const daysOfWeek: DayOfWeek[] = ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "monday"];
+            const daysOfWeek: DayOfWeek[] = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
             const hours: time[] = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
             for (const [i, day] of daysOfWeek.entries()) {
                 this.addFields({

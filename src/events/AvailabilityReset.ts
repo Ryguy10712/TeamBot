@@ -70,8 +70,8 @@ async function attemptRemoveReactions(team: TeamAndAvailability, channel: GuildT
 
 export function initReactionResetHandle(teamBot: TeamBot): ScheduledTask {
     // 0 0 * * 2
-    return cron.schedule("0 0 * * 2", async function () {
-        const days: DayOfWeek[] = ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "monday"];
+    return cron.schedule("0 0 * * 1", async function () {
+        const days: DayOfWeek[] = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
         const teams = await teamBot.prisma.team.findMany({
             where: { NOT: { schedulingChannel: null } },
             include: { availability: true },

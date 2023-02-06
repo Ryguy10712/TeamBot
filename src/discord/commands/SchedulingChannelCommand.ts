@@ -36,13 +36,13 @@ export class SchedulingChannelCommand extends DiscordCommand {
         const messages = [];
         try {
             messages.push(
+                await guildChan.send("Monday"),
                 await guildChan.send("Tuesday"),
                 await guildChan.send("Wednesday"),
                 await guildChan.send("Thursday"),
                 await guildChan.send("Friday"),
                 await guildChan.send("Saturday"),
                 await guildChan.send("Sunday"),
-                await guildChan.send("Monday")
             );
         } catch (e) {
             interaction.followUp({ embeds: [new MissingAccessEmbed()] });
@@ -67,22 +67,23 @@ export class SchedulingChannelCommand extends DiscordCommand {
                     availability: {
                         upsert: {
                             create: {
-                                tuesday: messages[0].id,
-                                wednesday: messages[1].id,
-                                thursday: messages[2].id,
-                                friday: messages[3].id,
-                                saturday: messages[4].id,
-                                sunday: messages[5].id,
-                                monday: messages[6].id,
+                                monday: messages[0].id,
+                                tuesday: messages[1].id,
+                                wednesday: messages[2].id,
+                                thursday: messages[3].id,
+                                friday: messages[4].id,
+                                saturday: messages[5].id,
+                                sunday: messages[6].id,
+                                
                             },
                             update: {
-                                tuesday: messages[0].id,
-                                wednesday: messages[1].id,
-                                thursday: messages[2].id,
-                                friday: messages[3].id,
-                                saturday: messages[4].id,
-                                sunday: messages[5].id,
-                                monday: messages[6].id,
+                                monday: messages[0].id,
+                                tuesday: messages[1].id,
+                                wednesday: messages[2].id,
+                                thursday: messages[3].id,
+                                friday: messages[4].id,
+                                saturday: messages[5].id,
+                                sunday: messages[6].id,
                             },
                         },
                     },
