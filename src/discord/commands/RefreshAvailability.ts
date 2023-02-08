@@ -1,82 +1,95 @@
-//@ts-nocheck
-import { Client, CommandInteraction, CacheType, GuildTextBasedChannel } from "discord.js";
+import { PrismaClient, TeamPlayer } from "@prisma/client";
+import { Client, CommandInteraction, CacheType, GuildTextBasedChannel, MessageReaction, User } from "discord.js";
 import { TeamBot } from "../../Bot";
+import { DayOfWeek, time, availability } from "../../types";
 import { DiscordCommand } from "../DiscordCommand";
-import fs from "fs";
-import { DayOfWeek, PCLTeam } from "../../interfaces/PCLTeam";
-import { UserNotOnTeamEmbed } from "../embeds/CommonEmbeds";
+import { UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
 
-export class RefreshAvailabilityCommand extends DiscordCommand{
+export class RefreshAvailabilityCommand extends DiscordCommand {
     public inDev: boolean;
+    private reactionToTime: {[yes: string]: time}
 
-    constructor(){
-        super()
-        this.inDev = false;
-        this.properties.setName("fix_availability")
-        this.properties.setDescription("only use this if availability appears incorrect")
+    constructor() {
+        super();
+        this.inDev = true;
+        this.properties.setName("fix_availability");
+        this.properties.setDescription("only use this if availability appears incorrect");
+
+        this.reactionToTime = {
+            "1️⃣": "one",
+            "2️⃣": "two",
+            "3️⃣": "three",
+            "4️⃣": "four",
+            "5️⃣": "five",
+            "6️⃣": "six",
+            "7️⃣": "seven",
+            "8️⃣": "eight",
+            "9️⃣": "nine",
+            "🔟": "ten",
+            "🕚": "eleven",
+            "🕛": "twelve",
+        }
     }
-    
+
+    private async filterTeamUsers(users: IterableIterator<User>, teamPlayers: TeamPlayer[]) {
+        const filteredPlayers: TeamPlayer[] = []
+        for await (const user of users){
+            const teamPlayer = teamPlayers.find(player => {
+                return player.playerId == user.id
+            })
+            if(teamPlayer){
+                filteredPlayers.push(teamPlayer)
+            }
+        }
+        return filteredPlayers
+    }
+
+    private async fixReactionInfo(reaction: MessageReaction, filteredUsers: TeamPlayer[], prisma: PrismaClient) {
+        const timeOfEmoji = this.reactionToTime[reaction.emoji.name!]
+        const day = reaction.message.content?.toLowerCase() as DayOfWeek
+        for await (const user of filteredUsers) {
+            let dayInfo = user[day] ? user[day] as availability : {}
+            if(!dayInfo[timeOfEmoji]){
+                dayInfo[timeOfEmoji] = true
+                await prisma.teamPlayer.update({
+                    where: {playerId: user.playerId},
+                    data: {[day]: dayInfo}
+                })
+                prisma.$disconnect()
+            }
+        }
+    }
+
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
         interaction.deferReply({ephemeral: true})
-        const teamsDb: PCLTeam[] = JSON.parse(fs.readFileSync("./db/teams.json", "utf-8"));
-        const issuerTeam = teamsDb.find(pclTeam => {
-            return pclTeam.players.includes(interaction.user.id)
-        })
-
-        if(!issuerTeam){
-            interaction.reply({embeds: [new UserNotOnTeamEmbed], ephemeral: true});
+        const daysOfWeek: DayOfWeek[] = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+        const validReactions = ["1️⃣" , "2️⃣" , "3️⃣" , "4️⃣" , "5️⃣" , "6️⃣" , "7️⃣" , "8️⃣" , "9️⃣" , "🔟" , "🕚" , "🕛"]
+        const issuer = await teamBot.prisma.teamPlayer.findFirst({
+            where: { playerId: interaction.user.id, OR: [{ isCaptain: true }, { isCoCap: true }] },
+            include: { team: { include: { availability: true, players: true }, } },
+        });
+        if (!issuer) {
+            interaction.reply({ embeds: [new UserNotCaptainOrEmbed()], ephemeral: true });
             return;
         }
-        if(!issuerTeam.schedulingChannel){
-            interaction.reply({content: "Your team does not have a scheduling channel", ephemeral: true})
+        if (!issuer.team.schedulingChannel) {
+            interaction.reply({ content: "You must have a scheduling channel to run this command", ephemeral: true });
             return;
         }
-        //end of return stack
 
-        const reactionToTime = {
-            "1️⃣": "1PM",
-            "2️⃣": "2PM",
-            "3️⃣": "3PM",
-            "4️⃣": "4PM",
-            "5️⃣": "5PM",
-            "6️⃣": "6PM",
-            "7️⃣": "7PM",
-            "8️⃣": "8PM",
-            "9️⃣": "9PM",
-            "🔟": "10PM",
-            "🕚": "11PM",
-            "🕛": "12PM",
-        };
-        type validReaction = "1️⃣" | "2️⃣" | "3️⃣" | "4️⃣" | "5️⃣" | "6️⃣" | "7️⃣" | "8️⃣" | "9️⃣" | "🔟" | "🕚" | "🕛";
-        type timeType = "1PM" | "2PM" | "3PM" | "4PM" | "5PM" | "6PM" | "7PM" | "8PM" | "9PM" | "10PM" | "11PM" | "12PM";
-        const reactionArr = ["1️⃣" , "2️⃣" , "3️⃣" , "4️⃣" , "5️⃣" , "6️⃣" , "7️⃣" , "8️⃣" , "9️⃣" , "🔟" , "🕚" , "🕛"]
-        try{
-            const schedChan = await client.channels.fetch(issuerTeam.schedulingChannel) as GuildTextBasedChannel
-            for(const messageId of issuerTeam.availability!.messageIds){
-                const msg = await schedChan.messages.fetch(messageId)
-                const day = msg.content.toLowerCase() as DayOfWeek
-                const reactionCollection = msg.reactions.valueOf();
-                for (const reaction of reactionCollection){
-                    const emoji = reaction[1].emoji.name as validReaction
-                    if(!reactionArr.includes(emoji)) break;
-                    const time = reactionToTime[emoji as validReaction]
-                    const users = await reaction[1].users.fetch()
-                    for(const user of users){
-                        if(user[1].id === teamBot.client.user?.id) break; //teambot reaction
-                        const currentField = issuerTeam.availability![day][time as timeType]
-                        if(!currentField.includes(user[1].id)){
-                            issuerTeam.availability![day][time as timeType].push(user[1].id);
-                        }
-                    }
-                }
+        const schedulingChannel = (await teamBot.client.channels.fetch(issuer.team.schedulingChannel)) as GuildTextBasedChannel;
+        const availability = issuer.team.availability!
+
+        for (const day of daysOfWeek) {
+            const msg = await schedulingChannel.messages.fetch(availability[day]);
+            const reactions = msg.reactions.valueOf().values()
+            
+            for await(const reaction of reactions){
+                const users = (await reaction.users.fetch()).values()
+                const filteredUsers = await this.filterTeamUsers(users, issuer.team.players)
+                this.fixReactionInfo(reaction, filteredUsers, teamBot.prisma);
             }
-            fs.writeFileSync("./db/teams.json", JSON.stringify(teamsDb))
-            interaction.followUp({content: "success"})
-        } catch(e: any) {
-            teamBot.log(e, false)
-            interaction.reply({content: "I cannot access your scheduling channel. Was it deleted? Do I have the right permissions?"})
         }
-       
-        
+        interaction.followUp({content: "Success", ephemeral: true})
     }
 }

@@ -90,8 +90,8 @@ export class TeamBot {
         this.initCommand(new TeamAvailabilityCommand());
         this.initCommand(new DressUpCommand())
         this.initCommand(new SpamBruhvyCommand())
-        //this.initCommand(new ResetAvailability()); not needed
-        //this.initCommand(new RefreshAvailabilityCommand()); deprecated
+        //this.initCommand(new ResetAvailability());
+        this.initCommand(new RefreshAvailabilityCommand());
         this.initCommand(new HelpCommand(this.commands)) //always do this one last
         
         this.initButton(new ScheduleRequestAcceptButton());
