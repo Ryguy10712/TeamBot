@@ -50,6 +50,8 @@ class TeamAvailabilityEmbed extends EmbedBuilder {
             eleven: "11PM",
             twelve: "12PM",
         };
+
+        const countArr = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
         //setting the fields
         if (this.day) {
             for (const yes of Object.values(hourmap)) {
@@ -104,7 +106,13 @@ class TeamAvailabilityEmbed extends EmbedBuilder {
                                 count++;
                                 if (count >= 5) {
                                     currentField.value = currentField.value.replace("...", "");
-                                    currentField.value += `${hourmap[hour]}🟢\n`;
+                                    const emoji = countArr[count - 1]
+                                    if(!emoji){
+                                        currentField.value += `${hourmap[hour]} (${count})\n`
+                                    } else {
+                                        currentField.value += `${hourmap[hour]} ${countArr[count - 1]}\n`;
+                                    }
+                                    
                                     break playerLoop;
                                 }
                             }
