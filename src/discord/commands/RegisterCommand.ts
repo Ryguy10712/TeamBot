@@ -44,7 +44,8 @@ export default class RegisterCommand extends DiscordCommand {
             }).then(() => {
                 interaction.reply({embeds: [new Embeds.RegisterSuccess(optionResponse)], ephemeral: true})
                 teamBot.prisma.$disconnect()
-            }).catch(() => {
+            }).catch((e) => {
+                teamBot.log(e, true)
                 interaction.reply("An unexpected error has occured")
                 teamBot.prisma.$disconnect()
             })
