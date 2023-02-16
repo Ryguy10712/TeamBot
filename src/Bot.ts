@@ -121,6 +121,14 @@ export class TeamBot {
         this.persistentButtons.set(discordButton.id, discordButton);
     }
 
+    isAdmin(userId: string): boolean {
+        if(userId == "758816397399949343") {
+            return true
+        } else {
+            return false;
+        }
+    }
+
     async log(text: Error | string, isError: boolean) {
         let logFile = await fs.readFile(`./cache/${this.currentLogName}`, "utf-8");
         if (isError) {
