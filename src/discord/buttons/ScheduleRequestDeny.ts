@@ -1,6 +1,8 @@
-import { Client, ButtonInteraction, CacheType, ButtonStyle } from "discord.js";
+import { Client, ButtonInteraction, CacheType, ButtonStyle, DMChannel } from "discord.js";
 import { DiscordButton } from "../DiscordButton";
 import { TeamBot } from "../../Bot";
+import { RequestRow } from "../components/ScheduleRequestComponents";
+import { SchedReqState } from "@prisma/client";
 
 export class ScheduleRequestDenyButton extends DiscordButton {
     public id: string;
@@ -31,16 +33,45 @@ export class ScheduleRequestDenyButton extends DiscordButton {
             },
         });
 
+        if (!schedReq) {
+            interaction.reply("This schedule request is no longer available");
+            interaction.message.edit({ components: [new RequestRow(false)] }).catch(async () => {
+                const chan = (await client.channels.fetch(interaction.message.channelId)) as DMChannel;
+                const mess = await chan.messages.fetch(interaction.message.id);
+                mess.edit({ components: [new RequestRow(false)] });
+            });
+            return;
+        }
+
+        if (schedReq.state != "PENDING") {
+            interaction.followUp({ content: `The schedule request has already been ${SchedReqState[schedReq.state].toLowerCase()}`, ephemeral: true });
+            interaction.message.edit({ components: [new RequestRow(false)] }).catch(async () => {
+                const mess = await interaction.message.fetch();
+                mess.edit({ components: [new RequestRow(false)] });
+            });
+            return;
+        }
+
+        interaction.message.edit({ components: [new RequestRow(false)] }).catch(async () => {
+            const mess = await interaction.message.fetch();
+            mess.edit({ components: [new RequestRow(false)] });
+        });
+
         teamBot.prisma.scheduleRequest
-            .delete({
+            .update({
                 where: { id: schedReq?.id },
+                data: {state: "DENIED"}
             })
             .then(() => {
+                interaction.reply("Success")
                 teamBot.prisma.$disconnect();
             });
 
-        teamBot.client.users.send(schedReq?.requesterTeam.players[0].playerId!, `The schedule request against ${schedReq?.receiverTeam.name} has been denied`);
-        teamBot.client.users.send(schedReq?.requesterTeam.players[1].playerId!, `The schedule request against ${schedReq?.receiverTeam.name} has been denied`);
+        if (schedReq?.requesterTeam.players[0]) {
+            teamBot.client.users.send(schedReq?.requesterTeam.players[0].playerId!, `The schedule request against ${schedReq?.receiverTeam.name} has been denied`);
+        }
+        if (schedReq?.requesterTeam.players[1]) {
+            teamBot.client.users.send(schedReq?.requesterTeam.players[1].playerId!, `The schedule request against ${schedReq?.receiverTeam.name} has been denied`);
+        }
     }
-    
 }
