@@ -75,7 +75,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         //evaluate wether or not a co-captain exists
         const opponentCoCaptainUser = oppCoCaptain ? await client.users.fetch(oppCoCaptain.playerId) : null 
         const capMsg = await opponentCaptainUser.send({embeds: [new IncomingRequestEmbed(issuerPlayer?.team.name!, matchType!)], components: [new RequestRow()]})
-        const coCapMsg = opponentCoCaptainUser ? await opponentCoCaptainUser.send({embeds: [new IncomingRequestEmbed(issuerPlayer?.team.name!, matchType!)]}) : null
+        const coCapMsg = opponentCoCaptainUser ? await opponentCoCaptainUser.send({embeds: [new IncomingRequestEmbed(issuerPlayer?.team.name!, matchType!)], components: [new RequestRow()]}) : null
         teamBot.prisma.scheduleRequest.create({
             data: {
                 requesterId: issuerPlayer!.teamId,
