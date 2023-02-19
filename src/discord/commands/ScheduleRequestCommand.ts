@@ -71,11 +71,11 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         }})
         const oppCaptain = oppCapAndCoCap.find(teamPlayer => {return teamPlayer.isCaptain})!
         const oppCoCaptain = oppCapAndCoCap.find(teamPlayer => {return teamPlayer.isCoCap})!
-        const opponentCaptainUser = await client.users.fetch(oppCaptain.playerId)
-        //evaluate wether or not a co-captain exists
-        const opponentCoCaptainUser = oppCoCaptain ? await client.users.fetch(oppCoCaptain.playerId) : null 
-        const capMsg = await opponentCaptainUser.send({embeds: [new IncomingRequestEmbed(issuerPlayer?.team.name!, matchType!)], components: [new RequestRow()]})
-        const coCapMsg = opponentCoCaptainUser ? await opponentCoCaptainUser.send({embeds: [new IncomingRequestEmbed(issuerPlayer?.team.name!, matchType!)], components: [new RequestRow()]}) : null
+        const [capMsg, coCapMsg] = await Promise.all([
+            client.users.send(oppCaptain.playerId, {embeds: [new IncomingRequestEmbed(issuerPlayer?.team.name!, matchType!)], components: [new RequestRow()]}),
+            oppCoCaptain ? client.users.send(oppCoCaptain.playerId, {embeds: [new IncomingRequestEmbed(issuerPlayer?.team.name!, matchType!)], components: [new RequestRow()]}) : null
+        ])
+
         teamBot.prisma.scheduleRequest.create({
             data: {
                 requesterId: issuerPlayer!.teamId,
