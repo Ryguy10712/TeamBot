@@ -2,7 +2,7 @@ import { ButtonInteraction, CacheType, Client, CommandInteraction, ComponentType
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import { MatchTypeRow, RequestRow, TeamListRow } from "../components/ScheduleRequestComponents";
-import { IncomingRequestEmbed, RequestSentEmbed, SchedReqPrimaryEmbed } from "../embeds/ScheduleRequestEmbeds";
+import { AlreadyPendingEmbed, IncomingRequestEmbed, RequestSentEmbed, SchedReqPrimaryEmbed } from "../embeds/ScheduleRequestEmbeds";
 import { DisposedInteraction, UserNotCaptainOrEmbed } from "../embeds/CommonEmbeds";
 import { MatchType } from "../../types";
 
@@ -15,7 +15,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
     }
 
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
-        const issuerPlayer = await teamBot.prisma.teamPlayer.findFirst({where: {playerId: interaction.user.id}, include: {team: true}})
+        const issuerPlayer = await teamBot.prisma.teamPlayer.findFirst({where: {playerId: interaction.user.id}, include: {team: {include: {scheduleRequestsIn: true, scheduleRequestsOut: true}}}})
         //check to see if this person is cap or co-cap of a team
         if(!issuerPlayer?.isCaptain && !issuerPlayer?.isCoCap){
             interaction.reply({embeds: [new UserNotCaptainOrEmbed()], ephemeral: true})
@@ -56,7 +56,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
             return i.user.id === interaction.user.id
         }
         const buttonInteraction = await reply.awaitMessageComponent({filter: buttonFilter, componentType: ComponentType.Button, time: 120_000}).catch(() => {return}) as ButtonInteraction<CacheType>
-        if(!buttonInteraction) return interaction.editReply({embeds: [new DisposedInteraction]}) //user did not pick a button
+        if(!buttonInteraction) return interaction.editReply({embeds: [new DisposedInteraction]}) //user did not press a button
         if(!selectedTeam) return interaction.editReply("Select a team first")
         //determine matchType
         let matchType: MatchType;
@@ -65,6 +65,16 @@ export default class ScheduleRequestCommand extends DiscordCommand {
         if(buttonInteraction.customId === "schedreqScrim") matchType = MatchType.SCRIM;
         //get captain of other team and dm them
         const oppTeam = teams.find(team => {return team.name == selectedTeam})!
+        //see if there is already a pending schedule request with this team
+        const schedReqs = issuerPlayer?.team.scheduleRequestsIn.concat(issuerPlayer.team.scheduleRequestsOut)
+        const schedReqsWithTeam = schedReqs?.filter(schedReq => {
+            return schedReq.receiverId == oppTeam.id || schedReq.requesterId == oppTeam.id
+        })
+        const alreadyPending = schedReqsWithTeam?.some(schedReq => {return schedReq.state == "PENDING"})
+        if(alreadyPending){
+            interaction.editReply({embeds: [new AlreadyPendingEmbed]})
+            return;
+        }
         const oppCapAndCoCap = await teamBot.prisma.teamPlayer.findMany({where: { //query gets both captain and cocaptain
             teamId: oppTeam.id,
             OR: [{isCaptain: true}, {isCoCap: true}]
@@ -88,8 +98,7 @@ export default class ScheduleRequestCommand extends DiscordCommand {
             
         }).then(() => {
             teamBot.prisma.$disconnect()
-            buttonInteraction.editReply({embeds: [new RequestSentEmbed(selectedTeam!)]}) 
-            buttonInteraction.replied = true; //button handler will acknowledge this
+            interaction.editReply({embeds: [new RequestSentEmbed(selectedTeam!)]}) 
         })
         .catch(() => {interaction.editReply("An unxpected error occured and the schedule request will be terminatd")})
         //co cap msg id is null if co cap doesnt exist

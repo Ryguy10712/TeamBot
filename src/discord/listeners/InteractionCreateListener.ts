@@ -8,7 +8,7 @@ import { DiscordContextMenu } from "../DiscordContextMenu";
 export class InteractionCreateListener extends DiscordListener {
     async startListener(teamBot: TeamBot) {
         //SPECIAL CASES
-        const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze", "teamcfgTrue", "teamcfgFalse"];
+        const nonReplyButtonIds = ["teamcfgGold", "teamcfgSilver", "teamcfgBronze", "teamcfgTrue", "teamcfgFalse", "schedreqMatch", "schedreqChallenge", "schedreqScrim"];
         const nonDeferUpdateIds = ["teamcfgAdd", "teamcfgRemove", "teamcfgEdit", "teamcfgCoCap"];
         //get buttons in case of crash and/or restart, and add them to non-replies
         //sort the different kinds of buttons

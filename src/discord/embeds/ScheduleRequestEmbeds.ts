@@ -42,3 +42,15 @@ export class IncomingRequestEmbed extends EmbedBuilder {
     }
 }
 
+export class AlreadyPendingEmbed extends EmbedBuilder {
+    constructor(){
+        super()
+        this.setColor("Orange")
+        this.setTitle("Hold up")
+        this.setFields({
+            name: "Warning:",
+            value: "You already have a pending request with this team. Either accept it, or wait for the other team to deal with it."
+        })
+    }
+}
+
