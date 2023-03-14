@@ -73,5 +73,7 @@ export class ScheduleRequestDenyButton extends DiscordButton {
         if (schedReq?.requesterTeam.players[1]) {
             teamBot.client.users.send(schedReq?.requesterTeam.players[1].playerId!, `The schedule request against ${schedReq?.receiverTeam.name} has been denied`);
         }
+
+        
     }
 }
