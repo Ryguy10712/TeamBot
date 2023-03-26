@@ -129,6 +129,8 @@ export class TeamBot {
         }
     }
 
+    schedule() {}
+
     async log(text: Error | string, isError: boolean) {
         let logFile = await fs.readFile(`./cache/${this.currentLogName}`, "utf-8");
         if (isError) {
