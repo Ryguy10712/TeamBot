@@ -1,5 +1,5 @@
 import { ButtonBuilder, SelectMenuBuilder, ModalBuilder } from "@discordjs/builders";
-import { ActionRowBuilder, ButtonStyle, SelectMenuComponentData, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, ButtonStyle, SelectMenuComponent, TextInputBuilder, TextInputStyle } from "discord.js";
 
 enum MenuState {
     addPlayer,
@@ -62,7 +62,7 @@ export class TeamConfigMenu extends SelectMenuBuilder {
             }
         ])
         //set proper field as the default field
-        const data = this.toJSON() as unknown as SelectMenuComponentData
+        const data = this.toJSON() as unknown as SelectMenuComponent
         data.options!.find(option => {
             return option.value == MenuState[state]
         })!.default = true

@@ -2,7 +2,7 @@
   "dependencies": {
     "@prisma/client": "^4.8.0",
     "@types/node-cron": "^3.0.6",
-    "discord.js": "^14.6.0",
+    "discord.js": "^14.8.0",
     "dotenv": "^16.0.3",
     "node-cron": "^3.0.2",
     "prisma": "^4.8.0",
