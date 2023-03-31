@@ -1,11 +1,11 @@
 import { PrismaClient, Team } from "@prisma/client";
-import { SelectMenuBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } from "discord.js";
+import { StringSelectMenuBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } from "discord.js";
 import { ScheduleRequestAcceptButton } from "../buttons/ScheduleRequestAccept";
 import { ScheduleRequestDenyButton } from "../buttons/ScheduleRequestDeny";
 import { DiscordButton } from "../DiscordButton";
 
 //Components
-export class TeamListMenu extends SelectMenuBuilder {
+export class TeamListMenu extends StringSelectMenuBuilder {
     prisma: PrismaClient;
     issuerTeam: Team;
     constructor(issuerTeam: Team, prisma: PrismaClient) {
@@ -53,7 +53,7 @@ export const AcceptButton = new ButtonBuilder().setCustomId("schedreqAccept").se
 export const DenyButton = new ButtonBuilder().setCustomId("schedreqDeny").setLabel("Decline").setStyle(ButtonStyle.Danger);
 
 //ActionRows
-export class TeamListRow extends ActionRowBuilder<SelectMenuBuilder> {
+export class TeamListRow extends ActionRowBuilder<StringSelectMenuBuilder> {
     team: Team
     prisma: PrismaClient
 

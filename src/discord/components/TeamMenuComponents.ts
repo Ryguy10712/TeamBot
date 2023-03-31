@@ -1,4 +1,4 @@
-import { ButtonBuilder, SelectMenuBuilder, ModalBuilder } from "@discordjs/builders";
+import { ButtonBuilder, StringSelectMenuBuilder, ModalBuilder } from "@discordjs/builders";
 import { ActionRowBuilder, ButtonStyle, SelectMenuComponent, TextInputBuilder, TextInputStyle } from "discord.js";
 
 enum MenuState {
@@ -12,14 +12,14 @@ enum MenuState {
 }
 
 //COMPONENTS
-export class TeamConfigRow extends ActionRowBuilder<SelectMenuBuilder> {
+export class TeamConfigRow extends ActionRowBuilder<StringSelectMenuBuilder> {
     constructor(state: MenuState) {
         super();
         this.setComponents(new TeamConfigMenu(state))
     }
 }
 
-export class TeamConfigMenu extends SelectMenuBuilder {
+export class TeamConfigMenu extends StringSelectMenuBuilder {
     
     constructor(state: MenuState){
         super()
