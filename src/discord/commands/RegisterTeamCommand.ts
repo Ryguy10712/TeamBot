@@ -146,7 +146,8 @@ export default class RegisterTeamCommand extends DiscordCommand {
                     await interaction.reply({ embeds: [new Embeds.TeamCreateSuccess(teamName, coCaptainId, teamRank)], ephemeral: true });
                     await teamBot.prisma.$disconnect();
                 })
-                .catch(() => {
+                .catch((e) => {
+                    teamBot.log(e, true)
                     interaction.reply({ content: "An unexpected error occured", ephemeral: true });
                 });
         }
