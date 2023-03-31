@@ -80,3 +80,16 @@ export const CaptainCoCapMatchError = new EmbedBuilder()
             value: "You cannot be the captain, and the cocaptain of the same team"
         })
         .setColor("Red")
+
+export class UniqueConstraintViolation extends EmbedBuilder {
+    constructor(){
+        super()
+        this.setColor("Red")
+        this.setTitle("Something borked on my end...")
+        this.setFields({
+            name: "Failed",
+            value: "This request contains information that is too similar to another team's information. The team name you gave is probably taken"
+        })
+        this.setFooter({text: "Unique constraint violation"})
+    }
+}

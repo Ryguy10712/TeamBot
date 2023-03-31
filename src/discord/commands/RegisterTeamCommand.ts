@@ -147,8 +147,13 @@ export default class RegisterTeamCommand extends DiscordCommand {
                     await teamBot.prisma.$disconnect();
                 })
                 .catch((e) => {
-                    teamBot.log(e, true)
-                    interaction.reply({ content: "An unexpected error occured", ephemeral: true });
+                    teamBot.log("unique constraint violation when creating team", false)
+                    if(e.code === "P2002"){ //unique constraint failed
+                        interaction.reply({embeds: [new Embeds.UniqueConstraintViolation], ephemeral: true})
+                    } else {
+                        interaction.reply({ content: "An unexpected error occured", ephemeral: true });
+                    }
+                    
                 });
         }
     }
