@@ -35,6 +35,8 @@ import { ChannelDeleteListener } from "./discord/listeners/ChannelDeleteListener
 import { MessageDeleteListener } from "./discord/listeners/MessageDeleteListener";
 import { DressUpCommand } from "./discord/commands/admin/DressUpCommand";
 import { SpamBruhvyCommand } from "./discord/commands/SpamBruhvyCommand";
+import { ScheduleRequestCancelCommand } from "./discord/commands/ScheduleRequestCancelCommand";
+import { MatchResultsCommand } from "./discord/commands/MatchResultsCommand";
 dotenv.config();
 
 export class TeamBot {
@@ -92,6 +94,8 @@ export class TeamBot {
         this.initCommand(new SpamBruhvyCommand())
         //this.initCommand(new ResetAvailability());
         this.initCommand(new RefreshAvailabilityCommand());
+        //this.initCommand(new ScheduleRequestCancelCommand())
+        this.initCommand(new MatchResultsCommand());
         this.initCommand(new HelpCommand(this.commands)) //always do this one last
         
         this.initButton(new ScheduleRequestAcceptButton());
