@@ -1,4 +1,4 @@
-import { Client, CommandInteraction, CacheType, SlashCommandIntegerOption } from "discord.js";
+import { Client, CommandInteraction, CacheType, SlashCommandIntegerOption, SlashCommandBooleanOption } from "discord.js";
 import { TeamBot } from "../../Bot";
 import { DiscordCommand } from "../DiscordCommand";
 import { MatchResultsEmbed } from "../embeds/MatchResultsEmbeds";
@@ -43,6 +43,11 @@ export class MatchResultsCommand extends DiscordCommand {
         .addIntegerOption(opponentEloOption)
         .addIntegerOption(roundsWonOption)
         .addIntegerOption(roundsLostOption)
+        .addBooleanOption(
+            new SlashCommandBooleanOption()
+            .setName("hidden")
+            .setDescription("wether or not the message is hidden")
+        )
     }
 
     async executeInteraction(client: Client<boolean>, interaction: CommandInteraction<CacheType>, teamBot: TeamBot) {
@@ -50,6 +55,7 @@ export class MatchResultsCommand extends DiscordCommand {
         const opponentElo = interaction.options.get("enemy_elo", true).value as number
         const roundsWon = interaction.options.get("rounds_won", true).value as number
         const roundsLost = interaction.options.get("rounds_lost", true).value as number
+        let hidden = interaction.options.get("hidden", false)?.value as boolean
 
         let actualWinPrcnt = roundsWon/(roundsWon + roundsLost)
         
@@ -76,11 +82,13 @@ export class MatchResultsCommand extends DiscordCommand {
         expectedWinPrcnt *= 100
         expectedWinPrcnt = Math.round(expectedWinPrcnt * 10) / 10
         ratingChange = Math.round(ratingChange)
-        leaguePoints = Math.round(leaguePoints)
+        leaguePoints = Math.round(leaguePoints * 10)/10
 
+        if(!hidden){
+            hidden = false
+        }
 
-
-        interaction.reply({embeds: [new MatchResultsEmbed(expectedWinPrcnt, actualWinPrcnt, ratingChange, leaguePoints)], ephemeral: true})
+        interaction.reply({embeds: [new MatchResultsEmbed(expectedWinPrcnt, actualWinPrcnt, ratingChange, leaguePoints)], ephemeral: hidden})
         
 
     }
