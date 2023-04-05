@@ -6,8 +6,8 @@ dotenv.config()
 
 export class ReadyListener extends DiscordListener {
     startListener(teamBot: TeamBot): void {
-        teamBot.client.on("ready", async () => {
-            console.log("Team Bot is ready")
+        teamBot.client.on("ready", async (client) => {
+            console.log(`${client.user.username} is ready`)
             if(teamBot.maintenanceMode){
                 teamBot.client.user?.setActivity({name: "Maintenance..."})
             }
