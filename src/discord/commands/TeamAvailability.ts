@@ -106,12 +106,7 @@ class TeamAvailabilityEmbed extends EmbedBuilder {
                                 count++;
                                 if (count >= 5) {
                                     currentField.value = currentField.value.replace("...", "");
-                                    const emoji = countArr[count - 1]
-                                    if(!emoji){
-                                        currentField.value += `${hourmap[hour]} (${count})\n`
-                                    } else {
-                                        currentField.value += `${hourmap[hour]} ${countArr[count - 1]}\n`;
-                                    }
+                                    currentField.value += `${hourmap[hour]}🟢\n`;
                                     
                                     break playerLoop;
                                 }
