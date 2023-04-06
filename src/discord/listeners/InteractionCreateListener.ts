@@ -60,10 +60,11 @@ export class InteractionCreateListener extends DiscordListener {
                         return;
                     }
                     //not a persitent button, but should have a reply
-                    interaction.deferReply();
+                    interaction.deferReply({ephemeral: true});
+                    interaction.deferred = true;
                     setTimeout(() => {
                         if (!interaction.replied) {
-                            interaction.followUp({ embeds: [new MisunderstoodButtonEmbed(interaction.customId)], ephemeral: true });
+                            interaction.followUp({ embeds: [new MisunderstoodButtonEmbed(interaction.customId)], ephemeral: false });
                             return;
                         }
                     }, 2_700);
@@ -74,6 +75,15 @@ export class InteractionCreateListener extends DiscordListener {
             if (interaction.isModalSubmit()) {
                 teamBot.log(`${interaction.user.username} submit ${interaction.customId}`, false);
             }
+
+            if(interaction.isAutocomplete()){
+                const cmd = teamBot.commands.get(interaction.commandName)
+                if(cmd instanceof DiscordCommand){
+                    cmd.handleAutoComplete(interaction, teamBot)
+                }
+            }
+
+            
         });
     }
 }

@@ -98,3 +98,12 @@ export class PlayerNotOnUserTeamEmbed extends EmbedBuilder {
         //this.setFooter({text: "Nice try"})
     }
 }
+
+export class NoSchedulingChannelEmbed extends EmbedBuilder {
+    constructor(){
+        super()
+        this.setColor("Red")
+        this.setTitle("You must have a scheduling channel to use this command")
+    }
+    
+}
