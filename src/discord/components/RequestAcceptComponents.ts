@@ -73,7 +73,7 @@ export class MatchOrganizerEmbed extends EmbedBuilder {
 
         for (const [i, day] of daysOfWeek.entries()) {
             const currentField = this.data.fields[i];
-            for (const hour of hours) {
+            hourLoop: for (const hour of hours) {
                 const readyPlayers = team.players.filter((player) => {
                     const avail = player[day]?.valueOf() as availability;
                     if (!avail) return false;
@@ -88,7 +88,6 @@ export class MatchOrganizerEmbed extends EmbedBuilder {
                 if (readyPlayers.length >= 5 && readyOppPlayers.length >= 5) {
                     currentField.value = currentField.value.replace("...", "");
                     currentField.value += `${hourmap[hour]}🟢\n`;
-                    break;
                 }
             }
         }
