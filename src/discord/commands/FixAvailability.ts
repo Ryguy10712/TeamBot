@@ -10,7 +10,7 @@ export class FixAvailabilityCommand extends DiscordCommand {
     public inDev: boolean;
     constructor(){
         super()
-        this.inDev = true;
+        this.inDev = false;
         this.properties
         .setName("fix_availability")
         .setDescription("fixes availability if it doesn't seem right")
