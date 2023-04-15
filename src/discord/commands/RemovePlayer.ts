@@ -7,7 +7,7 @@ export class RemovePlayerCommand extends DiscordCommand {
     public inDev: boolean
     constructor(){
         super()
-        this.inDev = true;
+        this.inDev = false;
         this.properties
         .setName("remove_player")
         .setDescription("generates a list of players to remove")
