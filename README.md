@@ -16,5 +16,7 @@ You will need NodeJS to run this bot
 -If you wish to run this bot via an ssh session, you will have to make sure it does not terminate when you logout of SSH. 
 ON LINUX: prefix ```nohup``` to ```npm start```. Full command is ```nohup npm start```
 
+Feel free to DM me with any troubles on discord @ryguy10712
+
 
 
